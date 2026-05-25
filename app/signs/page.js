@@ -4,6 +4,33 @@ import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { SIGNS, S_CATEGORIES, getExplanation, scoreKeywords } from '@/lib/data'
 
+let currentSignAudio = null
+async function speakSignAnswer(text) {
+  if (currentSignAudio) { try { currentSignAudio.pause() } catch {}; currentSignAudio = null }
+  if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
+  try {
+    const res = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voiceId: 'north_m', speed: 0.95 }),
+    })
+    if (!res.ok) throw new Error('TTS ' + res.status)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    currentSignAudio = audio
+    audio.onended = () => { URL.revokeObjectURL(url); if (currentSignAudio === audio) currentSignAudio = null }
+    audio.onerror = () => { URL.revokeObjectURL(url); if (currentSignAudio === audio) currentSignAudio = null }
+    await audio.play()
+  } catch {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const u = new SpeechSynthesisUtterance(text)
+      u.lang = 'en-US'; u.rate = 0.95
+      window.speechSynthesis.speak(u)
+    }
+  }
+}
+
 export default function SignsPage() {
   const [lang, setLang] = useState('zh')
   const [filterCat, setFilterCat] = useState('all')
@@ -97,6 +124,7 @@ export default function SignsPage() {
         <div className="actions">
           <button className="btn btn-primary" onClick={checkAnswer} disabled={!answer.trim()}>✓ Check Answer</button>
           <button className="btn" onClick={() => setResult({ score: null, revealed: true })}>👁 Reveal Answer</button>
+          <button className="btn btn-success btn-sm" onClick={() => speakSignAnswer(`This sign means ${sign.meaning}. As a driver, I should ${sign.action}.`)}>🔊 Hear answer</button>
           <button className="btn btn-sm" onClick={() => { setAnswer(''); setResult(null) }}>Clear</button>
         </div>
 
