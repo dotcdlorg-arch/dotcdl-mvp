@@ -164,4 +164,78 @@ started this at `app/globals.css` lines 358–379. User agreed: "step 1 and 2".
   after the original `.mode-card.selected` rule; in `components/AppShell.js` remove
   the `<nav className="mobile-tabs">...</nav>` block before the closing `</>`.
 
+---
+
+## Session 19 — Strip numbers from homepage + add language selector (2026-05-25)
+
+### Action 38 — Rewrite `app/page.js`: remove numbers, translate, add 5-language picker
+
+**Request:** User asked to remove "140 out of 140 officer Q&A" and "84 out of 84 traffic
+signs" from the main page, delete all numbers on that page (only introduce
+functionalities), keep the last "5 Languages" feature card untouched, and add a
+5-language selection to the main index page.
+
+**File modified:** `app/page.js` (full rewrite — was server component, now client component
+with `'use client'` directive to support language state).
+
+**Content changes (numbers removed):**
+
+- `"140 Officer Q&A"` → `"Officer Q&A"`
+- `"84 Traffic Signs"` → `"Traffic Signs"`
+- Mock Inspection desc `"19-question timed simulation: 14 Q&A + 5 signs, scored and
+  saved to your progress report"` → `"Timed simulated inspection mixing officer Q&A
+  and traffic signs, scored and saved to your progress report"`
+- All other titles/descs preserved verbatim (no other numbers were present on the
+  page in nav, hero, or footer).
+- The 8th feature card (🌍 5 Languages — "Interface in Chinese, Spanish, Hindi,
+  Punjabi, Vietnamese — practice answers in English") is rendered from a separate
+  `FIVE_LANG_CARD` constant and is hardcoded English in every language so it is
+  literally untouched, as requested.
+
+**Language selector added:**
+
+- New `<select>` in the nav, styled to match the dark theme (bg `#1e293b`, border
+  `#334155`, color `#e2e8f0`). Sits to the left of Sign In / Continue Training.
+- `aria-label="Interface language"` for a11y.
+- 6 options: `en` English (default), `zh` 中文, `es` Español, `hi` हिन्दी,
+  `pa` ਪੰਜਾਬੀ, `vi` Tiếng Việt. The "5 languages" referenced in the user's
+  request matches the 5 non-English entries (parity with `components/AppShell.js`
+  `LANGS`); English added so users can return to default.
+- State is `useState('en')` only — no `localStorage` persistence (kept minimal;
+  can be added later if requested).
+
+**Translations added (6 languages × per-locale strings):**
+
+- `T[lang]` object: hero badge, hero h1 (two lines), hero subhead, "Sign In",
+  "Start Free →", "Continue Training →", primary CTA, "Try Drive Mode" CTA,
+  two footer disclaimer lines, brand tagline ("AI Roadside Readiness Training").
+- `FEATURES_BY_LANG[lang]`: per-language titles + descs for the first 7 feature
+  cards (Officer Q&A, Traffic Signs, Listening Drills, AI Pronunciation, Drive
+  Mode, Mock Inspection, Progress Report).
+- Total ~6 × (12 hero/nav/footer strings + 7 × 2 feature strings) ≈ 156 translated
+  strings inline in the file.
+
+**Not changed:**
+
+- `components/AppShell.js` — its own language picker is independent and unchanged.
+- No new files, no new dependencies, no API routes, no middleware changes.
+- No CSS changes (inline styles used to match the existing homepage pattern).
+- All routes / link hrefs unchanged (`/sign-in`, `/sign-up`, `/practice`, `/drive`).
+
+**Verification:**
+
+- `npx next build` → ✓ Compiled successfully in 1970ms. Homepage `/` static-rendered
+  at 27.3 kB / 162 kB First Load JS (up from prior size due to inline translation
+  tables and client-side hydration; acceptable for a single-page marketing route).
+- All 16 routes still build (no regressions to /practice, /signs, /mock, /drive,
+  /report, /sign-in, /sign-up, or any API route).
+- Lint/type-check passed implicitly via `next build`.
+
+**Net diff:** `app/page.js` went from 85 lines → ~240 lines (added translation tables
+and language-picker logic; structure of the rendered tree is otherwise identical).
+
+**Reversal:**
+
+- `git checkout HEAD -- app/page.js` restores the prior server-component version
+  with the original `140` / `84` / `19` numbers and no language selector.
 
