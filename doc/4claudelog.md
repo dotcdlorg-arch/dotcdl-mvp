@@ -1418,3 +1418,112 @@ git add middleware.js doc/4claudelog.md
 git commit -m "Fix __dirname: remove next/server import, use Web standard APIs only"
 git push
 ```
+
+---
+
+## Session 9 — Model config + middleware runtime fix (2026-05-24)
+
+---
+
+### Action 24 — Create `.claude/settings.json` to set default model
+
+**File created:** `.claude/settings.json`
+
+**Request:** User asked how to switch to higher LLM models in the VS Code Claude Code extension, then invoked `/update-config` to apply the change persistently.
+
+**What was done:**
+
+- Explained three ways to switch models: `/model` command, `/config`, and `/fast` toggle.
+- User selected `claude-opus-4-7` (most capable) at project scope.
+- Created `.claude/settings.json`:
+
+```json
+{
+  "model": "claude-opus-4-7"
+}
+```
+
+**Scope:** Project-level — applies to all team members who open this project in Claude Code. Takes effect on next session start.
+
+**Note:** This file will be committed to git. If a personal-only override is preferred, move the setting to `.claude/settings.local.json` (already gitignored in this project).
+
+**Reversal:** Delete `.claude/settings.json`.
+
+---
+
+### Action 25 — Fix middleware runtime crash: `req.nextUrl` and `req.cookies` undefined
+
+**File modified:** `middleware.js`
+
+**Vercel error:**
+```
+500 internal server error
+Middleware 2026-05-25 06:03:08.512 [error] [TypeError: Cannot destructure property
+'pathname' of 'i.nextUrl' as it is undefined.]
+```
+
+**Root cause:**
+
+Vercel runs TWO separate compilations of the middleware source:
+
+1. **Next.js webpack build** — bundles into `.next/server/middleware.js`. This gets a proper `NextRequest` at runtime, so `req.nextUrl` and `req.cookies` work fine.
+2. **Vercel post-build source compilation** — Vercel takes the raw `middleware.js` source and compiles it separately with its own bundler. This compiled version receives a plain Web standard `Request` object, not a `NextRequest`. `nextUrl` and `cookies` are Next.js extensions that do not exist on the standard `Request` interface — both are `undefined` at runtime.
+
+Session 8 fixed the `__dirname` crash by removing the `import { NextResponse } from 'next/server'` line (which was causing Vercel's bundler to pull in Node.js-dependent code). But it still used `req.nextUrl` and `req.cookies`, which are `NextRequest`-only properties. Those crash in Vercel's runtime for the same reason.
+
+**Fix — two substitutions using only Web standard APIs:**
+
+| Before | After | Why |
+|--------|-------|-----|
+| `const { pathname } = req.nextUrl` | `const { pathname } = new URL(req.url)` | `req.url` is a standard `Request` property; `URL` is a Web global |
+| `req.cookies.has('__session')` | `req.headers.get('cookie').includes('__session=')` | `req.headers` is standard; `cookies` is Next.js-only |
+
+**Full before/after:**
+
+Before:
+```js
+export default function middleware(req) {
+  const { pathname } = req.nextUrl
+  if (PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))) {
+    if (!req.cookies.has('__session')) {
+      if (pathname.startsWith('/api/')) return new Response('Unauthorized', { status: 401 })
+      return Response.redirect(new URL('/sign-in', req.url))
+    }
+  }
+  // returning undefined passes the request through to the route handler
+}
+```
+
+After:
+```js
+export default function middleware(req) {
+  const { pathname } = new URL(req.url)
+  if (PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))) {
+    const cookie = req.headers.get('cookie') || ''
+    if (!cookie.includes('__session=')) {
+      if (pathname.startsWith('/api/')) return new Response('Unauthorized', { status: 401 })
+      return Response.redirect(new URL('/sign-in', req.url))
+    }
+  }
+}
+```
+
+Also removed the trailing comment (`// returning undefined...`) — no longer needed since the behavior is the same (implicit `undefined` return).
+
+**Build verified:** ✅
+```
+✓ Compiled successfully
+ƒ Middleware  25.8 kB
+```
+
+**Reversal:** Revert the two substitutions above. Not recommended — reverting restores the crash.
+
+---
+
+## Session 9 Deployment Instructions
+
+```bash
+git add middleware.js .claude/settings.json doc/4claudelog.md
+git commit -m "Fix middleware: use URL(req.url) and headers cookie — req.nextUrl/cookies are NextRequest-only"
+git push
+```

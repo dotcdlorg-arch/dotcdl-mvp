@@ -10,14 +10,14 @@ const PROTECTED = [
 ]
 
 export default function middleware(req) {
-  const { pathname } = req.nextUrl
+  const { pathname } = new URL(req.url)
   if (PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))) {
-    if (!req.cookies.has('__session')) {
+    const cookie = req.headers.get('cookie') || ''
+    if (!cookie.includes('__session=')) {
       if (pathname.startsWith('/api/')) return new Response('Unauthorized', { status: 401 })
       return Response.redirect(new URL('/sign-in', req.url))
     }
   }
-  // returning undefined passes the request through to the route handler
 }
 
 export const config = {
