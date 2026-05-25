@@ -403,8 +403,10 @@ export default function DrivePage() {
     if (idx < 0 || idx >= list.length) return
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }
     if (typeof window !== 'undefined') window.speechSynthesis.cancel()
+    const q = list[idx]
     setQIdx(idx)
-    speak(list[idx].officer_question_en, null)
+    setConvHistory(prev => [...prev, { role: 'officer', text: q.officer_question_en }])
+    speak(q.officer_question_en, null)
   }
 
   async function startListening() {
@@ -666,7 +668,10 @@ export default function DrivePage() {
         {!isAutoConv && driverState === 'idle' && currentQ && qIdx < questions.length && (
           <div className="card" style={{ textAlign: 'center', padding: '20px' }}>
             <div style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: 10 }}>{dt(lang, 'yourTurn')}</div>
-            <div className="q-officer" style={{ marginBottom: 16 }}>{currentQ.officer_question_en}</div>
+            <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>
+              💡 {dt(lang, 'perfectAns')}
+            </div>
+            <div className="q-officer" style={{ marginBottom: 16, color: 'var(--green)' }}>{currentQ.simple_driver_answer_en}</div>
             <div className="flex-c" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
               <button className="btn btn-sm" onClick={() => gotoQuestion(qIdx - 1)} disabled={qIdx === 0}>
                 {dt(lang, 'prev')}

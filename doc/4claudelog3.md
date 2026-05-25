@@ -199,3 +199,100 @@ questions without recording, mirroring the mock page's Prev/Next).
 
 - `git checkout HEAD~ -- app/drive/page.js` reverts the i18n keys,
   helper, and button row.
+
+---
+
+### Action 47 — Drive conversation: fix frozen officer field + wrong "Your turn" content
+
+**Request:** After Action 46, user reported two bugs:
+1. The "officer question field is freeze and did not change to new
+   question" when navigating with Prev/Next — the conversation
+   thread at the top of the page stayed showing only the originally
+   spoken questions, not the one the user navigated to.
+2. The "Your turn" card was showing the new question text again
+   ("wrong information of new question instead of suggest answer").
+   User wants to see the suggested/model answer there so they can
+   read it and practice repeating it.
+
+**File modified:** `app/drive/page.js`
+
+**Changes:**
+
+1. **`gotoQuestion(idx)` now appends to `convHistory`** — the
+   helper was only updating `qIdx` and re-playing the audio, but
+   never adding the new officer message to the chronological
+   thread. Now it does, matching what `askQuestion` does on
+   auto-advance:
+   ```js
+   const q = list[idx]
+   setQIdx(idx)
+   setConvHistory(prev => [...prev, { role: 'officer', text: q.officer_question_en }])
+   speak(q.officer_question_en, null)
+   ```
+   When the user clicks Prev or Next, the new officer message bubble
+   appears in the thread, so they can see the question that's being
+   asked. (Yes, repeated nav clicks can produce duplicate officer
+   bubbles in the thread — that's an acceptable trade. The thread
+   is a chronological "what was asked" log, not a deduped view.
+   Reversal note in Action 46 covered the previous design choice.)
+
+2. **"Your turn" card now shows model answer, not the question.**
+   The idle controls card was rendering `currentQ.officer_question_en`
+   under the "Your turn" label — duplicating the question that was
+   already in the thread above. Swapped it to show the suggested
+   answer with the standard "💡 perfectAns" label (reusing the
+   already-translated `perfectAns` key from `DT`):
+   ```jsx
+   <div style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: 10 }}>{dt(lang, 'yourTurn')}</div>
+   <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>
+     💡 {dt(lang, 'perfectAns')}
+   </div>
+   <div className="q-officer" style={{ marginBottom: 16, color: 'var(--green)' }}>{currentQ.simple_driver_answer_en}</div>
+   ```
+   - Green tint distinguishes the model answer from the officer's
+     question shown in the thread above.
+   - Reuses the existing `perfectAns` translation key — already
+     localized to all 7 languages (en/zh/es/hi/pa/vi) — so no new
+     i18n entries needed.
+   - The 🔊 Hear answer button still plays this same model answer
+     text; user can now both read AND hear what they should say.
+
+**Design notes:**
+
+- **Why duplicating into convHistory is OK:** The conversation
+  thread is the log of the practice session, not a deduped state.
+  If the user navigates Q1 → Q2 → Q1, seeing "officer asked Q1,
+  then Q2, then Q1 again" is accurate and matches what the audio
+  did. Re-recording answers on revisited questions remains valid —
+  each driver bubble still pairs with the most recent officer
+  bubble visually.
+- **Why not delete the duplicate-prevention logic from Action 46:**
+  Because there wasn't any — Action 46 simply didn't append at all,
+  which produced the "frozen field" bug. Action 47 reverses that
+  design decision: append is the correct behavior.
+
+**Not changed:**
+
+- `askQuestion`, `scoreAndAdvance`, scenario picker, voice card,
+  auto-loop card, result card.
+- The Prev / Next button row itself, button labels, disabled-state
+  logic — all from Action 46 still works as designed.
+
+**Verification:**
+
+- `npx next build` → ✓ 16/16 routes. `/drive` 8.69 → 8.72 kB
+  (+0.03 kB for the new label div + answer color).
+- Manual flow:
+  - Start a scenario → conv thread shows officer Q1, idle card
+    shows "💡 Model answer: <Q1 answer in green>".
+  - Click Next → thread appends officer Q2, idle card updates to
+    show Q2's model answer. Question audio plays. ✓ no longer
+    frozen.
+  - Click Prev → thread appends officer Q1, idle card updates to
+    show Q1's model answer. ✓ correct content in correct field.
+  - Tap to record → driver bubble appears, qIdx advances, askQuestion
+    appends Q(n+1) — flow integrates cleanly with manual nav.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/drive/page.js` reverts both fixes.
