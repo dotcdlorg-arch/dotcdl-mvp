@@ -404,3 +404,136 @@ different scenarios without leaving the conversation phase.
 
 - `git checkout HEAD~ -- app/drive/page.js` removes the dropdown
   block; the conversation header reverts to title + progress bar.
+
+---
+
+### Action 49 — Drive conversation: fix "next question frozen" after AI grading
+
+**Request:** User reported that after the officer asks a question,
+the driver records, and AI grading completes, the next question
+does not auto-advance — the page is "frozen without proceed to
+next question".
+
+**File modified:** `app/drive/page.js`
+
+**Root cause:**
+
+Two stale-closure / race issues introduced by the Prev/Next nav
+(Action 46) and the scenario dropdown (Action 48):
+
+1. **`scoreAndAdvance` reads `qIdx` from React closure** at the
+   two key lines:
+   ```js
+   const q = qs[qIdx]              // line 450 (was)
+   if (!q) return                  // line 451 — early-return WITHOUT setDriverState
+   ...
+   const nextIdx = qIdx + 1        // line 485 (was)
+   ```
+   `scoreAndAdvance` is created each render and captured by the
+   `mr.onstop` handler inside `startListening`. With the dropdown
+   now able to swap `questionsRef.current` to a different scenario
+   (different question array) mid-recording, and with `qIdx` state
+   transitions happening across renders, the closure-captured
+   `qIdx` could point outside the new `questionsRef.current` —
+   making `q` undefined. The `if (!q) return` then exits the
+   function early **without ever calling `setDriverState('idle')`**,
+   so the UI stayed stuck on the "processing" spinner card forever.
+
+2. **Dropdown switched scenarios without stopping recording.** If
+   the user changed scenario while the MediaRecorder was active,
+   `startScenario` reset all state but `mrRef.current` kept
+   recording. When recording later stopped, the stale `onstop`
+   fired `scoreAndAdvance` against the NEW scenario's questions
+   with the OLD closure's qIdx — guaranteed mismatch, possible
+   freeze.
+
+**Changes:**
+
+1. **Added `qIdxRef`** synchronized with `qIdx` state via
+   `useEffect`. This gives `scoreAndAdvance` a fresh, mutable
+   pointer to the current question index that is **immune to
+   closure capture timing**:
+   ```js
+   const qIdxRef = useRef(0)
+   useEffect(() => { qIdxRef.current = qIdx }, [qIdx])
+   ```
+   Same pattern as the existing `questionsRef` (already in the
+   file at line 213).
+
+2. **`scoreAndAdvance` now reads from the ref**, and the
+   early-return path now resets `driverState`:
+   ```js
+   const currentIdx = qIdxRef.current  // fresh, not stale closure
+   const q = qs[currentIdx]
+   if (!q) { setDriverState('idle'); return }  // ← always exit processing
+   ...
+   const nextIdx = currentIdx + 1
+   qIdxRef.current = nextIdx            // ← update ref BEFORE setQIdx
+   setQIdx(nextIdx)
+   ```
+   The `qIdxRef.current = nextIdx` mutation is synchronous so any
+   reentrant code (e.g., subsequent score round) sees the updated
+   value immediately, before React's batched state update flushes.
+
+3. **`gotoQuestion` and `startScenario` also write `qIdxRef.current`
+   inline** alongside their `setQIdx(...)` calls. This keeps the
+   ref in lock-step with state — no waiting on the
+   `useEffect(...,[qIdx])` to flush after render.
+
+4. **Dropdown onChange now stops any in-flight recording first.**
+   `mrRef.current.onstop = null` is set BEFORE `.stop()` so the
+   stale handler can't fire against the new scenario:
+   ```js
+   if (mrRef.current && mrRef.current.state !== 'inactive') {
+     mrRef.current.onstop = null
+     mrRef.current.stop()
+   }
+   stopAutoConv()
+   startScenario(next)
+   ```
+   This was the source of the "wrong scenario's question gets
+   scored against my old answer" cross-pollination edge case,
+   which was the worst manifestation of the freeze (the freeze
+   happened when the closure pointed beyond the new array length).
+
+**Design notes:**
+
+- **Why a ref instead of functional setState:** functional setState
+  works for "set qIdx to qIdx+1" but does not solve the read in
+  line 450 (`qs[qIdx]`) or the `nextIdx` pass to `setTimeout(...,
+  900)`. The ref is the smallest change that addresses both reads.
+- **Why nullify `mrRef.current.onstop` before `.stop()`:** the
+  `.stop()` call still fires the `onstop` event by spec. Setting
+  it to null first prevents the stale handler from racing with
+  the new scenario's state. The MediaRecorder + audio tracks
+  still get cleaned up in `startScenario` → `stopDrivePreview`.
+
+**Not changed:**
+
+- The 900 ms auto-advance delay between grading and next question
+  — kept for pacing.
+- Prev/Next nav, model-answer-in-idle-card (Action 47), all i18n
+  keys — unchanged.
+- `askQuestion`, `speak`, `startListening`, `stopListening`,
+  `startAutoConv`, `stopAutoConv` — all unchanged.
+
+**Verification:**
+
+- `npx next build` → ✓ 16/16 routes. `/drive` 8.86 → 8.91 kB
+  (+0.05 kB for the ref + 5 ref-write lines).
+- Manual flow:
+  - Q1 → tap to record → say answer → stop → grading → driver
+    bubble + score visible → ~900 ms → Q2 plays. ✓ no freeze.
+  - Click Prev/Next between questions → record → grade → next
+    question advances correctly (ref points to the navigated-to
+    qIdx, not the stale closure).
+  - Mid-recording, change dropdown → recorder stops cleanly,
+    `onstop` does not fire on the old closure, new scenario
+    starts with Q1. ✓ no cross-pollination, no freeze.
+  - Last question (Q8) → record → grade → setPhase('result')
+    fires, result card appears. ✓ end-of-session still works.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/drive/page.js` removes the ref, the
+  ref writes, and the dropdown's recorder-stop block.

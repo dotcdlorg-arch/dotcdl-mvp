@@ -217,6 +217,7 @@ export default function DrivePage() {
   const mrRef = useRef(null)
   const audioRef = useRef(null)
   const questionsRef = useRef([])
+  const qIdxRef = useRef(0)
   const autoPlayRef = useRef(false)
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
   const autoConvRef = useRef(false)
@@ -225,6 +226,7 @@ export default function DrivePage() {
 
   // Keep questionsRef in sync so askQuestion closure always has fresh list
   useEffect(() => { questionsRef.current = questions }, [questions])
+  useEffect(() => { qIdxRef.current = qIdx }, [qIdx])
 
   // ── Real human TTS via OpenAI API ─────────────────────────
   const speak = useCallback(async (text, onEnd) => {
@@ -383,6 +385,7 @@ export default function DrivePage() {
     setSelectedScenario(scenario)
     setQuestions(final)
     questionsRef.current = final
+    qIdxRef.current = 0
     setQIdx(0)
     setConvHistory([])
     setSessionScores([])
@@ -404,6 +407,7 @@ export default function DrivePage() {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }
     if (typeof window !== 'undefined') window.speechSynthesis.cancel()
     const q = list[idx]
+    qIdxRef.current = idx
     setQIdx(idx)
     setConvHistory(prev => [...prev, { role: 'officer', text: q.officer_question_en }])
     speak(q.officer_question_en, null)
@@ -447,8 +451,9 @@ export default function DrivePage() {
 
   async function scoreAndAdvance(text) {
     const qs = questionsRef.current
-    const q = qs[qIdx]
-    if (!q) return
+    const currentIdx = qIdxRef.current
+    const q = qs[currentIdx]
+    if (!q) { setDriverState('idle'); return }
     let scoreResult = { score: 0, feedback: null, wordScores: null }
     try {
       const res = await fetch('/api/score', {
@@ -482,7 +487,8 @@ export default function DrivePage() {
       body: JSON.stringify({ questionCode: q.question_code, status: 'viewed', lastScore: scoreResult.score, lastTranscript: text })
     }).catch(() => {})
 
-    const nextIdx = qIdx + 1
+    const nextIdx = currentIdx + 1
+    qIdxRef.current = nextIdx
     setQIdx(nextIdx)
     if (nextIdx < qs.length) {
       setTimeout(() => askQuestion(nextIdx, qs), 900)
@@ -601,6 +607,10 @@ export default function DrivePage() {
               onChange={e => {
                 const next = SCENARIOS.find(s => s.id === e.target.value)
                 if (next && next.id !== selectedScenario?.id) {
+                  if (mrRef.current && mrRef.current.state !== 'inactive') {
+                    mrRef.current.onstop = null
+                    mrRef.current.stop()
+                  }
                   stopAutoConv()
                   startScenario(next)
                 }
