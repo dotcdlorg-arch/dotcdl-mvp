@@ -1,23 +1,16 @@
-import { NextResponse } from 'next/server'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const PROTECTED = [
-  '/practice', '/signs', '/mock', '/report', '/drive',
-  '/api/progress', '/api/score', '/api/transcribe',
-  '/api/mock', '/api/device', '/api/conversation', '/api/pronunciation',
-]
+const isProtected = createRouteMatcher([
+  '/practice(.*)', '/signs(.*)', '/mock(.*)',
+  '/report(.*)', '/drive(.*)',
+  '/api/progress(.*)', '/api/score(.*)', '/api/transcribe(.*)',
+  '/api/mock(.*)', '/api/device(.*)', '/api/conversation(.*)',
+  '/api/pronunciation(.*)',
+])
 
-export default function middleware(req) {
-  const { pathname } = req.nextUrl
-  if (PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))) {
-    if (!req.cookies.has('__session')) {
-      if (pathname.startsWith('/api/')) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-      return NextResponse.redirect(new URL('/sign-in', req.url))
-    }
-  }
-  return NextResponse.next()
-}
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtected(req)) await auth.protect()
+})
 
 export const config = {
   runtime: 'nodejs',

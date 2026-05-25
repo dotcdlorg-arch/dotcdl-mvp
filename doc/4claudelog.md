@@ -1742,3 +1742,64 @@ git add vercel.json doc/4claudelog.md
 git commit -m "Add vercel.json: lock framework preset to nextjs"
 git push
 ```
+
+---
+
+## Session 13 — Restore clerkMiddleware (2026-05-25)
+
+### Action 29 — Restore `clerkMiddleware` in `middleware.js`
+
+**File modified:** `middleware.js`
+
+**Error:**
+```
+Clerk: auth() was called but Clerk can't detect usage of clerkMiddleware().
+```
+
+**Root cause:**
+
+Clerk's `auth()` server function (used in every API route via `await auth()`) does not operate standalone. It requires `clerkMiddleware()` to have run earlier in the request lifecycle — the middleware sets the Clerk auth context that `auth()` reads. Our custom cookie-only middleware (Sessions 5–11) never called `clerkMiddleware()`, so every `auth()` call in every API route threw this error on the live site.
+
+The reason we removed `clerkMiddleware()` in Session 5 was that it caused Vercel's **Edge Function** analyzer to reject the bundle (`#crypto`, `#safe-node-apis`, `@clerk/shared/buildAccountsBaseUrl`). That rejection no longer applies — Session 11 switched middleware to **Node.js runtime** (`experimental.nodeMiddleware: true`). Node.js has no restrictions on Clerk's backend imports. The original root cause is gone.
+
+**Fix:** Restore `middleware.js` to the correct AGENTS.md pattern exactly:
+
+```js
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+
+const isProtected = createRouteMatcher([
+  '/practice(.*)', '/signs(.*)', '/mock(.*)',
+  '/report(.*)', '/drive(.*)',
+  '/api/progress(.*)', '/api/score(.*)', '/api/transcribe(.*)',
+  '/api/mock(.*)', '/api/device(.*)', '/api/conversation(.*)',
+  '/api/pronunciation(.*)',
+])
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtected(req)) await auth.protect()
+})
+
+export const config = {
+  runtime: 'nodejs',
+  matcher: [
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+  ],
+}
+```
+
+`runtime: 'nodejs'` is kept in the config — this is what makes `clerkMiddleware` deployable on Vercel without Edge rejection.
+
+**Build verified:** ✅ passes.
+
+**Reversal:** Replace with Session 11's custom cookie-check middleware and remove `runtime: 'nodejs'`. Warning: reverting breaks `auth()` in all API routes.
+
+---
+
+## Session 13 Deployment Instructions
+
+```bash
+git add middleware.js doc/4claudelog.md
+git commit -m "Restore clerkMiddleware: Node.js runtime makes Clerk backend imports valid on Vercel"
+git push
+```
