@@ -352,3 +352,84 @@ page is still `useState('zh')` — not changed.
   bundles this change) restores the 5-language-only state. The fallback flip
   from `zh` → `en` in each helper is part of the same revert.
 
+---
+
+### Action 40 — Add language selector to Progress Report page
+
+**Request:** User asked to add the language-selection function to the progress report
+page (`/report`), which had no language picker because it was a pure server component
+fetching Supabase data directly and didn't use `AppShell`.
+
+**Design choice:** Split the route into server-fetcher + client-renderer rather than
+converting the whole page to a client component or wrapping it in `AppShell`. The
+existing `/report` has its own custom header design (different from AppShell's), so
+keeping that layout while just injecting the picker preserved the visual surgical-
+ness. Doing the split also keeps Clerk auth + Supabase fetch on the server (no
+client-side DB credentials, no extra round-trip).
+
+**Files modified / created:**
+
+1. **`app/report/page.js`** — slimmed from a 156-line server component to a 47-line
+   shell. Still does `auth()`, the 3 Supabase queries (`question_progress`,
+   `sign_progress`, `mock_results`), the per-category aggregation, and the
+   `understood / review / avgQ / avgS / bestMock / overall` math. Renders nothing
+   itself — just passes 12 plain props to `<ReportClient>`. Imported `QUESTIONS`
+   only (dropped `SIGNS` — was imported but unused even before).
+
+2. **`app/report/ReportClient.js`** — new file (~225 lines). `'use client'`. Owns
+   `useState('en')` for the language, the `RT` translation table with 6 locales
+   (en, zh, es, hi, pa, vi), and the entire JSX previously in `page.js`. The
+   header now contains a `<select>` styled to match the existing dark header
+   (`#1e293b` bg, `#334155` border) positioned left of the "← Back to Practice"
+   anchor.
+
+**Default language:** `en` (not `zh` like the other pages). Reason: the report
+header itself was already in English and the labels are short — picking English as
+the default keeps existing user-visible behavior identical until they touch the
+picker. Matches Action 38 / homepage convention.
+
+**Translation key coverage (per language, ~33 keys):** `brandSub`, `backToPractice`,
+`pageTitle`, `pageSub`, `overall`, `strong`, `developing`, the 8 metric labels
+(`questionsSeen`, `understood`, `needReview`, `avgQ`, `avgS`, `mocksTaken`,
+`bestMock`, `latestMock`), `catPerf`, `seenSuffix`, `coverage`, `avgScore`,
+`mockHistory`, `nextSteps`, the 6 next-steps copy strings (`reviewItem` is a
+function `(n) => '...${n}...'` so the "Review 5 questions…" count interpolates
+correctly per locale), and `footerDisclaimer`. Total **~198** strings inline.
+
+**Not translated (intentional):**
+
+- The 5 category names (`Basic Identity / Documents`, `Route / Cargo`, `HOS / ELD`,
+  `Vehicle Condition`, `Accident / Emergency`). They are the canonical category
+  identifiers from `data/questions.json` and the Supabase rows reference them too.
+  Translating only the UI label would create a drift surface; leaving them in
+  English keeps the report aligned with the data source.
+- Mock dates use `toLocaleDateString()` with no locale arg — defaults to the
+  browser locale, which is the established pattern in the rest of the app.
+- The "/100" suffix on numerics — universal.
+
+**Not changed:**
+
+- No Supabase schema changes, no API routes, no auth flow changes, no middleware.
+- No dependency additions.
+- The AppShell-based pages (/practice, /signs, /mock, /drive) are unaffected — the
+  report has its own (intentionally separate) header design.
+
+**Verification:**
+
+- `npx next build` → ✓ All 16 routes built. `/report` now ships 6.14 kB / 109 kB
+  First Load JS (was 147 B / 103 kB — the +6 kB is the new translation tables and
+  the client-side picker; acceptable for a logged-in dashboard).
+- Server-side data fetch behavior identical: `auth()` runs first, redirect to
+  `/sign-in` if no user, then 3-way `Promise.all` of supabase queries.
+
+**Net diff:**
+
+- `app/report/page.js`: 156 → 47 lines (–109, the body moved to ReportClient).
+- `app/report/ReportClient.js`: +225 new file.
+- Net: +116 lines, +1 file.
+
+**Reversal:**
+
+- `git rm app/report/ReportClient.js && git checkout HEAD~ -- app/report/page.js`
+  restores the prior single-file server-component report page.
+
