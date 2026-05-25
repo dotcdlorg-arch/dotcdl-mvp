@@ -2,6 +2,7 @@
   "name": "cdl-english-pro",
   "version": "2.1.0",
   "description": "CDL English Roadside Readiness — Premium AI Training Platform. Training only. Not affiliated with DOT, FMCSA, or CVSA.",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",

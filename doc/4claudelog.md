@@ -1270,3 +1270,72 @@ git add middleware.js doc/4claudelog.md
 git commit -m "Fix MIDDLEWARE_INVOCATION_FAILED: use default export in middleware"
 git push
 ```
+
+---
+
+## Session 7 — Fix __dirname is not defined in middleware (2026-05-25)
+
+### Action 20 — Diagnose __dirname runtime error
+
+**Status:** ✅ Complete
+
+**Context:** After Session 6's default-export fix, Vercel deployment still succeeds but the site shows `MIDDLEWARE_INVOCATION_FAILED` with runtime log:
+
+```
+Middleware 2026-05-25 05:34:26.605 [error] [ReferenceError: __dirname is not defined
+```
+
+**Key facts established:**
+- Local built bundle (`.next/server/middleware.js`) has **zero** occurrences of `__dirname` — Next.js's own compilation is clean.
+- The Vercel build log has always shown: `Compiling "middleware.js" from ESM to CommonJS...`
+- Vercel's own post-build compilation step converts the ESM middleware to CommonJS, injecting `__dirname` as part of its CJS wrapper.
+- That CJS wrapper then runs in Edge Runtime (V8), where `__dirname` is not a global → crash.
+
+**Vercel's own warning pointed at the fix:**
+```
+Warning: Node.js functions are compiled from ESM to CommonJS.
+If this is not intended, add "type": "module" to your package.json file.
+```
+
+Adding `"type": "module"` tells Vercel's build tooling to treat all `.js` files as native ES modules and skip the ESM→CJS transform, leaving the middleware as ESM for Edge Runtime.
+
+---
+
+### Action 21 — Add `"type": "module"` to package.json
+
+**File modified:** `package.json`
+
+**Change:**
+```diff
+  "private": true,
++ "type": "module",
+```
+
+**Safety check:** Verified no CommonJS patterns (`require()`, `module.exports`) exist in any source file under `app/`, `lib/`, `components/`, or `middleware.js`. All project files already use `import/export` exclusively. `"type": "module"` is safe to add.
+
+**Next.js compatibility:** `"type": "module"` has been supported by Next.js since v13.4. This project uses Next.js 15.5.18.
+
+**Build verified:** ✅
+
+```
+✓ Compiled successfully
+ƒ Middleware  34.1 kB
+```
+
+---
+
+## Session 7 Reversal Guide
+
+### Reversal R21 — Remove type:module
+
+To reverse: delete `"type": "module"` line from `package.json`. This will cause Vercel to resume ESM→CJS compilation of middleware, re-introducing the `__dirname` crash.
+
+---
+
+## Session 7 Deployment Instructions
+
+```bash
+git add middleware.js package.json doc/4claudelog.md
+git commit -m "Fix __dirname in Edge middleware: add type:module to stop Vercel CJS transform"
+git push
+```
