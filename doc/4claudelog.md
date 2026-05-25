@@ -1339,3 +1339,82 @@ git add middleware.js package.json doc/4claudelog.md
 git commit -m "Fix __dirname in Edge middleware: add type:module to stop Vercel CJS transform"
 git push
 ```
+
+---
+
+## Session 8 — Fix __dirname: remove next/server import (2026-05-25)
+
+### Action 22 — Root cause: Vercel compiles source file separately, follows imports
+
+**Status:** ✅ Complete
+
+**Context:** `"type": "module"` (Session 7) did not stop the `__dirname` error. The error persists in runtime logs: `ReferenceError: __dirname is not defined`.
+
+**Definitive root cause:** Vercel performs TWO compilations of the middleware:
+
+1. **Next.js build** (`npm run build`) — webpack bundles `.next/server/middleware.js`. This is a proper Edge bundle with tree-shaking; it strips all Node.js-only code. Result: 0 occurrences of `__dirname`. Size: 104 KB raw / 34 kB reported.
+
+2. **Vercel post-build compilation** (`Compiling "middleware.js" from ESM to CommonJS...`) — Vercel takes the SOURCE `middleware.js` and compiles it independently using its own bundler. When resolving `import { NextResponse } from 'next/server'`, Vercel's bundler follows the import into Next.js's package and bundles unoptimized server code. That unoptimized code contains `__dirname`. This compiled version is what Vercel deploys (not Next.js's clean bundle), and it crashes in Edge Runtime.
+
+**Evidence:** Bundle size cross-check:
+- Before this fix (with `import { NextResponse }`): middleware shown as 34.1 kB
+- After removing the import: middleware shown as **25.7 kB** — the `next/server` import was pulling in real code
+
+**Why `"type": "module"` failed:** It prevents Vercel from using CommonJS module wrapping syntax, but does not prevent Vercel's bundler from following and including `next/server` code that internally uses `__dirname`.
+
+---
+
+### Action 23 — Remove next/server import; use Web standard APIs only
+
+**File modified:** `middleware.js`
+
+**Before:**
+```js
+import { NextResponse } from 'next/server'
+// ...
+export default function middleware(req) {
+  // ...
+  return NextResponse.redirect(new URL('/sign-in', req.url))
+  // ...
+  return NextResponse.next()
+}
+```
+
+**After:**
+```js
+// No imports at all
+export default function middleware(req) {
+  const { pathname } = req.nextUrl
+  if (PROTECTED.some(...)) {
+    if (!req.cookies.has('__session')) {
+      if (pathname.startsWith('/api/')) return new Response('Unauthorized', { status: 401 })
+      return Response.redirect(new URL('/sign-in', req.url))
+    }
+  }
+  // returning undefined passes through to the route handler
+}
+```
+
+**Why this works:**
+- `req.nextUrl` and `req.cookies` are properties of `NextRequest`. The middleware receives a `NextRequest` at runtime regardless of what is imported — Next.js injects it. No import needed.
+- `Response.redirect()` and `new Response()` are Web standard globals available in Edge Runtime — no package needed.
+- `new URL()` is a Web standard global — no package needed.
+- Returning `undefined` from middleware passes the request through to the route handler in Next.js 15 (equivalent to `NextResponse.next()`).
+- Zero imports → Vercel's source compiler has nothing to follow → no `__dirname` introduced.
+
+**Build verified:** ✅
+```
+ƒ Middleware  25.7 kB  ← was 34.1 kB; reduction confirms next/server import removed
+```
+
+**Bundle scan:** ✅ `0 occurrences of __dirname`
+
+---
+
+## Session 8 Deployment Instructions
+
+```bash
+git add middleware.js doc/4claudelog.md
+git commit -m "Fix __dirname: remove next/server import, use Web standard APIs only"
+git push
+```

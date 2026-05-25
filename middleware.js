@@ -1,4 +1,7 @@
-import { NextResponse } from 'next/server'
+// No imports — importing next/server causes Vercel's separate source compilation to bundle
+// unoptimized Next.js server code that references __dirname, crashing in Edge Runtime.
+// req is a NextRequest at runtime (next/server not needed to use its properties).
+// Response and URL are Web standard globals available in Edge Runtime.
 
 const PROTECTED = [
   '/practice', '/signs', '/mock', '/report', '/drive',
@@ -6,22 +9,15 @@ const PROTECTED = [
   '/api/mock', '/api/device', '/api/conversation', '/api/pronunciation',
 ]
 
-function isProtected(pathname) {
-  return PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))
-}
-
-// Lightweight cookie-presence check — no Clerk backend imports (avoids Vercel Edge ban on #crypto / #safe-node-apis).
-// Full JWT verification happens per-request in each API route via auth() from @clerk/nextjs/server.
 export default function middleware(req) {
-  if (isProtected(req.nextUrl.pathname)) {
+  const { pathname } = req.nextUrl
+  if (PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))) {
     if (!req.cookies.has('__session')) {
-      if (req.nextUrl.pathname.startsWith('/api/')) {
-        return new Response('Unauthorized', { status: 401 })
-      }
-      return NextResponse.redirect(new URL('/sign-in', req.url))
+      if (pathname.startsWith('/api/')) return new Response('Unauthorized', { status: 401 })
+      return Response.redirect(new URL('/sign-in', req.url))
     }
   }
-  return NextResponse.next()
+  // returning undefined passes the request through to the route handler
 }
 
 export const config = {
