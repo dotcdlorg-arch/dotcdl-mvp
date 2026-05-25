@@ -177,13 +177,38 @@ function mt(lang, key) {
   return t[key] !== undefined ? t[key] : (MT.zh[key] || key)
 }
 
-// ── Speak helper ──────────────────────────────────────────────
-function speakText(text) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'en-US'; u.rate = 0.92; u.pitch = 0.88
-  window.speechSynthesis.speak(u)
+// ── Speak helper — real OpenAI voice with browser-synth fallback ─────
+let currentMockAudio = null
+
+function stopCurrentMockAudio() {
+  if (currentMockAudio) { try { currentMockAudio.pause() } catch {} ; currentMockAudio = null }
+  if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
+}
+
+async function speakText(text, onEnd) {
+  stopCurrentMockAudio()
+  try {
+    const res = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voiceId: 'north_m', speed: 0.92 }),
+    })
+    if (!res.ok) throw new Error('TTS ' + res.status)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    currentMockAudio = audio
+    audio.onended = () => { URL.revokeObjectURL(url); if (currentMockAudio === audio) currentMockAudio = null; onEnd?.() }
+    audio.onerror = () => { URL.revokeObjectURL(url); if (currentMockAudio === audio) currentMockAudio = null; onEnd?.() }
+    await audio.play()
+  } catch (e) {
+    console.error('Mock TTS fallback:', e)
+    if (typeof window === 'undefined' || !window.speechSynthesis) { setTimeout(() => onEnd?.(), 100); return }
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'en-US'; u.rate = 0.92; u.pitch = 0.88
+    if (onEnd) { u.onend = () => onEnd(); u.onerror = () => onEnd() }
+    window.speechSynthesis.speak(u)
+  }
 }
 
 export default function MockPage() {
@@ -347,7 +372,7 @@ export default function MockPage() {
   function stopAutoPlay() {
     autoPlayRef.current = false
     setIsAutoPlaying(false)
-    if (typeof window !== 'undefined') window.speechSynthesis.cancel()
+    stopCurrentMockAudio()
   }
   function playMockItem(list, idx) {
     if (!autoPlayRef.current || idx >= list.length) {
@@ -357,16 +382,10 @@ export default function MockPage() {
     }
     const item = list[idx]
     const text = item.type === 'question' ? item.data.officer_question_en : item.data.name
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      setTimeout(() => playMockItem(list, idx + 1), 100)
-      return
-    }
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = 'en-US'; u.rate = 0.92; u.pitch = 0.88
-    u.onend = () => setTimeout(() => playMockItem(list, idx + 1), 4000)
-    u.onerror = () => setTimeout(() => playMockItem(list, idx + 1), 4000)
-    window.speechSynthesis.speak(u)
+    speakText(text, () => {
+      if (!autoPlayRef.current) return
+      setTimeout(() => playMockItem(list, idx + 1), 4000)
+    })
   }
 
   // ── INTRO ──────────────────────────────────────

@@ -70,23 +70,42 @@ const T = {
 
 function t(lang, key) { return (T[lang] || T.zh)[key] || T.zh[key] || key }
 
-function speak(text, rate) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'en-US'; u.rate = rate || 1
-  window.speechSynthesis.speak(u)
+// Real human voice via OpenAI TTS, fallback to browser synthesis on failure.
+let currentAudio = null
+
+function stopCurrentAudio() {
+  if (currentAudio) { try { currentAudio.pause() } catch {} ; currentAudio = null }
+  if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
 }
 
-function speakWithCb(text, rate, onEnd) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) { setTimeout(() => onEnd?.(), 100); return }
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'en-US'; u.rate = rate || 1
-  u.onend = () => onEnd?.()
-  u.onerror = () => onEnd?.()
-  window.speechSynthesis.speak(u)
+async function speakViaApi(text, rate, onEnd) {
+  stopCurrentAudio()
+  try {
+    const res = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voiceId: 'north_m', speed: rate || 1 }),
+    })
+    if (!res.ok) throw new Error('TTS ' + res.status)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    currentAudio = audio
+    audio.onended = () => { URL.revokeObjectURL(url); if (currentAudio === audio) currentAudio = null; onEnd?.() }
+    audio.onerror = () => { URL.revokeObjectURL(url); if (currentAudio === audio) currentAudio = null; onEnd?.() }
+    await audio.play()
+  } catch (e) {
+    console.error('Practice TTS fallback:', e)
+    if (typeof window === 'undefined' || !window.speechSynthesis) { setTimeout(() => onEnd?.(), 100); return }
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'en-US'; u.rate = rate || 1
+    if (onEnd) { u.onend = () => onEnd(); u.onerror = () => onEnd() }
+    window.speechSynthesis.speak(u)
+  }
 }
+
+function speak(text, rate) { speakViaApi(text, rate, null) }
+function speakWithCb(text, rate, onEnd) { speakViaApi(text, rate, onEnd) }
 
 function saveProgress(questionCode, status, lastScore, lastTranscript) {
   fetch('/api/progress', {
@@ -169,7 +188,7 @@ function PracticeInner() {
   function stopAutoPlay() {
     autoPlayRef.current = false
     setIsAutoPlaying(false)
-    if (typeof window !== 'undefined') window.speechSynthesis.cancel()
+    stopCurrentAudio()
   }
   function playFromList(list, idx) {
     if (!autoPlayRef.current || idx >= list.length) {

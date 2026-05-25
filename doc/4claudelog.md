@@ -1869,3 +1869,265 @@ git add app/api/speak/route.js app/drive/page.js doc/4claudelog.md
 git commit -m "Improve TTS error logging: include HTTP status in server log and client error"
 git push
 ```
+
+---
+
+## Session 15 — Real cause of "no real person voice" identified (2026-05-25)
+
+**Investigation per user request:** verify `.env.local` API key is working and debug the
+real‑person voice bug. Sessions 13–14 fixed the surrounding plumbing (Clerk middleware,
+Node.js runtime, error logging) but did not actually test whether the OpenAI key returns
+audio. Session 14 already noted this remained outstanding.
+
+---
+
+### Action 31 — Verified `.env.local` and the speak/drive chain
+
+**`.env.local` state (read at this session):**
+
+- `OPENAI_API_KEY` present (`sk-proj-…wrls14MA`)
+- All Clerk, Supabase, and site variables present
+- File is gitignored — production Vercel reads its own env, not this file
+
+**Code review of the playback chain — no bug found:**
+
+- `app/api/speak/route.js` — correct: validates auth → rate limit → key → calls OpenAI
+  TTS → returns MP3 with `Cache-Control: private, max-age=3600`. Error path returns 502
+  with `TTS failed: <status>` (Session 14 improvement) and server logs include status.
+- `app/drive/page.js` `speak()` (lines 191–239) — correct: POSTs to `/api/speak`, plays
+  the returned MP3 blob via `<Audio>`, falls back to `window.speechSynthesis` ONLY when
+  `res.ok` is false. Same pattern in `previewVoice()` (lines 242–272).
+
+The code is structurally correct. The silent fallback to browser robotic voice means
+`/api/speak` is returning non‑2xx in production.
+
+---
+
+### Action 32 — Direct OpenAI TTS test with the key from `.env.local`
+
+**Command run (locally, bypassing all app code):**
+
+```bash
+KEY=$(grep '^OPENAI_API_KEY=' .env.local | cut -d= -f2-)
+curl -sS -o /tmp/tts_test.mp3 -w "HTTP %{http_code}\n" \
+  -X POST https://api.openai.com/v1/audio/speech \
+  -H "Authorization: Bearer $KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"tts-1","voice":"onyx","input":"hello driver, this is a test"}'
+```
+
+**Result:**
+
+```
+HTTP 429
+```
+
+**Response body (`/tmp/tts_test.mp3` is JSON, not audio):**
+
+```json
+{
+  "error": {
+    "message": "You exceeded your current quota, please check your plan and billing details. ...",
+    "type": "insufficient_quota",
+    "param": null,
+    "code": "insufficient_quota"
+  }
+}
+```
+
+---
+
+### Root cause
+
+The OpenAI API key in `.env.local` is **syntactically valid and authenticates correctly**,
+but the linked OpenAI account has **zero remaining quota / no active billing**. OpenAI
+returns HTTP 429 with `code: "insufficient_quota"` for every TTS request.
+
+What happens end‑to‑end in the live app:
+
+1. Driver clicks play in Drive mode
+2. Client POSTs `/api/speak` → Clerk auth passes → server calls OpenAI TTS
+3. OpenAI returns **429 insufficient_quota**
+4. Route returns `502 TTS failed: 429` (visible now thanks to Session 14 logging)
+5. Client throws → `catch` falls back to `window.speechSynthesis` → **robotic browser voice**
+
+This also affects every other OpenAI‑backed feature on the same key:
+
+- `/api/transcribe` (Whisper STT — recording transcription)
+- `/api/score` (GPT‑4o‑mini semantic scoring; falls back silently to keyword‑only)
+- Any other route that uses `OPENAI_API_KEY`
+
+**No code change can fix this.** It is an account/billing condition at OpenAI.
+
+---
+
+### Fix (action required by user, not by Claude)
+
+1. Open <https://platform.openai.com/account/billing> while signed in as the owner of
+   key `sk-proj-…wrls14MA`.
+2. Either:
+   - Add a payment method and purchase credits (recommended), or
+   - Generate a new key on an account that has active billing and replace
+     `OPENAI_API_KEY=` in both `.env.local` **and** Vercel → Project → Settings →
+     Environment Variables → Production.
+3. Redeploy on Vercel after updating the env var (Vercel does not hot‑reload env vars
+   in already‑running functions).
+4. Re‑test by clicking a voice preview on `/drive` — the network tab should now show
+   `POST /api/speak → 200`, response `Content-Type: audio/mpeg`, and a real human voice
+   should play.
+
+**Verification command after replacing the key:**
+
+```bash
+curl -sS -o /tmp/tts_check.mp3 -w "HTTP %{http_code}\n" \
+  -X POST https://api.openai.com/v1/audio/speech \
+  -H "Authorization: Bearer <NEW_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"tts-1","voice":"onyx","input":"test"}' && file /tmp/tts_check.mp3
+```
+
+Expected: `HTTP 200` and `/tmp/tts_check.mp3: Audio file with ID3 ...` (MP3, not JSON).
+
+---
+
+### Why prior sessions didn't catch this
+
+Sessions 4–13 chased a long chain of Vercel Edge / middleware errors — every one was
+real and had to be fixed before this layer was reachable. Session 14 added HTTP status
+to the error log so the next failure would be identifiable, but did not call OpenAI
+directly to verify the key. This session is that verification step.
+
+No file changes in this session — diagnostic only.
+
+---
+
+## Session 16 — Extend real OpenAI voice to 听力练习 and 模拟检查 (2026-05-25)
+
+**User report:** Real human voice works in 驾驶模式 (drive) but 听力练习 (practice listen) and
+模拟检查 (mock) still play robotic browser voice. (Implies OpenAI quota was restored after
+Session 15 — drive now works, so the key is healthy.)
+
+**Root cause:** Only `app/drive/page.js` ever called `/api/speak`. `app/practice/page.js` and
+`app/mock/page.js` used `window.speechSynthesis` directly — always robotic. This was a
+pre-existing structural gap, not a regression.
+
+---
+
+### Action 33 — `app/api/speak/route.js` — accept optional `speed` override
+
+So practice listen mode's 0.7x / 1x / 1.3x rate buttons keep working when routed through
+OpenAI TTS.
+
+```diff
+- const { text, voiceId } = body
++ const { text, voiceId, speed: speedOverride } = body
+  ...
+- const speed = SPEED_MAP[voiceId] || 0.95
++ const speed = (typeof speedOverride === 'number' && speedOverride >= 0.25 && speedOverride <= 4.0)
++   ? speedOverride
++   : (SPEED_MAP[voiceId] || 0.95)
+```
+
+Default behavior unchanged when `speed` is omitted (drive mode untouched). OpenAI TTS
+accepts `speed` in `[0.25, 4.0]` — same validation range.
+
+---
+
+### Action 34 — `app/practice/page.js` — route `speak`/`speakWithCb` through `/api/speak`
+
+Replaced the two module-level browser-synth functions with an `speakViaApi` helper that:
+
+1. POSTs `/api/speak` with `voiceId: 'north_m'` (onyx — deep authoritative officer) and
+   `speed: rate || 1`.
+2. Plays the returned MP3 blob through a module-level `<Audio>`, tracking it in
+   `currentAudio` so it can be stopped.
+3. On any failure (network, 401, 429, 502) — falls back silently to the original
+   `SpeechSynthesisUtterance` browser-synth call (browser robotic voice is better than
+   no voice).
+
+Public surface unchanged — `speak(text, rate)` and `speakWithCb(text, rate, onEnd)` keep
+their existing signatures, so the four call sites (`playFromList` line 182, listen-mode
+play button line 323, text-mode play button line 343, speak-mode play button line 389)
+required no change.
+
+Also updated `stopAutoPlay` to call `stopCurrentAudio()` instead of just
+`speechSynthesis.cancel()` — stops the `<Audio>` in addition to any browser synth.
+
+---
+
+### Action 35 — `app/mock/page.js` — route `speakText` and `playMockItem` through `/api/speak`
+
+`speakText(text)` rewritten to `speakText(text, onEnd)`:
+
+- Calls `/api/speak` with `voiceId: 'north_m'`, `speed: 0.92` (matches the original
+  utterance speed/pitch feel).
+- Plays MP3 blob; on `onended` calls `onEnd?.()`. Tracked in `currentMockAudio`.
+- Falls back to `SpeechSynthesisUtterance` on any error.
+
+`playMockItem(list, idx)` simplified: instead of building an utterance inline with an
+`onend` continuation, it just calls `speakText(text, () => { if (autoPlayRef.current)
+setTimeout(() => playMockItem(list, idx + 1), 4000) })`. Same 4-second gap behavior,
+now driven by either real audio's `onended` or the fallback utterance's `onend`.
+
+`stopAutoPlay` calls `stopCurrentMockAudio()` to halt mid-track when user presses ⏸.
+
+The 4 `speakText(...)` callers in the file (lines 313, 337, 429, 463, 526) accept the
+new optional `onEnd` signature transparently — calling with one arg still works.
+
+---
+
+### Verification
+
+**`npm run build`:** ✅ Compiled successfully, all 16 pages generated, no warnings.
+
+| Route | Size before | Size after |
+|---|---|---|
+| /practice | 6.76 kB | 6.76 kB |
+| /mock | 8.08 kB | 8.08 kB |
+| /drive | 8.02 kB | 8.02 kB |
+
+Bundle sizes unchanged — purely a logic swap, no new dependencies.
+
+**Manual test plan (user must run):**
+
+1. `/practice?mode=listen` → click 🔊 play button → expect real OpenAI voice (deep
+   male, onyx). Rate buttons 0.7×/1×/1.3× change speed.
+2. `/practice?mode=listen` → click ▶ 自动播放 → continuous play with real voice;
+   ⏸ stops mid-sentence.
+3. `/mock` → click 🔊 next to any question → real voice.
+4. `/mock` → ▶ 自动播放 → continuous play with real voice + 4s gap.
+5. `/drive` → still works (regression check — voice menu still functions).
+6. Network tab: each play should show `POST /api/speak → 200`, `Content-Type:
+   audio/mpeg`. If a 502 appears, fallback to robotic voice kicks in.
+
+**Cost note:** Practice/mock will now consume OpenAI TTS quota per playback. TTS-1 is
+$15/1M characters. Same questions are cached for 1h via `Cache-Control: private,
+max-age=3600` so repeats are free within an hour. Rate limit on `/api/speak` is 20/min
+per user (Session 2 setup).
+
+---
+
+### Reversal R34/R35 — restore browser-only voice
+
+To revert each page:
+
+- `app/practice/page.js` — replace `speakViaApi`/`speak`/`speakWithCb`/`stopCurrentAudio`
+  with the original two-function browser-synth block; revert `stopAutoPlay` to call
+  `speechSynthesis.cancel()` directly.
+- `app/mock/page.js` — replace `speakText(text, onEnd)` with the original
+  `speakText(text)` browser-synth function; revert `playMockItem` to build inline
+  `SpeechSynthesisUtterance`; revert `stopAutoPlay`.
+- `app/api/speak/route.js` — remove the `speedOverride` parsing, restore
+  `const speed = SPEED_MAP[voiceId] || 0.95`.
+
+---
+
+## Session 16 Deployment Instructions
+
+```bash
+git add app/api/speak/route.js app/practice/page.js app/mock/page.js doc/4claudelog.md
+git commit -m "Use OpenAI voice in practice and mock pages (was browser-only)"
+git push
+```
+
+

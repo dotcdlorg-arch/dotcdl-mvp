@@ -37,11 +37,13 @@ export async function POST(req) {
     return new Response('Invalid JSON', { status: 400 })
   }
 
-  const { text, voiceId } = body
+  const { text, voiceId, speed: speedOverride } = body
   if (!text?.trim()) return new Response('No text provided', { status: 400 })
 
   const voice = VOICE_MAP[voiceId] || 'onyx'
-  const speed = SPEED_MAP[voiceId] || 0.95
+  const speed = (typeof speedOverride === 'number' && speedOverride >= 0.25 && speedOverride <= 4.0)
+    ? speedOverride
+    : (SPEED_MAP[voiceId] || 0.95)
 
   try {
     const res = await fetch('https://api.openai.com/v1/audio/speech', {
