@@ -466,7 +466,7 @@ code{background:var(--bg3);border:1px solid var(--line);border-radius:4px;paddin
 @media (max-width: 600px) {
   .mobile-tabs {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     position: fixed;
     left: 0; right: 0; bottom: 0;
     background: var(--bg2);
@@ -476,19 +476,15 @@ code{background:var(--bg3);border:1px solid var(--line);border-radius:4px;paddin
     padding-bottom: env(safe-area-inset-bottom);
   }
   .mobile-tab {
-    display: flex; flex-direction: column;
+    display: flex;
     align-items: center; justify-content: center;
-    gap: 2px; padding: 8px 4px;
+    padding: 10px 4px;
     background: transparent; border: none;
     text-decoration: none; color: var(--muted);
-    font-family: var(--font); font-size: .65rem; font-weight: 600;
-    min-height: 58px;
-    line-height: 1.1;
-    text-align: center;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    transition: color var(--transition);
+    min-height: 56px;
+    transition: color var(--transition), transform var(--transition);
   }
-  .mobile-tab .mobile-tab-icon { font-size: 1.35rem; line-height: 1; }
+  .mobile-tab .mobile-tab-icon { font-size: 1.75rem; line-height: 1; }
   .mobile-tab.active { color: var(--brand); }
-  .mobile-tab.active .mobile-tab-icon { transform: scale(1.08); }
+  .mobile-tab.active .mobile-tab-icon { transform: scale(1.12); }
 }

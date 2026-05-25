@@ -150,7 +150,6 @@ export default function AppShell({ children, lang = 'zh', setLang, stats }) {
     {
       label: nl(lang, 'training'),
       items: [
-        { href: '/practice', icon: '📖', labelKey: 'text' },
         { href: '/practice?mode=listen', icon: '🎧', labelKey: 'listen' },
         { href: '/practice?mode=speak', icon: '🎤', labelKey: 'speak' },
         { href: '/signs', icon: '🚦', labelKey: 'signs' },
@@ -259,20 +258,23 @@ export default function AppShell({ children, lang = 'zh', setLang, stats }) {
 
       <nav className="mobile-tabs" aria-label="Primary mobile navigation">
         {[
-          { href: '/practice', icon: '📖', labelKey: 'text' },
-          { href: '/signs',    icon: '🚦', labelKey: 'signs' },
-          { href: '/mock',     icon: '🚔', labelKey: 'mock' },
-          { href: '/drive',    icon: '🚗', labelKey: 'drive' },
+          { href: '/practice?mode=listen', icon: '🎧', labelKey: 'listen' },
+          { href: '/practice?mode=speak',  icon: '🎤', labelKey: 'speak' },
+          { href: '/signs',                icon: '🚦', labelKey: 'signs' },
+          { href: '/mock',                 icon: '🚔', labelKey: 'mock' },
+          { href: '/drive',                icon: '🚗', labelKey: 'drive' },
         ].map(tab => {
-          const active = pathname === tab.href || pathname.startsWith(tab.href + '/')
+          const active = isActive(tab.href)
+          const label = nl(lang, tab.labelKey)
           return (
             <Link
               key={tab.href}
               href={tab.href}
               className={`mobile-tab ${active ? 'active' : ''}`}
+              aria-label={label}
+              title={label}
             >
               <span className="mobile-tab-icon">{tab.icon}</span>
-              <span>{nl(lang, tab.labelKey)}</span>
             </Link>
           )
         })}

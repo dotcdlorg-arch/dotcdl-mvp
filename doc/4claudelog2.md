@@ -433,3 +433,76 @@ correctly per locale), and `footerDisclaimer`. Total **~198** strings inline.
 - `git rm app/report/ReportClient.js && git checkout HEAD~ -- app/report/page.js`
   restores the prior single-file server-component report page.
 
+---
+
+### Action 41 — Drop "Text practice" entry; mobile tabs icon-only with 5 buttons
+
+**Request:** User asked to (a) remove the "Text practice" nav entry since it
+duplicates Listening, and (b) drop the text labels under the smartphone bottom-tab
+buttons, leaving only the 5 remaining icons as buttons.
+
+**Files modified:**
+
+1. **`components/AppShell.js`**
+   - Removed `{ href: '/practice', icon: '📖', labelKey: 'text' }` from the
+     sidebar `Training` group. The group now has 4 items: Listening, Speak +
+     AI score, Traffic signs, Mock inspection. The `/practice` route itself
+     is unchanged — bare `/practice` still renders text mode if reached
+     directly, but no nav points there anymore (listen/speak entries use
+     `?mode=listen` / `?mode=speak`).
+   - Rewrote the `<nav className="mobile-tabs">` block:
+     - Items array went from 4 (text, signs, mock, drive) → 5 (listen, speak,
+       signs, mock, drive). These are the 5 symbols that remain after the text
+       icon is removed.
+     - Removed the `<span>{nl(lang, tab.labelKey)}</span>` text label. Each
+       button is now icon-only.
+     - Added `aria-label={label}` and `title={label}` per tab so screen
+       readers and tooltip-on-hover still expose the destination (still
+       localised via `nl()`).
+     - Swapped the inline `pathname === tab.href || pathname.startsWith(...)`
+       check for the existing `isActive(tab.href)` helper, which correctly
+       distinguishes `/practice?mode=listen` from `/practice?mode=speak`
+       using `window.location.search`.
+
+2. **`app/globals.css`** — `.mobile-tabs` block inside `@media (max-width: 600px)`:
+   - Grid: `repeat(4, 1fr)` → `repeat(5, 1fr)`.
+   - Removed `flex-direction: column`, `gap: 2px`, label typography props
+     (`font-size: .65rem`, `font-weight: 600`, `line-height: 1.1`,
+     `text-align: center`, `text-overflow: ellipsis`, `white-space: nowrap`,
+     `overflow: hidden`) — no labels left to style.
+   - `min-height` 58px → 56px (icon-only buttons can be slightly shorter).
+   - `.mobile-tab .mobile-tab-icon` font-size: 1.35rem → 1.75rem (bigger
+     icons now that labels are gone — keeps the tap target visually weighty).
+   - Active scale: 1.08 → 1.12 (more obvious feedback without a label).
+
+**Not changed:**
+
+- The /practice route, the text-mode UI inside it, or any other page.
+- `NAV_LABELS` in AppShell — the `text` key still exists (harmless if unused;
+  may be reused later, and removing it would cascade into a fallback path).
+- The desktop sidebar still uses text+icon labels — only the phone bottom bar
+  is now icon-only.
+- No homepage / report / signs / mock / drive / practice page changes.
+
+**Verification:**
+
+- `npx next build` → ✓ All 16 routes still build identically (sizes unchanged
+  for every route since changes are inside the shared AppShell component +
+  CSS).
+- Manual: resize browser <600px or use devtools mobile emulation; expect 5
+  evenly-spaced icons (🎧 🎤 🚦 🚔 🚗) along the bottom with no text,
+  active state highlighted in brand colour, hovering on desktop (or
+  long-press on iOS) reveals the localised label via the `title` attribute.
+
+**Net diff:**
+
+- `components/AppShell.js`: -1 sidebar item (text), mobile-tabs items: 4 → 5,
+  labels removed from buttons, `isActive` helper reused. ~+3/-7 net lines.
+- `app/globals.css`: ~+3/-9 net lines on the mobile-tabs block.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- components/AppShell.js app/globals.css` (relative
+  to the commit that bundles this change) restores the 4-item bottom tab bar
+  with text labels and re-adds the Text-practice entry to the sidebar.
+
