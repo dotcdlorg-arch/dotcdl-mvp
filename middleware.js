@@ -18,6 +18,9 @@ export default function middleware(req) {
       return Response.redirect(new URL('/sign-in', req.url))
     }
   }
+  // Explicit passthrough — NextResponse.next() internally sets this header.
+  // Returning undefined causes Vercel's edge to treat the request as unhandled → 404.
+  return new Response(null, { headers: { 'x-middleware-next': '1' } })
 }
 
 export const config = {

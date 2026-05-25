@@ -1527,3 +1527,71 @@ git add middleware.js .claude/settings.json doc/4claudelog.md
 git commit -m "Fix middleware: use URL(req.url) and headers cookie — req.nextUrl/cookies are NextRequest-only"
 git push
 ```
+
+---
+
+## Session 10 — Fix Cache 404 Not Found Key /404.html (2026-05-24)
+
+### Action 26 — Add explicit passthrough response to middleware
+
+**File modified:** `middleware.js`
+
+**Vercel error:**
+```
+Cache 404 Not Found Key /404.html
+```
+
+**Root cause:**
+
+Vercel's docs confirm: this error means Vercel's edge CDN received no valid response from the middleware for a request, treated the request as unhandled, and fell back to looking for a static `/404.html` in the edge cache. That file does not exist in a Next.js App Router build — 404s are handled dynamically by `app/not-found.js`.
+
+Our middleware was returning `undefined` implicitly for two cases:
+1. Non-protected routes (landing page `/`, `/sign-in`, `/sign-up`, etc.)
+2. Protected routes where the user **has** a valid `__session` cookie (authenticated → fall through)
+
+In Next.js's own middleware runner (webpack-bundled, full `NextRequest`), returning `undefined` is treated as pass-through equivalent to `NextResponse.next()`. In Vercel's source-compiled middleware (plain `Request`), `undefined` is treated as "no response provided" → edge returns 404 cache miss.
+
+`NextResponse.next()` internally sets one header to signal pass-through:
+```
+x-middleware-next: 1
+```
+
+We can replicate this with a raw `Response` — no import needed.
+
+**Change:**
+
+Before (implicit `undefined` return):
+```js
+  }
+  // returning undefined passes the request through to the route handler
+}
+```
+
+After (explicit passthrough):
+```js
+  }
+  // Explicit passthrough — NextResponse.next() internally sets this header.
+  // Returning undefined causes Vercel's edge to treat the request as unhandled → 404.
+  return new Response(null, { headers: { 'x-middleware-next': '1' } })
+}
+```
+
+**Why this is safe:** `new Response(null, ...)` is a valid Web standard constructor. The `x-middleware-next: 1` header is understood by Vercel's edge infrastructure (it is what `NextResponse.next()` sets under the hood). Zero imports — no `__dirname` risk.
+
+**Build verified:** ✅
+```
+✓ Compiled successfully
+ƒ Middleware  25.8 kB
+```
+
+**Reversal:** Remove the explicit return line. This will reintroduce the `Cache 404 Not Found Key /404.html` error on Vercel.
+
+---
+
+## Session 10 Deployment Instructions
+
+```bash
+git add middleware.js doc/4claudelog.md
+git commit -m "Fix Cache 404: return explicit x-middleware-next passthrough instead of undefined"
+git push
+```
