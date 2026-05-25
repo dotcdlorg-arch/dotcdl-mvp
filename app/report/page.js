@@ -41,8 +41,6 @@ export default async function ReportPage() {
 
   return (
     <ReportClient
-      qpLength={qp?.length ?? 0}
-      totalQuestions={QUESTIONS.length}
       understood={understood}
       review={review}
       avgQ={avgQ}

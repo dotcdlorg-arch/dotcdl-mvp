@@ -63,7 +63,6 @@ export default function SignsPage() {
 
       <div className="card">
         <div className="between mb-8">
-          <span className="badge badge-blue">Sign {idx + 1} / {filtered.length}</span>
           <span className="badge badge-gray">{sign.category}</span>
           {progress[sign.sign_code] != null && (
             <span className={`badge ${progress[sign.sign_code]>=80?'badge-green':progress[sign.sign_code]>=55?'badge-amber':'badge-red'}`}>

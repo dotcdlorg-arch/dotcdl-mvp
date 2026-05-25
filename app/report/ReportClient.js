@@ -201,14 +201,13 @@ const color = (v) => v >= 80 ? '#059669' : v >= 55 ? '#d97706' : '#dc2626'
 const pct   = (v) => Math.max(0, Math.min(100, v))
 
 export default function ReportClient({
-  qpLength, totalQuestions, understood, review, avgQ, avgS,
+  understood, review, avgQ, avgS,
   mocksLength, bestMock, latestMock, catStats, overall, mocks,
 }) {
   const [lang, setLang] = useState('en')
   const t = (k) => rt(lang, k)
 
   const metrics = [
-    { val: `${qpLength}/${totalQuestions}`, label: t('questionsSeen') },
     { val: understood, label: t('understood') },
     { val: review, label: t('needReview') },
     { val: avgQ ? `${avgQ}/100` : '—', label: t('avgQ') },

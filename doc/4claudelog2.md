@@ -506,3 +506,70 @@ buttons, leaving only the 5 remaining icons as buttons.
   to the commit that bundles this change) restores the 4-item bottom tab bar
   with text labels and re-adds the Text-practice entry to the sidebar.
 
+---
+
+### Action 42 — Remove "N / total" counters from practice, signs, report pages
+
+**Request:** User asked to remove three counter badges/tiles:
+- "1 / 140" question counter on the Listening + Speak + AI score practice pages
+- "Sign 1 / 84" counter on the Traffic Signs page
+- "Questions Seen 0/140" tile on the Training Progress Report page
+
+**Files modified:**
+
+1. **`app/practice/page.js`** — line 337. Removed
+   `<span className="badge badge-blue">{safeIdx + 1} / {filtered.length}</span>`
+   from the question-card meta row. The row now starts with the difficulty
+   badge. `safeIdx` and `filtered.length` are still used elsewhere (nav arrows,
+   auto-play, disabled-state on Next), so no other cleanup needed.
+
+2. **`app/signs/page.js`** — line 66. Removed
+   `<span className="badge badge-blue">Sign {idx + 1} / {filtered.length}</span>`
+   from the sign card. The card now starts with the category badge. `idx` and
+   `filtered.length` are still used elsewhere (next/prev navigation, modulo
+   wrap), so no other cleanup needed.
+
+3. **`app/report/ReportClient.js`** — Removed the
+   `{ val: \`${qpLength}/${totalQuestions}\`, label: t('questionsSeen') }`
+   entry from the `metrics` array. The metrics grid now has 7 tiles (was 8):
+   Understood, Need Review, Avg Q Score, Avg Sign Score, Mocks Taken,
+   Best Mock, Latest Mock. Dropped the `qpLength` and `totalQuestions` props
+   from the component signature since they're no longer referenced. The
+   `t('questionsSeen')` translation key remains in `RT` across all 6 locales —
+   harmless dead string, kept rather than deleted from 6 places per the
+   "don't churn surrounding code" guideline; can be reused if the metric is
+   ever brought back.
+
+4. **`app/report/page.js`** — Stopped passing `qpLength={qp?.length ?? 0}` and
+   `totalQuestions={QUESTIONS.length}` to `<ReportClient>`. The server still
+   imports `QUESTIONS` for the category-stats aggregation, so the import line
+   is unchanged.
+
+**Not changed:**
+
+- The data structures behind the counters: `QUESTIONS` (140 items),
+  `SIGNS` (84 items), and `question_progress` rows are untouched. The UI just
+  no longer surfaces the total counts to the user.
+- The category-performance section of the report still shows per-category
+  "X/Y seen" lines — those are scoped per category, not the global totals
+  the user asked about, and parallel the per-category coverage bars; left
+  intact.
+- Translation tables (`T`, `MT`, `DT`, `RT`, `NAV_LABELS`) — no keys removed.
+- All other badges, headers, and page chrome unchanged.
+
+**Verification:**
+
+- `npx next build` → ✓ All 16 routes built.
+  - `/practice` 7.07 → 7.05 kB
+  - `/signs` 2.07 → 2.05 kB
+  - `/report` 6.14 → 6.11 kB
+  Minor savings from the removed JSX + prop-passing.
+
+**Net diff:** 4 files, ~-2 lines each (badge removed). Plus signature cleanup.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/practice/page.js app/signs/page.js
+  app/report/page.js app/report/ReportClient.js` restores the 3 counter
+  badges/tile and the `qpLength` / `totalQuestions` plumbing.
+

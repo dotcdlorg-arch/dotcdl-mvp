@@ -334,7 +334,6 @@ function PracticeInner() {
       <div className="card">
         {/* Meta row */}
         <div className="flex-c mb-8">
-          <span className="badge badge-blue">{safeIdx + 1} / {filtered.length}</span>
           <span className={`badge ${diffClass}`}>{q.difficulty}</span>
           <span className="badge badge-gray">{q.category}</span>
           {p?.status === 'understood' && <span className="badge badge-green">✓ Understood</span>}
