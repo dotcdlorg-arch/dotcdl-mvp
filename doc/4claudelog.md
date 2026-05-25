@@ -1595,3 +1595,150 @@ git add middleware.js doc/4claudelog.md
 git commit -m "Fix Cache 404: return explicit x-middleware-next passthrough instead of undefined"
 git push
 ```
+
+---
+
+## Session 11 — Switch middleware to Node.js runtime (2026-05-24)
+
+### Action 27 — Root cause: all middleware errors stem from Edge Runtime; switch to Node.js runtime
+
+**Files modified:** `next.config.mjs`, `middleware.js`
+
+**Error:** `Cache 404 Not Found Key /404.html` — still occurring after Session 10's `x-middleware-next` fix.
+
+**Root cause analysis:**
+
+Consulted Next.js docs and the Next.js 15.2 release blog. The complete chain of all middleware errors (Sessions 4–10) traces to a single root cause: **middleware was running in Edge Runtime on Vercel**.
+
+Vercel's Edge Runtime:
+1. Runs a separate source-level compilation of `middleware.js` (independent of Next.js's webpack build)
+2. That compiler bundles `@clerk/backend` internals → rejected (`#crypto`, `#safe-node-apis`, `@clerk/shared/buildAccountsBaseUrl`)
+3. Without Clerk, `import { NextResponse } from 'next/server'` caused `__dirname` in Vercel's CJS transform
+4. Without the import, `req.nextUrl` and `req.cookies` were undefined (NextRequest-only APIs)
+5. With raw `new Response(null, { headers: { 'x-middleware-next': '1' } })`, Vercel's edge still returned Cache 404 (edge passthrough signal not properly understood by Vercel's compiled source path)
+
+**Key discovery:** Next.js 15.2 introduced `experimental.nodeMiddleware` (experimental); **Next.js 15.5.0 made it stable**. This project runs 15.5.18. Switching middleware to Node.js runtime eliminates ALL Edge Runtime constraints in one change.
+
+Sources:
+- [nextjs.org/blog/next-15-2 — Node.js Middleware section](https://nextjs.org/blog/next-15-2#nodejs-middleware-experimental)
+- Next.js docs version history: `v15.5.0 — Middleware can now use the Node.js runtime (stable)`
+
+---
+
+**Change 1 — `next.config.mjs`**
+
+Added `experimental.nodeMiddleware: true`:
+
+```diff
+  const nextConfig = {
++   experimental: {
++     nodeMiddleware: true,
++   },
+    images: { ... }
+  }
+```
+
+---
+
+**Change 2 — `middleware.js`** — full rewrite back to clean, correct Next.js pattern
+
+```js
+import { NextResponse } from 'next/server'
+
+const PROTECTED = [
+  '/practice', '/signs', '/mock', '/report', '/drive',
+  '/api/progress', '/api/score', '/api/transcribe',
+  '/api/mock', '/api/device', '/api/conversation', '/api/pronunciation',
+]
+
+export default function middleware(req) {
+  const { pathname } = req.nextUrl
+  if (PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))) {
+    if (!req.cookies.has('__session')) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      return NextResponse.redirect(new URL('/sign-in', req.url))
+    }
+  }
+  return NextResponse.next()
+}
+
+export const config = {
+  runtime: 'nodejs',
+  matcher: [
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+  ],
+}
+```
+
+What this restores vs all the prior workarounds:
+
+| Workaround removed | Proper API restored |
+|---|---|
+| `new URL(req.url)` | `req.nextUrl` (NextRequest property) |
+| `req.headers.get('cookie').includes(...)` | `req.cookies.has('__session')` (NextRequest property) |
+| `new Response(null, { headers: { 'x-middleware-next': '1' } })` | `NextResponse.next()` |
+| `new Response('Unauthorized', { status: 401 })` | `NextResponse.json({ error: 'Unauthorized' }, { status: 401 })` |
+| `Response.redirect(...)` | `NextResponse.redirect(...)` |
+
+`runtime: 'nodejs'` in the `config` export tells Vercel to deploy middleware as a Lambda (Node.js function), not an Edge Function. Vercel no longer runs its own source-level Edge compilation on the file — it uses the Next.js webpack output directly.
+
+**Build verified:** ✅
+```
+✓ Compiled successfully
+✓ Generating static pages (16/16)
+```
+(No `ƒ Middleware` line — expected; Node.js middleware is a Lambda, not reported as an Edge bundle at build time.)
+
+**Reversal:**
+- Remove `experimental: { nodeMiddleware: true }` from `next.config.mjs`
+- Revert `middleware.js` to the Session 10 version (raw Response workarounds)
+- Warning: reverting restores ALL prior Edge Runtime errors
+
+---
+
+## Session 11 Deployment Instructions
+
+```bash
+git add middleware.js next.config.mjs doc/4claudelog.md
+git commit -m "Fix middleware: switch to Node.js runtime (experimental.nodeMiddleware) — eliminates all Edge bundling errors"
+git push
+```
+
+---
+
+## Session 12 — Add vercel.json to lock framework preset (2026-05-24)
+
+### Action 28 — Create `vercel.json` with `framework: "nextjs"`
+
+**File created:** `vercel.json`
+
+**Reference:** `doc/404.md.rtf` — checklist item 3: *"Ensure the Framework Preset matches your actual framework (Next.js, Vite, etc.). Misconfiguration here can lead to successful builds that emit files to unexpected locations."*
+
+**Root cause addressed:** Vercel's framework preset was not enforced in code. If set incorrectly in the dashboard (e.g. "Other" instead of "Next.js"), Vercel uses wrong default build commands and output directory settings, causing NOT_FOUND even when the build succeeds locally.
+
+**Fix:** `vercel.json` with `framework: "nextjs"` locks the preset at the repo level, overriding whatever the dashboard shows. Vercel reads this file before applying project settings.
+
+```json
+{
+  "framework": "nextjs"
+}
+```
+
+**Why this is safe:** `vercel.json` `framework` field is Vercel's documented way to set the framework preset in code. For Next.js App Router projects the correct value is `"nextjs"`. No other settings are needed — Next.js default build command (`next build`) and output directory (`.next`) are already correct.
+
+**Build verified:** ✅ `npm run build` passes unchanged.
+
+**Reversal:** Delete `vercel.json`.
+
+---
+
+## Session 12 Deployment Instructions
+
+```bash
+git add vercel.json doc/4claudelog.md
+git commit -m "Add vercel.json: lock framework preset to nextjs"
+git push
+```
