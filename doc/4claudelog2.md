@@ -673,3 +673,80 @@ was no way to go back, and no explanation was shown at any point.
 - `git checkout HEAD~ -- app/mock/page.js` reverts to the pre-Action-43
   speak-mode UI (no answer field, no explanation, no Prev/Next nav).
 
+---
+
+### Action 44 — Drive Mode: add "Hear answer" voice button
+
+**Request:** User asked to add a voice-answer button to Drive Mode's "Your English
+answer" area that plays the model answer in a real-person voice so the driver can
+listen and repeat for practice.
+
+**File modified:** `app/drive/page.js`
+
+**Changes:**
+
+1. **Added `hearAnswer` translation key** to `DT` for all 6 locales:
+   - en: `'🔊 Hear answer'`
+   - zh: `'🔊 听答案'`
+   - es: `'🔊 Escuchar respuesta'`
+   - hi: `'🔊 उत्तर सुनें'`
+   - pa: `'🔊 ਜਵਾਬ ਸੁਣੋ'`
+   - vi: `'🔊 Nghe câu trả lời'`
+
+2. **Added a third button** to the "Your turn" controls card (the block
+   shown when `!isAutoConv && driverState === 'idle' && currentQ && qIdx <
+   questions.length`, lines ~645–661). Placed after the existing "Replay
+   question" button so the row reads: Tap-to-record → Replay question →
+   Hear answer.
+
+   - `<button className="btn btn-sm btn-success" onClick={() =>
+     speak(currentQ.simple_driver_answer_en, null)}>{dt(lang,
+     'hearAnswer')}</button>`
+   - Green `btn-success` styling distinguishes "model answer playback" from
+     the neutral "replay officer question" button next to it.
+   - Reuses the existing `speak()` helper — same OpenAI TTS pipeline,
+     same `selectedVoice.id`, same browser-synthesis fallback if the API
+     fails. Driver hears the answer in the same real-person voice that
+     the officer uses.
+   - Added `flexWrap: 'wrap'` to the parent `.flex-c` so the now-three
+     buttons wrap gracefully on narrow phone widths.
+
+**Voice choice — design note:**
+
+The button plays the answer using `selectedVoice.id` (currently the officer
+voice). Using a separate "driver voice" was considered but skipped:
+- the existing voice catalog is named for officers, not drivers;
+- the goal is "hear a real human voice say the answer" — any natural human
+  voice serves that goal;
+- changing voice ID mid-session would require fetching a second OpenAI TTS
+  call and managing two audio playback contexts; out of scope for a
+  "repeat-after-me" study aid.
+
+If the user later wants a distinct voice for the model answer, that's a
+follow-up change: parameterize `speak()` with an optional `voiceId` override.
+
+**State machine:**
+
+Clicking "Hear answer" goes `idle → speaking → idle` via the existing
+`audio.onended` → `setDriverState('idle')` path. The "Your turn" card
+re-renders identically after playback. No new state was added.
+
+**Not changed:**
+
+- The `speak()` function itself, the OpenAI `/api/speak` route, the voice
+  catalog, or any other Drive Mode behavior.
+- The `autoConv` loop, preview-all, score handling, scenario selection.
+- The "Hear answer" is intentionally NOT shown in the auto-conv card (lines
+  ~620–642) — that mode is a hands-free loop where the user is already
+  listening; clicking a button defeats the purpose.
+
+**Verification:**
+
+- `npx next build` → ✓ All 16 routes built. `/drive` 8.42 → 8.49 kB
+  (+0.07 kB — one new button + 6 locale strings).
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/drive/page.js` removes the button and the
+  6 `hearAnswer` translation keys.
+

@@ -38,6 +38,7 @@ const DT = {
     listening: 'Recording…', processing: 'Processing…', speaking: 'Officer speaking…',
     tap2speak: '🎤 Tap to record', stopRec: '⏹ Stop recording',
     replayQ: '🔊 Replay', endEarly: 'End session',
+    hearAnswer: '🔊 Hear answer',
     tryAgain: 'Try again', fullReport: '📊 Full report',
     loadingVoice: 'Loading voice…',
     voiceError: 'Voice failed to load, using system voice',
@@ -65,6 +66,7 @@ const DT = {
     listening: '正在录音…', processing: '处理中…', speaking: '警官说话中…',
     tap2speak: '🎤 点击录音', stopRec: '⏹ 停止录音',
     replayQ: '🔊 重播', endEarly: '提前结束',
+    hearAnswer: '🔊 听答案',
     tryAgain: '再试一次', fullReport: '📊 完整报告',
     loadingVoice: '加载声音…',
     voiceError: '声音加载失败，使用系统声音',
@@ -92,6 +94,7 @@ const DT = {
     listening: 'Grabando…', processing: 'Procesando…', speaking: 'Oficial hablando…',
     tap2speak: '🎤 Grabar respuesta', stopRec: '⏹ Detener',
     replayQ: '🔊 Repetir', endEarly: 'Terminar sesión',
+    hearAnswer: '🔊 Escuchar respuesta',
     tryAgain: 'Intentar de nuevo', fullReport: '📊 Informe completo',
     loadingVoice: 'Cargando voz…',
     voiceError: 'Error de voz, usando sistema',
@@ -119,6 +122,7 @@ const DT = {
     listening: 'रिकॉर्ड हो रहा है…', processing: 'प्रसंस्करण…', speaking: 'अधिकारी बोल रहे हैं…',
     tap2speak: '🎤 रिकॉर्ड करें', stopRec: '⏹ रोकें',
     replayQ: '🔊 दोबारा', endEarly: 'सत्र समाप्त',
+    hearAnswer: '🔊 उत्तर सुनें',
     tryAgain: 'फिर कोशिश', fullReport: '📊 पूरी रिपोर्ट',
     loadingVoice: 'आवाज़ लोड हो रही है…',
     voiceError: 'आवाज़ त्रुटि, सिस्टम उपयोग कर रहे हैं',
@@ -146,6 +150,7 @@ const DT = {
     listening: 'ਰਿਕਾਰਡ ਹੋ ਰਿਹਾ ਹੈ…', processing: 'ਪ੍ਰੋਸੈਸਿੰਗ…', speaking: 'ਅਫਸਰ ਬੋਲ ਰਹੇ ਹਨ…',
     tap2speak: '🎤 ਰਿਕਾਰਡ ਕਰੋ', stopRec: '⏹ ਰੋਕੋ',
     replayQ: '🔊 ਦੁਬਾਰਾ', endEarly: 'ਸੈਸ਼ਨ ਖਤਮ',
+    hearAnswer: '🔊 ਜਵਾਬ ਸੁਣੋ',
     tryAgain: 'ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼', fullReport: '📊 ਪੂਰੀ ਰਿਪੋਰਟ',
     loadingVoice: 'ਆਵਾਜ਼ ਲੋਡ ਹੋ ਰਹੀ ਹੈ…',
     voiceError: 'ਆਵਾਜ਼ ਗਲਤੀ, ਸਿਸਟਮ ਵਰਤ ਰਹੇ ਹਾਂ',
@@ -173,6 +178,7 @@ const DT = {
     listening: 'Đang ghi âm…', processing: 'Đang xử lý…', speaking: 'Viên chức đang nói…',
     tap2speak: '🎤 Ghi âm', stopRec: '⏹ Dừng',
     replayQ: '🔊 Phát lại', endEarly: 'Kết thúc sớm',
+    hearAnswer: '🔊 Nghe câu trả lời',
     tryAgain: 'Thử lại', fullReport: '📊 Xem báo cáo',
     loadingVoice: 'Đang tải giọng nói…',
     voiceError: 'Lỗi giọng nói, dùng hệ thống',
@@ -646,12 +652,15 @@ export default function DrivePage() {
           <div className="card" style={{ textAlign: 'center', padding: '20px' }}>
             <div style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: 10 }}>{dt(lang, 'yourTurn')}</div>
             <div className="q-officer" style={{ marginBottom: 16 }}>{currentQ.officer_question_en}</div>
-            <div className="flex-c" style={{ justifyContent: 'center' }}>
+            <div className="flex-c" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
               <button className="btn btn-drive btn-lg" onClick={startListening}>
                 {dt(lang, 'tap2speak')}
               </button>
               <button className="btn btn-sm" onClick={() => speak(currentQ.officer_question_en, null)}>
                 {dt(lang, 'replayQ')}
+              </button>
+              <button className="btn btn-sm btn-success" onClick={() => speak(currentQ.simple_driver_answer_en, null)}>
+                {dt(lang, 'hearAnswer')}
               </button>
             </div>
             <div style={{ marginTop: 10 }}>
