@@ -1,0 +1,236 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Georgia-Bold;\f1\fnil\fcharset0 Georgia;\f2\fnil\fcharset0 Menlo-Regular;
+\f3\froman\fcharset0 TimesNewRomanPSMT;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c0\c0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid401\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid5}
+{\list\listtemplateid6\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid501\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid6}
+{\list\listtemplateid7\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid601\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid7}
+{\list\listtemplateid8\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid701\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid8}
+{\list\listtemplateid9\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid801\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid9}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}{\listoverride\listid6\listoverridecount0\ls6}{\listoverride\listid7\listoverridecount0\ls7}{\listoverride\listid8\listoverridecount0\ls8}{\listoverride\listid9\listoverridecount0\ls9}}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sb157\sa157\pardirnatural\partightenfactor0
+
+\f0\b\fs39 \cf2 Understanding and Fixing Vercel NOT_FOUND (404) Errors\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\fs24 \cf2 Overview\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 The 
+\f2\fs18 NOT_FOUND
+\f1\fs24  error on Vercel is a 404-style error that indicates the requested resource (page, asset, or deployment) could not be found at the URL being accessed. It commonly arises from incorrect URLs, missing or deleted deployments, misconfigured build/output settings, or routing issues, especially for single-page applications (SPAs) and client-side routers.[\super 1][\nosupersub 2][\super 3][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 What the NOT_FOUND Error Means\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 Vercel\'92s documentation describes 
+\f2\fs18 NOT_FOUND
+\f1\fs24  as occurring when a requested resource cannot be located, often because it was moved, deleted, or the URL is wrong. The error page typically displays a 404 with a message such as 
+\f2\fs18 NOT_FOUND: Not Found
+\f1\fs24  and is served by Vercel rather than your application when Vercel has no matching file, function, or route for that path.[^5]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 Common Root Causes\
+1. Incorrect or Non\uc0\u8209 Existing Deployment URL\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 If the deployment URL or path is mistyped, or if the deployment has been deleted, Vercel cannot resolve the request and returns 
+\f2\fs18 NOT_FOUND
+\f1\fs24 . This includes cases where a preview deployment link is used after the deployment has been removed, or a path is requested that was never part of the output.[^4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 2. Deployment Deleted or Never Built Successfully\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 A 
+\f2\fs18 NOT_FOUND
+\f1\fs24  error can occur when you visit a deployment URL for a deployment that no longer exists or whose build failed and produced no output assets. In these cases, the project dashboard would show either missing deployments or failing build logs rather than a healthy deployment.[\super 1][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 3. Output Directory or Build Settings Misconfigured\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 If the "Output Directory" or similar build setting does not point to the directory where your framework actually emits static files, Vercel may end up serving an empty or wrong folder, so expected files and pages are not present, leading to 404s. This is a frequent cause when using custom build commands or non-default framework configurations.[^4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 4. Wrong Framework Preset in Vercel Project Settings\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 Selecting the wrong framework preset (for example, "Other" instead of Next.js, Create React App, Vite, etc.) can cause Vercel to use incorrect default build and output settings, resulting in 404s even though the app works locally. Multiple community reports show that simply matching the framework preset to the actual framework fixes 
+\f2\fs18 NOT_FOUND
+\f1\fs24  issues after redeploying.[\super 2][\nosupersub 6]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 5. Missing Rewrites for SPAs and Client\uc0\u8209 Side Routers\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 For single-page applications (React Router, Vue Router, Flutter web, etc.), Vercel needs explicit rewrites so that all unknown paths are served by the SPA\'92s entry file (commonly 
+\f2\fs18 index.html
+\f1\fs24 ). Without these rewrites, direct navigation or refreshing non-root routes (e.g. 
+\f2\fs18 /dashboard
+\f1\fs24 , 
+\f2\fs18 /user/123
+\f1\fs24 ) leads Vercel to look for a server-side route or static file at that path and return 
+\f2\fs18 NOT_FOUND
+\f1\fs24  if none exists.[\super 3][\nosupersub 6][\super 2][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 6. Wrong Root Directory or Ignored Files\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 If the project\'92s root directory is mis-set, Vercel may build from the wrong folder and not include the app\'92s pages, causing 404s. Similarly, misconfigured 
+\f2\fs18 .vercelignore
+\f1\fs24  that excludes important files (like components or pages) can break routing or building, indirectly leading to missing routes and 404 errors.[\super 7][\nosupersub 2][^4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 Typical Scenarios Where NOT_FOUND Appears\
+Scenario A: Only / Works, Other Routes 404 on Refresh\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 Developers often report that the home route works but nested routes 404 after a refresh or direct navigation when deploying client-side routed apps to Vercel. The root cause is usually missing 
+\f2\fs18 vercel.json
+\f1\fs24  rewrites that route all paths back to the SPA entry file.[\super 6][\nosupersub 2][^3]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 Scenario B: Next.js or React App Works Locally but 404s After Deploy\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 In many cases, the app runs fine locally but Vercel returns 
+\f2\fs18 NOT_FOUND
+\f1\fs24  for the production URL. Common causes include using the wrong framework preset, incorrect output directory, or building from the wrong root folder.[\super 8][\nosupersub 2][\super 6][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 Scenario C: Old Preview or Deleted Deployment URL\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 Accessing an outdated preview deployment link or a deployment that has been deleted from the Vercel dashboard will result in 
+\f2\fs18 NOT_FOUND
+\f1\fs24 , because the deployment no longer exists on Vercel\'92s infrastructure.[\super 1][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b \cf2 Step\uc0\u8209 by\u8209 Step Troubleshooting Checklist\
+1. Verify the URL and Deployment Existence\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls1\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}Ensure there are no typos in the domain or path you are visiting, including scheme (
+\f2\fs18 https
+\f1\fs21 ), subdomain, and pathname.[^4]\
+{\listtext	\uc0\u8226 	}Check in the Vercel project dashboard that the deployment you are trying to access exists, is listed under deployments, and is not in an error state.[\super 1][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 2. Review Build Logs and Output\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls2\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}Open the deployment\'92s build logs and confirm the build completed successfully without errors that might prevent pages from being generated.[\super 4][\nosupersub 1]\
+{\listtext	\uc0\u8226 	}In the deployment details, inspect the Build Summary or Output view to confirm that expected pages and static assets are present at the correct output paths.[^9]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 3. Confirm Framework Preset and Build Settings\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls3\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}In Project Settings 
+\f3 \uc0\u8594 
+\f1  Build & Development Settings, ensure the "Framework Preset" matches your actual framework (Next.js, Vite, Create React App, Angular, etc.).[\super 2][\nosupersub 6]\
+{\listtext	\uc0\u8226 	}Verify build commands and environment variables are correct for the framework; misconfiguration here can lead to successful builds that emit files to unexpected locations.[^4]\
+{\listtext	\uc0\u8226 	}Check the "Output Directory" setting and ensure it matches where your build tool writes the final static files (for example 
+\f2\fs18 dist
+\f1\fs21 , 
+\f2\fs18 build
+\f1\fs21 , or 
+\f2\fs18 .next
+\f1\fs21  depending on the framework).[^4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 4. Configure Rewrites for SPAs or Client\uc0\u8209 Side Routing\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 If using a client-side router (React Router, Vue Router, Flutter web, etc.) deployed as a static SPA:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls4\ilvl0
+\fs21 \cf2 {\listtext	\uc0\u8226 	}Add a 
+\f2\fs18 vercel.json
+\f1\fs21  file at the project root with a rewrite rule that sends all paths to the entry file, commonly 
+\f2\fs18 index.html
+\f1\fs21 :\
+\pard\pardeftab720\pardirnatural\partightenfactor0
+
+\f2\fs18 \cf2 \{\uc0\u8232   "rewrites": [\{ "source": "/(.*)", "destination": "/index.html" \}]\u8232 \}\u8232 \
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf2 This pattern is documented by Vercel and widely used in community solutions to eliminate 404s on SPA routes.[\super 3][\nosupersub 6][^4]\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls5\ilvl0
+\fs21 \cf2 {\listtext	\uc0\u8226 	}For some setups, the destination may need to be 
+\f2\fs18 /
+\f1\fs21  instead of 
+\f2\fs18 /index.html
+\f1\fs21  if the framework handles routing from the root file.[\super 2][\nosupersub 3]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 5. Fix Root Directory and Ignored Files\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls6\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}Confirm that the project\'92s Root Directory in Vercel settings matches the folder that contains your app\'92s source (e.g. 
+\f2\fs18 /app
+\f1\fs21 , 
+\f2\fs18 /frontend
+\f1\fs21 ), especially if the app lives in a subdirectory of a monorepo.[\super 2][\nosupersub 4]\
+{\listtext	\uc0\u8226 	}Review 
+\f2\fs18 .vercelignore
+\f1\fs21  to ensure it is not excluding critical folders like 
+\f2\fs18 pages
+\f1\fs21 , 
+\f2\fs18 app
+\f1\fs21 , or 
+\f2\fs18 components
+\f1\fs21  that are required at build time.[^7]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 6. Check Access and Permissions\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls7\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}If the project uses deployment protection, ensure you are authenticated and have access to view the deployment or environment (preview, production, etc.).[^4]\
+{\listtext	\uc0\u8226 	}Verify that you are opening the correct environment URL (production vs preview) based on how you deployed (for example 
+\f2\fs18 vercel --prod
+\f1\fs21  for production deployments).[^6]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 7. Redeploy After Configuration Changes\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls8\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}After updating 
+\f2\fs18 vercel.json
+\f1\fs21 , build settings, framework preset, or root directory, trigger a new deployment and test the URL again once the deployment completes.[\super 3][\nosupersub 6][^2]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 Best Practices to Avoid NOT_FOUND in the Future\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sb105\sa105\pardirnatural\partightenfactor0
+\ls9\ilvl0
+\f1\b0\fs21 \cf2 {\listtext	\uc0\u8226 	}Always confirm the Framework Preset and Output Directory when setting up a new Vercel project or changing frameworks.[\super 6][\nosupersub 2][^4]\
+{\listtext	\uc0\u8226 	}For SPAs, introduce a 
+\f2\fs18 vercel.json
+\f1\fs21  with a global rewrite early in the project to avoid 404s on client routes.[\super 3][\nosupersub 6][^4]\
+{\listtext	\uc0\u8226 	}Avoid over-aggressive 
+\f2\fs18 .vercelignore
+\f1\fs21  rules; exclude only what is clearly unnecessary for builds.[^7]\
+{\listtext	\uc0\u8226 	}Use Vercel\'92s build logs and output summary as part of the standard deployment verification checklist to ensure pages are being emitted where expected.[\super 9][\nosupersub 4]\
+{\listtext	\uc0\u8226 	}Clean up old preview URLs and use the latest deployment links to avoid confusion with deleted deployments.[\super 1][\nosupersub 4]\
+\pard\pardeftab720\sb315\sa105\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 How This Fits in Vercel\'92s Model\
+\pard\pardeftab720\sa210\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 Vercel\'92s platform is file-system and output-directory driven: the build step produces a specific directory tree of static assets and serverless functions that Vercel maps directly to URL paths. A 
+\f2\fs18 NOT_FOUND
+\f1\fs24  error is essentially Vercel signaling that, in this deployment\'92s output, there is no file or function matching the requested path, and no rewrite or redirect rule that would map it to another handler.[\super 9][\nosupersub 4]\
+Understanding this model helps explain why configuration details such as framework preset, output directory, rewrites, and root directory are so critical to preventing 404 errors. When these are correctly set, Vercel can reliably translate incoming requests into the correct assets or functions, and your users see application pages instead of 
+\f2\fs18 NOT_FOUND
+\f1\fs24 .[\super 9][\nosupersub 4]}
