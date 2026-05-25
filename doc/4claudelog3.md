@@ -296,3 +296,111 @@ questions without recording, mirroring the mock page's Prev/Next).
 **Reversal:**
 
 - `git checkout HEAD~ -- app/drive/page.js` reverts both fixes.
+
+---
+
+### Action 48 — Drive conversation: add scenario dropdown selector
+
+**Request:** User asked to add a dropdown selection field on the
+Drive Mode / scenario pages so the user can switch between
+different scenarios without leaving the conversation phase.
+
+**File modified:** `app/drive/page.js`
+
+**Changes:**
+
+1. **Added a `<select>` dropdown** inside `drive-header` at the top
+   of the conversation phase (right below the scenario title +
+   progress bar):
+   ```jsx
+   <div style={{ marginTop: 10 }}>
+     <label style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginRight: 8 }}>
+       🎭 {dt(lang, 'selectScenario')}
+     </label>
+     <select
+       value={selectedScenario?.id || ''}
+       onChange={e => {
+         const next = SCENARIOS.find(s => s.id === e.target.value)
+         if (next && next.id !== selectedScenario?.id) {
+           stopAutoConv()
+           startScenario(next)
+         }
+       }}
+       style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--line)', fontSize: '.85rem', background: 'var(--bg)', color: 'var(--ink)' }}
+     >
+       {SCENARIOS.map(s => (
+         <option key={s.id} value={s.id}>{s.icon} {s.name}</option>
+       ))}
+     </select>
+   </div>
+   ```
+   - Reuses the existing `selectScenario` translation key from `DT`
+     (already localized to all 7 languages) — no new i18n entries
+     needed.
+   - `<option>` labels include the scenario icon + name. Icons
+     render inside option text in modern browsers (Chrome, Firefox,
+     Safari all support emoji-in-option). For terminals/browsers
+     that don't, the name remains readable.
+
+2. **Switch logic — onChange handler:**
+   - No-ops if user picks the currently-selected scenario (prevents
+     accidental session restart).
+   - Calls `stopAutoConv()` first to kill any in-flight auto-loop
+     before starting the new scenario. `startScenario` already
+     calls `stopDrivePreview` internally, which pauses
+     `audioRef.current` and clears the browser `speechSynthesis`
+     queue, so the new scenario's audio starts clean.
+   - Calls `startScenario(next)` which:
+     - resets `qIdx` to 0
+     - clears `convHistory` and `sessionScores`
+     - re-shuffles 8 questions for the new scenario's categories
+     - asks Q1 after 300 ms
+
+**Design notes:**
+
+- **Where the dropdown lives:** placed in the conversation-phase
+  header so it's visible the entire time the user is practicing.
+  Not added to the result phase (where the user already has
+  `Restart` + `Try again` + `Full report`) — out of scope for the
+  "switch scenarios on the fly" request.
+- **Why not also a "Switch voice" dropdown?** User asked
+  specifically for scenarios. Voice change is a separate session
+  concern (the voice is part of the officer's identity, not the
+  practice content) and would mid-stream interrupt the persona.
+  Out of scope.
+- **Mid-recording switching:** if the user is currently in
+  `listening` or `processing` state and changes the dropdown,
+  `startScenario` doesn't explicitly cancel the MediaRecorder.
+  That edge case stays as-is — it's brief enough (1-3 sec
+  typical recording) that requiring the user to stop recording
+  first is acceptable. Avoided wiring extra cleanup to keep the
+  change surgical.
+
+**Not changed:**
+
+- `startScenario`, `stopAutoConv`, `stopDrivePreview`, or any
+  other helper.
+- The scenario picker grid in `phase === 'select'` — still works
+  as the entry path.
+- All Prev / Next nav, recording, scoring, result rendering — all
+  unchanged.
+
+**Verification:**
+
+- `npx next build` → ✓ 16/16 routes. `/drive` 8.72 → 8.86 kB
+  (+0.14 kB for the dropdown JSX).
+- Manual flow:
+  - Start "Document Check" → conversation phase shows dropdown
+    with "📋 Document Check" as the selected option.
+  - Open dropdown → see all 6 scenarios with their icons.
+  - Pick "Hours of Service / ELD" → conv thread clears, new
+    officer Q1 plays in the same selected voice. Progress bar
+    resets. Page title updates to "⏱ Hours of Service / ELD".
+  - Pick the same scenario again → no-op (no restart).
+  - Pick a scenario while auto-loop is running → `stopAutoConv`
+    fires, loop ends, new scenario starts cleanly.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/drive/page.js` removes the dropdown
+  block; the conversation header reverts to title + progress bar.

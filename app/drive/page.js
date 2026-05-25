@@ -592,6 +592,26 @@ export default function DrivePage() {
               <div className="bar-fill brand" style={{ width: Math.round(qIdx / questions.length * 100) + '%' }} />
             </div>
           </div>
+          <div style={{ marginTop: 10 }}>
+            <label style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginRight: 8 }}>
+              🎭 {dt(lang, 'selectScenario')}
+            </label>
+            <select
+              value={selectedScenario?.id || ''}
+              onChange={e => {
+                const next = SCENARIOS.find(s => s.id === e.target.value)
+                if (next && next.id !== selectedScenario?.id) {
+                  stopAutoConv()
+                  startScenario(next)
+                }
+              }}
+              style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--line)', fontSize: '.85rem', background: 'var(--bg)', color: 'var(--ink)' }}
+            >
+              {SCENARIOS.map(s => (
+                <option key={s.id} value={s.id}>{s.icon} {s.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Conversation thread */}
