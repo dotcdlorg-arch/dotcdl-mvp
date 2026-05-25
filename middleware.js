@@ -12,7 +12,7 @@ function isProtected(pathname) {
 
 // Lightweight cookie-presence check — no Clerk backend imports (avoids Vercel Edge ban on #crypto / #safe-node-apis).
 // Full JWT verification happens per-request in each API route via auth() from @clerk/nextjs/server.
-export function middleware(req) {
+export default function middleware(req) {
   if (isProtected(req.nextUrl.pathname)) {
     if (!req.cookies.has('__session')) {
       if (req.nextUrl.pathname.startsWith('/api/')) {

@@ -1210,3 +1210,63 @@ git push
 ```
 
 Then trigger a new Vercel deployment.
+
+---
+
+## Session 6 — Fix MIDDLEWARE_INVOCATION_FAILED (2026-05-24)
+
+### Action 18 — Diagnose MIDDLEWARE_INVOCATION_FAILED
+
+**Status:** ✅ Complete
+
+**Context:** After Session 5's fix, Vercel deployment now succeeds (no Edge Function rejection, "Deployment completed"). The middleware bundle is 34.4 kB. But the live site returns:
+
+```
+500: INTERNAL_SERVER_ERROR
+Code: MIDDLEWARE_INVOCATION_FAILED
+ID: sfo1::nmcxz-1779686588850-805843d8338d
+```
+
+**Root cause:** Session 5 used `export function middleware(req)` (a **named** export). When Vercel compiles the middleware from ESM to CommonJS (as shown in the build log: `Compiling "middleware.js" from ESM to CommonJS...`), this becomes:
+
+```js
+// After ESM→CJS compilation:
+exports.middleware = function middleware(req) { ... }
+```
+
+Next.js's middleware invocation code looks for the **default** export:
+```js
+const mod = require('./middleware')
+const handler = mod.default || mod  // looks for default, not named 'middleware'
+handler(req)
+```
+
+Since `exports.middleware` is not `exports.default`, `handler` becomes the module object itself (not a function). Calling it throws `TypeError`, which surfaces as `MIDDLEWARE_INVOCATION_FAILED`.
+
+The original `clerkMiddleware` version used `export default clerkMiddleware(...)` — a default export. Session 5 changed to a named export by mistake.
+
+---
+
+### Action 19 — Fix export to default
+
+**File modified:** `middleware.js`
+
+**Change:**
+```diff
+- export function middleware(req) {
++ export default function middleware(req) {
+```
+
+One character change — `default` added. Everything else in the file unchanged.
+
+**Build verified:** ✅ `ƒ Middleware 34.3 kB` — same size, same clean bundle.
+
+---
+
+## Session 6 Deployment Instructions
+
+```bash
+git add middleware.js doc/4claudelog.md
+git commit -m "Fix MIDDLEWARE_INVOCATION_FAILED: use default export in middleware"
+git push
+```
