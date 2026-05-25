@@ -60,8 +60,8 @@ export async function POST(req) {
 
     if (!res.ok) {
       const err = await res.text()
-      console.error('OpenAI TTS error:', err)
-      return new Response('TTS failed', { status: 502 })
+      console.error(`OpenAI TTS error ${res.status}:`, err)
+      return new Response(`TTS failed: ${res.status}`, { status: 502 })
     }
 
     const audioBuffer = await res.arrayBuffer()

@@ -201,7 +201,7 @@ export default function DrivePage() {
         body: JSON.stringify({ text, voiceId: selectedVoice.id }),
       })
 
-      if (!res.ok) throw new Error('TTS API failed')
+      if (!res.ok) throw new Error(`TTS API failed: ${res.status}`)
 
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
@@ -249,7 +249,7 @@ export default function DrivePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: PREVIEW_TEXT, voiceId: voiceProfile.id }),
       })
-      if (!res.ok) throw new Error('preview failed')
+      if (!res.ok) throw new Error(`preview failed: ${res.status}`)
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const audio = new Audio(url)

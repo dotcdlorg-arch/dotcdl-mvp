@@ -1803,3 +1803,69 @@ git add middleware.js doc/4claudelog.md
 git commit -m "Restore clerkMiddleware: Node.js runtime makes Clerk backend imports valid on Vercel"
 git push
 ```
+
+---
+
+## Session 14 — Fix "no real person voice" in drive mode (2026-05-25)
+
+**Problem:** Drive mode plays robotic browser voice instead of the real human-quality OpenAI TTS voice.
+
+**Root cause chain (two layers):**
+
+1. **Layer 1 (fixed in Session 13):** Sessions 4–12 replaced `clerkMiddleware` with a custom cookie check. `auth()` in `/api/speak` threw `"Clerk: auth() was called but Clerk can't detect clerkMiddleware"` → route returned 500 → client caught the error and silently fell back to `window.speechSynthesis` (browser robotic voice). Fixed by restoring `clerkMiddleware`.
+
+2. **Layer 2 (this session):** Error messages were too vague — `throw new Error('TTS API failed')` and `throw new Error('preview failed')` swallowed the HTTP status code. Server-side `console.error` also omitted the status code. Made diagnostics impossible when OPENAI_API_KEY is missing or any other 4xx/5xx occurs.
+
+---
+
+### Action 30 — Improve TTS error logging in server route and client
+
+**Files changed:**
+- `app/api/speak/route.js` — include HTTP status in error log and response body
+- `app/drive/page.js` — include HTTP status in thrown Error for speak and preview
+
+**Before (`app/api/speak/route.js`):**
+```js
+console.error('OpenAI TTS error:', err)
+return new Response('TTS failed', { status: 502 })
+```
+
+**After (`app/api/speak/route.js`):**
+```js
+console.error(`OpenAI TTS error ${res.status}:`, err)
+return new Response(`TTS failed: ${res.status}`, { status: 502 })
+```
+
+**Before (`app/drive/page.js` — speak callback line 204):**
+```js
+if (!res.ok) throw new Error('TTS API failed')
+```
+
+**After:**
+```js
+if (!res.ok) throw new Error(`TTS API failed: ${res.status}`)
+```
+
+**Before (`app/drive/page.js` — previewVoice line 252):**
+```js
+if (!res.ok) throw new Error('preview failed')
+```
+
+**After:**
+```js
+if (!res.ok) throw new Error(`preview failed: ${res.status}`)
+```
+
+**Build result:** `npm run build` — clean, all 16 static pages generated, no errors.
+
+**Reversal:** Revert error message strings to original values; no logic change.
+
+**Outstanding diagnosis point:** If real-person voice still does not work after deploying Session 13 + 14, check Vercel dashboard → Settings → Environment Variables and confirm `OPENAI_API_KEY` is set for the Production environment. The browser console will now show the exact HTTP status code (e.g., `TTS API failed: 500`) to confirm which layer is failing.
+
+## Session 14 Deployment Instructions
+
+```bash
+git add app/api/speak/route.js app/drive/page.js doc/4claudelog.md
+git commit -m "Improve TTS error logging: include HTTP status in server log and client error"
+git push
+```
