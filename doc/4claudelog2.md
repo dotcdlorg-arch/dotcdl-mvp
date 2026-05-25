@@ -573,3 +573,103 @@ buttons, leaving only the 5 remaining icons as buttons.
   app/report/page.js app/report/ReportClient.js` restores the 3 counter
   badges/tile and the `qpLength` / `totalQuestions` plumbing.
 
+---
+
+### Action 43 — Mock speaking mode: show correct answer + explanation, add Prev/Next
+
+**Request:** User asked to (a) surface the correct answer and explanation as a field
+in the mock-inspection speaking mode, and (b) add Previous / Next question buttons.
+
+**Context:** Before this change, the speak-mode UI hid the model answer until the
+recording was scored (`recState === 'done'`), and the only forward navigation was
+"Skip" (which scored 0) or the "Next →" submit (which scored the recording). There
+was no way to go back, and no explanation was shown at any point.
+
+**File modified:** `app/mock/page.js`
+
+**Changes:**
+
+1. **Import `getExplanation`** from `@/lib/data` alongside the existing imports.
+
+2. **Added 2 new keys per locale to `MT`** (6 locales × 2 keys = 12 new strings):
+   - `prev: '← Previous'` and `next: 'Next →'` for the new nav buttons.
+     (The existing `nextQ` is "Next →" used by the score-and-advance button;
+     keeping them distinct prevents future confusion if either label needs
+     to diverge.)
+   - `explanation: 'Explanation'` label for the new collapsible field.
+
+3. **Added `gotoSpeak(idx)` helper** (after `nextSpeakQ` / before `skipSpeakQ`).
+   Pure navigation: clamps `idx`, resets `recState` to idle, clears
+   `currentTranscript` and `currentScore`, auto-speaks the destination
+   question. Does **not** push to `speakScores` / `answers` — so jumping
+   away mid-question leaves it unscored (same default-zero behaviour as
+   Skip). Final scoring at submit-time still iterates `items.length`.
+
+4. **Computed `explanationText = getExplanation(item.data, lang)`** at the top
+   of the `phase === 'active' && mode === 'speak'` branch. For `lang === 'en'`
+   this returns `''` (per the Action 39 change to `getExplanation`), so the
+   explanation collapses into nothing for English users — the model answer
+   already covers that case.
+
+5. **Two new UI blocks** inserted between the officer-question card and the
+   recording-controls block:
+
+   a. **Always-visible correct-answer + explanation reference card** —
+      mirrors the pattern from `app/practice/page.js` lines 365–378: a
+      green "✅ Model answer" header, the answer text in an
+      `.answer-block`, and (when non-empty) a `<details><summary>💬
+      Explanation</summary>...</details>` collapsible with the localised
+      explanation. The bottom margin of `.answer-block` is `0` when
+      there's no explanation to avoid an empty gap.
+
+   b. **Prev / Next nav row** — two `btn-sm` buttons in a `.flex-c` with
+      `justify-content: space-between`. Prev is disabled at `speakIdx === 0`,
+      Next is disabled at `speakIdx >= items.length - 1`. Both call
+      `gotoSpeak()`.
+
+**Design notes:**
+
+- The model answer also still appears inside the `recState === 'done'` card
+  next to the score (kept intact — it's the contextual "your answer vs the
+  model" comparison). Yes that's a duplicate on-screen, but each placement
+  serves a different need: the new card is the always-visible reference
+  for learning; the `done`-state copy is the post-recording comparison.
+  Removing the latter would force the user to scroll up after each recording.
+- Showing the answer up-front does reduce the test-realism of speak-mode,
+  which is a deliberate user choice (matches the practice page pattern).
+  No "Hide answer" toggle added — keeping the surface area minimal per
+  the surgical-changes guideline.
+- Nav buttons do not score on traverse. Combined with the existing Skip
+  (which scores 0), users now have three exit paths from a question:
+  Skip (0), Next-after-record (real score), or Prev/Next nav (no score
+  recorded → 0 at final tabulation since `nextSpeakQ` never fires for
+  bypassed questions). Acceptable for a practice tool.
+
+**Not changed:**
+
+- The 'write' mode UI, the 'intro' phase, the 'result' phase.
+- The /mock score-submission API call (`/api/mock` POST) — payload shape
+  identical.
+- The `{speakIdx + 1} / {items.length}` counter at line 549 — Action 42
+  removed counters from practice/signs/report but not mock per user's
+  literal request; leaving it for in-test progress visibility.
+- Translation tables for other pages.
+
+**Verification:**
+
+- `npx next build` → ✓ All 16 routes built. `/mock` size 8.53 → 8.87 kB
+  (+0.34 kB, the new card JSX + 12 new locale strings + gotoSpeak helper).
+- Manual sanity flow:
+  - Start mock → Speaking mode → first question appears.
+  - Below the officer card: green "Model answer" card with text + a
+    "💬 Explanation" expandable (in 5 non-English locales).
+  - Below that: Prev (disabled at idx 0) ↔ Next pair.
+  - Recording flow unchanged: tap to record → listen → process → done.
+  - In done state, the existing "Model answer" comparison card still
+    renders next to the score.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/mock/page.js` reverts to the pre-Action-43
+  speak-mode UI (no answer field, no explanation, no Prev/Next nav).
+

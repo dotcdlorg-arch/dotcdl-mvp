@@ -2,7 +2,7 @@
 import { useState, useMemo, useRef } from 'react'
 import Image from 'next/image'
 import AppShell from '@/components/AppShell'
-import { QUESTIONS, SIGNS, scoreKeywords } from '@/lib/data'
+import { QUESTIONS, SIGNS, scoreKeywords, getExplanation } from '@/lib/data'
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - .5) }
 
@@ -50,6 +50,8 @@ const MT = {
     score: 'AI score',
     yourAns: 'Your answer', modelAns: 'Model answer',
     nextQ: 'Next →', skip: 'Skip',
+    prev: '← Previous', next: 'Next →',
+    explanation: 'Explanation',
     complete: 'Complete',
     officerQ: 'Officer question', signLabel: 'Traffic sign',
     autoPlay: '▶ Play all', stopPlay: '⏸ Pause',
@@ -79,6 +81,8 @@ const MT = {
     score: 'AI 评分',
     yourAns: '你的回答', modelAns: '参考答案',
     nextQ: '下一题 →', skip: '跳过',
+    prev: '← 上一题', next: '下一题 →',
+    explanation: '解释',
     complete: '已完成',
     officerQ: '警官问题', signLabel: '交通标志',
     autoPlay: '▶ 连续播放', stopPlay: '⏸ 暂停',
@@ -108,6 +112,8 @@ const MT = {
     score: 'Puntuación AI',
     yourAns: 'Su respuesta', modelAns: 'Respuesta modelo',
     nextQ: 'Siguiente →', skip: 'Omitir',
+    prev: '← Anterior', next: 'Siguiente →',
+    explanation: 'Explicación',
     complete: 'Completado',
     officerQ: 'Pregunta del oficial', signLabel: 'Señal de tráfico',
     autoPlay: '▶ Reproducir todo', stopPlay: '⏸ Pausar',
@@ -137,6 +143,8 @@ const MT = {
     score: 'AI स्कोर',
     yourAns: 'आपका जवाब', modelAns: 'सही जवाब',
     nextQ: 'अगला →', skip: 'छोड़ें',
+    prev: '← पिछला', next: 'अगला →',
+    explanation: 'व्याख्या',
     complete: 'पूर्ण',
     officerQ: 'अधिकारी प्रश्न', signLabel: 'यातायात चिह्न',
     autoPlay: '▶ सभी चलाएं', stopPlay: '⏸ रोकें',
@@ -166,6 +174,8 @@ const MT = {
     score: 'AI ਸਕੋਰ',
     yourAns: 'ਤੁਹਾਡਾ ਜਵਾਬ', modelAns: 'ਸਹੀ ਜਵਾਬ',
     nextQ: 'ਅਗਲਾ →', skip: 'ਛੱਡੋ',
+    prev: '← ਪਿਛਲਾ', next: 'ਅਗਲਾ →',
+    explanation: 'ਵਿਆਖਿਆ',
     complete: 'ਪੂਰਾ ਹੋਇਆ',
     officerQ: 'ਅਫਸਰ ਸਵਾਲ', signLabel: 'ਆਵਾਜਾਈ ਚਿੰਨ੍ਹ',
     autoPlay: '▶ ਸਾਰੇ ਚਲਾਓ', stopPlay: '⏸ ਰੋਕੋ',
@@ -195,6 +205,8 @@ const MT = {
     score: 'Điểm AI',
     yourAns: 'Câu trả lời của bạn', modelAns: 'Câu trả lời mẫu',
     nextQ: 'Tiếp theo →', skip: 'Bỏ qua',
+    prev: '← Trước', next: 'Tiếp theo →',
+    explanation: 'Giải thích',
     complete: 'Hoàn thành',
     officerQ: 'Câu hỏi viên chức', signLabel: 'Biển báo giao thông',
     autoPlay: '▶ Phát tất cả', stopPlay: '⏸ Dừng',
@@ -366,6 +378,17 @@ export default function MockPage() {
       const qText = nextItem.type === 'question' ? nextItem.data.officer_question_en : (mt(lang, 'signQ'))
       setTimeout(() => speakText(qText), 300)
     }
+  }
+
+  // Free navigation (does not score). Use Skip / Next-after-record to score.
+  function gotoSpeak(idx) {
+    if (idx < 0 || idx >= items.length) return
+    setSpeakIdx(idx)
+    setRecState('idle')
+    setCurrentTranscript('')
+    setCurrentScore(null)
+    const it = items[idx]
+    setTimeout(() => speakText(it.type === 'question' ? it.data.officer_question_en : mt(lang, 'signQ')), 300)
   }
 
   function skipSpeakQ() {
@@ -541,6 +564,7 @@ export default function MockPage() {
     const item = items[speakIdx]
     const qText = item.type === 'question' ? item.data.officer_question_en : item.data.name
     const correctAns = item.type === 'question' ? item.data.simple_driver_answer_en : `${item.data.meaning} | Action: ${item.data.action}`
+    const explanationText = getExplanation(item.data, lang)
 
     return (
       <AppShell lang={lang} setLang={setLang}>
@@ -575,6 +599,30 @@ export default function MockPage() {
               🔊 {item.type === 'sign' ? mt(lang, 'signQ') : 'Replay question'}
             </button>
           </div>
+        </div>
+
+        {/* Correct answer + explanation reference */}
+        <div className="card" style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: '.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--green)', marginBottom: 6 }}>
+            ✅ {mt(lang, 'modelAns')}
+          </div>
+          <div className="answer-block" style={{ marginBottom: explanationText ? 10 : 0 }}>{correctAns}</div>
+          {explanationText && (
+            <details>
+              <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--muted)', fontSize: '.85rem' }}>💬 {mt(lang, 'explanation')}</summary>
+              <div style={{ marginTop: 8, fontSize: '.86rem', lineHeight: 1.6, color: 'var(--ink)' }}>{explanationText}</div>
+            </details>
+          )}
+        </div>
+
+        {/* Prev / Next navigation (does not score) */}
+        <div className="flex-c" style={{ justifyContent: 'space-between', marginBottom: 14 }}>
+          <button className="btn btn-sm" onClick={() => gotoSpeak(speakIdx - 1)} disabled={speakIdx === 0}>
+            {mt(lang, 'prev')}
+          </button>
+          <button className="btn btn-sm" onClick={() => gotoSpeak(speakIdx + 1)} disabled={speakIdx >= items.length - 1}>
+            {mt(lang, 'next')}
+          </button>
         </div>
 
         {/* Recording controls */}
