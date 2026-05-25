@@ -21,10 +21,5 @@
   "devDependencies": {
     "eslint": "^9",
     "eslint-config-next": "15.5.18"
-  },
-  "overrides": {
-    "@clerk/clerk-react": "5.24.1",
-    "@clerk/shared": "3.9.5",
-    "@clerk/types": "4.59.3"
   }
 }
