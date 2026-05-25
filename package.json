@@ -1,0 +1,25 @@
+{
+  "name": "cdl-english-pro",
+  "version": "2.1.0",
+  "description": "CDL English Roadside Readiness — Premium AI Training Platform. Training only. Not affiliated with DOT, FMCSA, or CVSA.",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "15.5.18",
+    "react": "^19",
+    "react-dom": "^19",
+    "@clerk/nextjs": "^6.12.4",
+    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/ssr": "^0.6.1",
+    "svix": "^1.61.0"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "15.5.18"
+  }
+}

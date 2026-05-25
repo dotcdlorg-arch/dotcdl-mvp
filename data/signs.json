@@ -1,0 +1,1656 @@
+[
+  {
+    "sign_code": "PDF_SIGN_001",
+    "name": "LEFT TURN AHEAD",
+    "category": "Warning",
+    "meaning": "A left turn is ahead.",
+    "action": "Slow down and prepare to turn left.",
+    "keywords": [
+      "left turn",
+      "slow down",
+      "turn left"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_001.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "LEFT TURN AHEAD：A left turn is ahead. 司机应采取行动：Slow down and prepare to turn left.",
+    "explanation_es": "LEFT TURN AHEAD: A left turn is ahead. Acción del conductor: Slow down and prepare to turn left.",
+    "explanation_hi": "LEFT TURN AHEAD: A left turn is ahead. ड्राइवर की कार्रवाई: Slow down and prepare to turn left.",
+    "explanation_pa": "LEFT TURN AHEAD: A left turn is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and prepare to turn left.",
+    "explanation_vi": "LEFT TURN AHEAD: A left turn is ahead. Hành động của tài xế: Slow down and prepare to turn left."
+  },
+  {
+    "sign_code": "PDF_SIGN_002",
+    "name": "RIGHT CURVE AHEAD",
+    "category": "Warning",
+    "meaning": "A right curve is ahead.",
+    "action": "Reduce speed and steer carefully through the curve.",
+    "keywords": [
+      "right curve",
+      "curve",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_002.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "RIGHT CURVE AHEAD：A right curve is ahead. 司机应采取行动：Reduce speed and steer carefully through the curve.",
+    "explanation_es": "RIGHT CURVE AHEAD: A right curve is ahead. Acción del conductor: Reduce speed and steer carefully through the curve.",
+    "explanation_hi": "RIGHT CURVE AHEAD: A right curve is ahead. ड्राइवर की कार्रवाई: Reduce speed and steer carefully through the curve.",
+    "explanation_pa": "RIGHT CURVE AHEAD: A right curve is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Reduce speed and steer carefully through the curve.",
+    "explanation_vi": "RIGHT CURVE AHEAD: A right curve is ahead. Hành động của tài xế: Reduce speed and steer carefully through the curve."
+  },
+  {
+    "sign_code": "PDF_SIGN_003",
+    "name": "SHARP CURVE TO RIGHT",
+    "category": "Warning",
+    "meaning": "A sharp curve to the right is ahead.",
+    "action": "Slow down before the curve.",
+    "keywords": [
+      "sharp curve",
+      "right",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_003.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "SHARP CURVE TO RIGHT：A sharp curve to the right is ahead. 司机应采取行动：Slow down before the curve.",
+    "explanation_es": "SHARP CURVE TO RIGHT: A sharp curve to the right is ahead. Acción del conductor: Slow down before the curve.",
+    "explanation_hi": "SHARP CURVE TO RIGHT: A sharp curve to the right is ahead. ड्राइवर की कार्रवाई: Slow down before the curve.",
+    "explanation_pa": "SHARP CURVE TO RIGHT: A sharp curve to the right is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down before the curve.",
+    "explanation_vi": "SHARP CURVE TO RIGHT: A sharp curve to the right is ahead. Hành động của tài xế: Slow down before the curve."
+  },
+  {
+    "sign_code": "PDF_SIGN_004",
+    "name": "WINDING ROAD",
+    "category": "Warning",
+    "meaning": "A winding road is ahead.",
+    "action": "Slow down and stay in your lane.",
+    "keywords": [
+      "winding road",
+      "slow down",
+      "lane"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_004.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "WINDING ROAD：A winding road is ahead. 司机应采取行动：Slow down and stay in your lane.",
+    "explanation_es": "WINDING ROAD: A winding road is ahead. Acción del conductor: Slow down and stay in your lane.",
+    "explanation_hi": "WINDING ROAD: A winding road is ahead. ड्राइवर की कार्रवाई: Slow down and stay in your lane.",
+    "explanation_pa": "WINDING ROAD: A winding road is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and stay in your lane.",
+    "explanation_vi": "WINDING ROAD: A winding road is ahead. Hành động của tài xế: Slow down and stay in your lane."
+  },
+  {
+    "sign_code": "PDF_SIGN_005",
+    "name": "HAIRPIN CURVE",
+    "category": "Warning",
+    "meaning": "A very sharp curve is ahead.",
+    "action": "Slow down significantly before the curve.",
+    "keywords": [
+      "hairpin",
+      "sharp curve",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_005.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "HAIRPIN CURVE：A very sharp curve is ahead. 司机应采取行动：Slow down significantly before the curve.",
+    "explanation_es": "HAIRPIN CURVE: A very sharp curve is ahead. Acción del conductor: Slow down significantly before the curve.",
+    "explanation_hi": "HAIRPIN CURVE: A very sharp curve is ahead. ड्राइवर की कार्रवाई: Slow down significantly before the curve.",
+    "explanation_pa": "HAIRPIN CURVE: A very sharp curve is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down significantly before the curve.",
+    "explanation_vi": "HAIRPIN CURVE: A very sharp curve is ahead. Hành động của tài xế: Slow down significantly before the curve."
+  },
+  {
+    "sign_code": "PDF_SIGN_006",
+    "name": "CROSS ROAD AHEAD",
+    "category": "Warning",
+    "meaning": "A crossroad is ahead.",
+    "action": "Watch for traffic entering from both sides.",
+    "keywords": [
+      "cross road",
+      "intersection",
+      "traffic"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_006.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "CROSS ROAD AHEAD：A crossroad is ahead. 司机应采取行动：Watch for traffic entering from both sides.",
+    "explanation_es": "CROSS ROAD AHEAD: A crossroad is ahead. Acción del conductor: Watch for traffic entering from both sides.",
+    "explanation_hi": "CROSS ROAD AHEAD: A crossroad is ahead. ड्राइवर की कार्रवाई: Watch for traffic entering from both sides.",
+    "explanation_pa": "CROSS ROAD AHEAD: A crossroad is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch for traffic entering from both sides.",
+    "explanation_vi": "CROSS ROAD AHEAD: A crossroad is ahead. Hành động của tài xế: Watch for traffic entering from both sides."
+  },
+  {
+    "sign_code": "PDF_SIGN_007",
+    "name": "Y INTERSECTION AHEAD",
+    "category": "Warning",
+    "meaning": "A Y-shaped intersection is ahead.",
+    "action": "Watch for merging or turning traffic.",
+    "keywords": [
+      "y intersection",
+      "intersection",
+      "traffic"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_007.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "Y INTERSECTION AHEAD：A Y-shaped intersection is ahead. 司机应采取行动：Watch for merging or turning traffic.",
+    "explanation_es": "Y INTERSECTION AHEAD: A Y-shaped intersection is ahead. Acción del conductor: Watch for merging or turning traffic.",
+    "explanation_hi": "Y INTERSECTION AHEAD: A Y-shaped intersection is ahead. ड्राइवर की कार्रवाई: Watch for merging or turning traffic.",
+    "explanation_pa": "Y INTERSECTION AHEAD: A Y-shaped intersection is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch for merging or turning traffic.",
+    "explanation_vi": "Y INTERSECTION AHEAD: A Y-shaped intersection is ahead. Hành động của tài xế: Watch for merging or turning traffic."
+  },
+  {
+    "sign_code": "PDF_SIGN_008",
+    "name": "CIRCULAR INTERSECTION AHEAD",
+    "category": "Warning",
+    "meaning": "A roundabout or circular intersection is ahead.",
+    "action": "Slow down and yield as required.",
+    "keywords": [
+      "circular intersection",
+      "roundabout",
+      "yield"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_008.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "CIRCULAR INTERSECTION AHEAD：A roundabout or circular intersection is ahead. 司机应采取行动：Slow down and yield as required.",
+    "explanation_es": "CIRCULAR INTERSECTION AHEAD: A roundabout or circular intersection is ahead. Acción del conductor: Slow down and yield as required.",
+    "explanation_hi": "CIRCULAR INTERSECTION AHEAD: A roundabout or circular intersection is ahead. ड्राइवर की कार्रवाई: Slow down and yield as required.",
+    "explanation_pa": "CIRCULAR INTERSECTION AHEAD: A roundabout or circular intersection is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and yield as required.",
+    "explanation_vi": "CIRCULAR INTERSECTION AHEAD: A roundabout or circular intersection is ahead. Hành động của tài xế: Slow down and yield as required."
+  },
+  {
+    "sign_code": "PDF_SIGN_009",
+    "name": "MERGING TRAFFIC FROM RIGHT",
+    "category": "Warning",
+    "meaning": "Traffic may merge from the right.",
+    "action": "Watch the right side and allow safe space.",
+    "keywords": [
+      "merging traffic",
+      "right",
+      "merge"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_009.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "MERGING TRAFFIC FROM RIGHT：Traffic may merge from the right. 司机应采取行动：Watch the right side and allow safe space.",
+    "explanation_es": "MERGING TRAFFIC FROM RIGHT: Traffic may merge from the right. Acción del conductor: Watch the right side and allow safe space.",
+    "explanation_hi": "MERGING TRAFFIC FROM RIGHT: Traffic may merge from the right. ड्राइवर की कार्रवाई: Watch the right side and allow safe space.",
+    "explanation_pa": "MERGING TRAFFIC FROM RIGHT: Traffic may merge from the right. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch the right side and allow safe space.",
+    "explanation_vi": "MERGING TRAFFIC FROM RIGHT: Traffic may merge from the right. Hành động của tài xế: Watch the right side and allow safe space."
+  },
+  {
+    "sign_code": "PDF_SIGN_010",
+    "name": "ADDED LANE FROM LEFT",
+    "category": "Warning",
+    "meaning": "An added lane begins from the left.",
+    "action": "Stay alert for vehicles entering the roadway.",
+    "keywords": [
+      "added lane",
+      "left",
+      "traffic"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_010.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "ADDED LANE FROM LEFT：An added lane begins from the left. 司机应采取行动：Stay alert for vehicles entering the roadway.",
+    "explanation_es": "ADDED LANE FROM LEFT: An added lane begins from the left. Acción del conductor: Stay alert for vehicles entering the roadway.",
+    "explanation_hi": "ADDED LANE FROM LEFT: An added lane begins from the left. ड्राइवर की कार्रवाई: Stay alert for vehicles entering the roadway.",
+    "explanation_pa": "ADDED LANE FROM LEFT: An added lane begins from the left. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stay alert for vehicles entering the roadway.",
+    "explanation_vi": "ADDED LANE FROM LEFT: An added lane begins from the left. Hành động của tài xế: Stay alert for vehicles entering the roadway."
+  },
+  {
+    "sign_code": "PDF_SIGN_011",
+    "name": "HILL",
+    "category": "Warning",
+    "meaning": "A hill or steep grade is ahead.",
+    "action": "Control speed and use proper gear.",
+    "keywords": [
+      "hill",
+      "grade",
+      "speed"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_011.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "HILL：A hill or steep grade is ahead. 司机应采取行动：Control speed and use proper gear.",
+    "explanation_es": "HILL: A hill or steep grade is ahead. Acción del conductor: Control speed and use proper gear.",
+    "explanation_hi": "HILL: A hill or steep grade is ahead. ड्राइवर की कार्रवाई: Control speed and use proper gear.",
+    "explanation_pa": "HILL: A hill or steep grade is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Control speed and use proper gear.",
+    "explanation_vi": "HILL: A hill or steep grade is ahead. Hành động của tài xế: Control speed and use proper gear."
+  },
+  {
+    "sign_code": "PDF_SIGN_012",
+    "name": "HILL WITH GRADE",
+    "category": "Warning",
+    "meaning": "A steep downgrade is ahead.",
+    "action": "Use lower gear and control speed.",
+    "keywords": [
+      "hill",
+      "grade",
+      "downgrade"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_012.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "HILL WITH GRADE：A steep downgrade is ahead. 司机应采取行动：Use lower gear and control speed.",
+    "explanation_es": "HILL WITH GRADE: A steep downgrade is ahead. Acción del conductor: Use lower gear and control speed.",
+    "explanation_hi": "HILL WITH GRADE: A steep downgrade is ahead. ड्राइवर की कार्रवाई: Use lower gear and control speed.",
+    "explanation_pa": "HILL WITH GRADE: A steep downgrade is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use lower gear and control speed.",
+    "explanation_vi": "HILL WITH GRADE: A steep downgrade is ahead. Hành động của tài xế: Use lower gear and control speed."
+  },
+  {
+    "sign_code": "PDF_SIGN_013",
+    "name": "TRUCK ESCAPE RAMP",
+    "category": "Warning",
+    "meaning": "An emergency escape ramp is ahead for runaway trucks.",
+    "action": "Use the ramp only if brakes fail or speed cannot be controlled.",
+    "keywords": [
+      "truck escape ramp",
+      "runaway truck",
+      "brakes"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_013.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "TRUCK ESCAPE RAMP：An emergency escape ramp is ahead for runaway trucks. 司机应采取行动：Use the ramp only if brakes fail or speed cannot be controlled.",
+    "explanation_es": "TRUCK ESCAPE RAMP: An emergency escape ramp is ahead for runaway trucks. Acción del conductor: Use the ramp only if brakes fail or speed cannot be controlled.",
+    "explanation_hi": "TRUCK ESCAPE RAMP: An emergency escape ramp is ahead for runaway trucks. ड्राइवर की कार्रवाई: Use the ramp only if brakes fail or speed cannot be controlled.",
+    "explanation_pa": "TRUCK ESCAPE RAMP: An emergency escape ramp is ahead for runaway trucks. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use the ramp only if brakes fail or speed cannot be controlled.",
+    "explanation_vi": "TRUCK ESCAPE RAMP: An emergency escape ramp is ahead for runaway trucks. Hành động của tài xế: Use the ramp only if brakes fail or speed cannot be controlled."
+  },
+  {
+    "sign_code": "PDF_SIGN_014",
+    "name": "LOW CLEARANCE AHEAD",
+    "category": "Warning",
+    "meaning": "A low clearance height is ahead.",
+    "action": "Do not enter if your truck is too tall.",
+    "keywords": [
+      "low clearance",
+      "height",
+      "too tall"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_014.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "LOW CLEARANCE AHEAD：A low clearance height is ahead. 司机应采取行动：Do not enter if your truck is too tall.",
+    "explanation_es": "LOW CLEARANCE AHEAD: A low clearance height is ahead. Acción del conductor: Do not enter if your truck is too tall.",
+    "explanation_hi": "LOW CLEARANCE AHEAD: A low clearance height is ahead. ड्राइवर की कार्रवाई: Do not enter if your truck is too tall.",
+    "explanation_pa": "LOW CLEARANCE AHEAD: A low clearance height is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not enter if your truck is too tall.",
+    "explanation_vi": "LOW CLEARANCE AHEAD: A low clearance height is ahead. Hành động của tài xế: Do not enter if your truck is too tall."
+  },
+  {
+    "sign_code": "PDF_SIGN_015",
+    "name": "TRUCK CROSSING",
+    "category": "Warning",
+    "meaning": "Trucks may cross or enter the road ahead.",
+    "action": "Slow down and watch for trucks.",
+    "keywords": [
+      "truck crossing",
+      "trucks",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_015.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "TRUCK CROSSING：Trucks may cross or enter the road ahead. 司机应采取行动：Slow down and watch for trucks.",
+    "explanation_es": "TRUCK CROSSING: Trucks may cross or enter the road ahead. Acción del conductor: Slow down and watch for trucks.",
+    "explanation_hi": "TRUCK CROSSING: Trucks may cross or enter the road ahead. ड्राइवर की कार्रवाई: Slow down and watch for trucks.",
+    "explanation_pa": "TRUCK CROSSING: Trucks may cross or enter the road ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for trucks.",
+    "explanation_vi": "TRUCK CROSSING: Trucks may cross or enter the road ahead. Hành động của tài xế: Slow down and watch for trucks."
+  },
+  {
+    "sign_code": "PDF_SIGN_016",
+    "name": "YIELD AHEAD",
+    "category": "Warning",
+    "meaning": "A yield sign is ahead.",
+    "action": "Prepare to slow down and yield.",
+    "keywords": [
+      "yield ahead",
+      "yield",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_016.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "YIELD AHEAD：A yield sign is ahead. 司机应采取行动：Prepare to slow down and yield.",
+    "explanation_es": "YIELD AHEAD: A yield sign is ahead. Acción del conductor: Prepare to slow down and yield.",
+    "explanation_hi": "YIELD AHEAD: A yield sign is ahead. ड्राइवर की कार्रवाई: Prepare to slow down and yield.",
+    "explanation_pa": "YIELD AHEAD: A yield sign is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Prepare to slow down and yield.",
+    "explanation_vi": "YIELD AHEAD: A yield sign is ahead. Hành động của tài xế: Prepare to slow down and yield."
+  },
+  {
+    "sign_code": "PDF_SIGN_017",
+    "name": "TRAFFIC SIGNAL AHEAD",
+    "category": "Warning",
+    "meaning": "A traffic signal is ahead.",
+    "action": "Be prepared to stop.",
+    "keywords": [
+      "traffic signal",
+      "signal",
+      "stop"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_017.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "TRAFFIC SIGNAL AHEAD：A traffic signal is ahead. 司机应采取行动：Be prepared to stop.",
+    "explanation_es": "TRAFFIC SIGNAL AHEAD: A traffic signal is ahead. Acción del conductor: Be prepared to stop.",
+    "explanation_hi": "TRAFFIC SIGNAL AHEAD: A traffic signal is ahead. ड्राइवर की कार्रवाई: Be prepared to stop.",
+    "explanation_pa": "TRAFFIC SIGNAL AHEAD: A traffic signal is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Be prepared to stop.",
+    "explanation_vi": "TRAFFIC SIGNAL AHEAD: A traffic signal is ahead. Hành động của tài xế: Be prepared to stop."
+  },
+  {
+    "sign_code": "PDF_SIGN_018",
+    "name": "SLIPPERY WHEN WET",
+    "category": "Warning",
+    "meaning": "The road may be slippery when wet.",
+    "action": "Slow down and avoid sudden braking.",
+    "keywords": [
+      "slippery",
+      "wet",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_018.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "SLIPPERY WHEN WET：The road may be slippery when wet. 司机应采取行动：Slow down and avoid sudden braking.",
+    "explanation_es": "SLIPPERY WHEN WET: The road may be slippery when wet. Acción del conductor: Slow down and avoid sudden braking.",
+    "explanation_hi": "SLIPPERY WHEN WET: The road may be slippery when wet. ड्राइवर की कार्रवाई: Slow down and avoid sudden braking.",
+    "explanation_pa": "SLIPPERY WHEN WET: The road may be slippery when wet. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and avoid sudden braking.",
+    "explanation_vi": "SLIPPERY WHEN WET: The road may be slippery when wet. Hành động của tài xế: Slow down and avoid sudden braking."
+  },
+  {
+    "sign_code": "PDF_SIGN_019",
+    "name": "LANE REDUCTION RIGHT LANE ENDS",
+    "category": "Warning",
+    "meaning": "The right lane ends ahead.",
+    "action": "Merge safely to the left.",
+    "keywords": [
+      "right lane ends",
+      "merge",
+      "lane reduction"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_019.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "LANE REDUCTION RIGHT LANE ENDS：The right lane ends ahead. 司机应采取行动：Merge safely to the left.",
+    "explanation_es": "LANE REDUCTION RIGHT LANE ENDS: The right lane ends ahead. Acción del conductor: Merge safely to the left.",
+    "explanation_hi": "LANE REDUCTION RIGHT LANE ENDS: The right lane ends ahead. ड्राइवर की कार्रवाई: Merge safely to the left.",
+    "explanation_pa": "LANE REDUCTION RIGHT LANE ENDS: The right lane ends ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Merge safely to the left.",
+    "explanation_vi": "LANE REDUCTION RIGHT LANE ENDS: The right lane ends ahead. Hành động của tài xế: Merge safely to the left."
+  },
+  {
+    "sign_code": "PDF_SIGN_020",
+    "name": "ROAD NARROWS",
+    "category": "Warning",
+    "meaning": "The roadway narrows ahead.",
+    "action": "Stay centered and reduce speed.",
+    "keywords": [
+      "road narrows",
+      "narrow",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_020.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "ROAD NARROWS：The roadway narrows ahead. 司机应采取行动：Stay centered and reduce speed.",
+    "explanation_es": "ROAD NARROWS: The roadway narrows ahead. Acción del conductor: Stay centered and reduce speed.",
+    "explanation_hi": "ROAD NARROWS: The roadway narrows ahead. ड्राइवर की कार्रवाई: Stay centered and reduce speed.",
+    "explanation_pa": "ROAD NARROWS: The roadway narrows ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stay centered and reduce speed.",
+    "explanation_vi": "ROAD NARROWS: The roadway narrows ahead. Hành động của tài xế: Stay centered and reduce speed."
+  },
+  {
+    "sign_code": "PDF_SIGN_021",
+    "name": "DIVIDED HIGHWAY AHEAD",
+    "category": "Warning",
+    "meaning": "A divided highway begins ahead.",
+    "action": "Stay on the correct side of the divider.",
+    "keywords": [
+      "divided highway",
+      "divider"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_021.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "DIVIDED HIGHWAY AHEAD：A divided highway begins ahead. 司机应采取行动：Stay on the correct side of the divider.",
+    "explanation_es": "DIVIDED HIGHWAY AHEAD: A divided highway begins ahead. Acción del conductor: Stay on the correct side of the divider.",
+    "explanation_hi": "DIVIDED HIGHWAY AHEAD: A divided highway begins ahead. ड्राइवर की कार्रवाई: Stay on the correct side of the divider.",
+    "explanation_pa": "DIVIDED HIGHWAY AHEAD: A divided highway begins ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stay on the correct side of the divider.",
+    "explanation_vi": "DIVIDED HIGHWAY AHEAD: A divided highway begins ahead. Hành động của tài xế: Stay on the correct side of the divider."
+  },
+  {
+    "sign_code": "PDF_SIGN_022",
+    "name": "TWO WAY TRAFFIC",
+    "category": "Warning",
+    "meaning": "Traffic travels in both directions ahead.",
+    "action": "Stay in your lane and use caution.",
+    "keywords": [
+      "two way traffic",
+      "both directions"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_022.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "TWO WAY TRAFFIC：Traffic travels in both directions ahead. 司机应采取行动：Stay in your lane and use caution.",
+    "explanation_es": "TWO WAY TRAFFIC: Traffic travels in both directions ahead. Acción del conductor: Stay in your lane and use caution.",
+    "explanation_hi": "TWO WAY TRAFFIC: Traffic travels in both directions ahead. ड्राइवर की कार्रवाई: Stay in your lane and use caution.",
+    "explanation_pa": "TWO WAY TRAFFIC: Traffic travels in both directions ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stay in your lane and use caution.",
+    "explanation_vi": "TWO WAY TRAFFIC: Traffic travels in both directions ahead. Hành động của tài xế: Stay in your lane and use caution."
+  },
+  {
+    "sign_code": "PDF_SIGN_023",
+    "name": "NO PASSING ZONE",
+    "category": "Warning",
+    "meaning": "A no passing zone begins.",
+    "action": "Do not pass other vehicles.",
+    "keywords": [
+      "no passing zone",
+      "do not pass"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_023.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "NO PASSING ZONE：A no passing zone begins. 司机应采取行动：Do not pass other vehicles.",
+    "explanation_es": "NO PASSING ZONE: A no passing zone begins. Acción del conductor: Do not pass other vehicles.",
+    "explanation_hi": "NO PASSING ZONE: A no passing zone begins. ड्राइवर की कार्रवाई: Do not pass other vehicles.",
+    "explanation_pa": "NO PASSING ZONE: A no passing zone begins. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not pass other vehicles.",
+    "explanation_vi": "NO PASSING ZONE: A no passing zone begins. Hành động của tài xế: Do not pass other vehicles."
+  },
+  {
+    "sign_code": "PDF_SIGN_024",
+    "name": "ADVISORY SPEED 35 MPH",
+    "category": "Warning",
+    "meaning": "The recommended safe speed is 35 mph.",
+    "action": "Slow down to about 35 mph if conditions require.",
+    "keywords": [
+      "advisory speed",
+      "35",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_024.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "ADVISORY SPEED 35 MPH：The recommended safe speed is 35 mph. 司机应采取行动：Slow down to about 35 mph if conditions require.",
+    "explanation_es": "ADVISORY SPEED 35 MPH: The recommended safe speed is 35 mph. Acción del conductor: Slow down to about 35 mph if conditions require.",
+    "explanation_hi": "ADVISORY SPEED 35 MPH: The recommended safe speed is 35 mph. ड्राइवर की कार्रवाई: Slow down to about 35 mph if conditions require.",
+    "explanation_pa": "ADVISORY SPEED 35 MPH: The recommended safe speed is 35 mph. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down to about 35 mph if conditions require.",
+    "explanation_vi": "ADVISORY SPEED 35 MPH: The recommended safe speed is 35 mph. Hành động của tài xế: Slow down to about 35 mph if conditions require."
+  },
+  {
+    "sign_code": "PDF_SIGN_025",
+    "name": "ADVISORY EXIT SPEED 25 MPH",
+    "category": "Warning",
+    "meaning": "The recommended speed for the exit is 25 mph.",
+    "action": "Slow down before the exit ramp.",
+    "keywords": [
+      "exit speed",
+      "25",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_025.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "ADVISORY EXIT SPEED 25 MPH：The recommended speed for the exit is 25 mph. 司机应采取行动：Slow down before the exit ramp.",
+    "explanation_es": "ADVISORY EXIT SPEED 25 MPH: The recommended speed for the exit is 25 mph. Acción del conductor: Slow down before the exit ramp.",
+    "explanation_hi": "ADVISORY EXIT SPEED 25 MPH: The recommended speed for the exit is 25 mph. ड्राइवर की कार्रवाई: Slow down before the exit ramp.",
+    "explanation_pa": "ADVISORY EXIT SPEED 25 MPH: The recommended speed for the exit is 25 mph. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down before the exit ramp.",
+    "explanation_vi": "ADVISORY EXIT SPEED 25 MPH: The recommended speed for the exit is 25 mph. Hành động của tài xế: Slow down before the exit ramp."
+  },
+  {
+    "sign_code": "PDF_SIGN_026",
+    "name": "ADVISORY TURN SPEED 25 MPH",
+    "category": "Warning",
+    "meaning": "The recommended speed for the turn is 25 mph.",
+    "action": "Slow down before turning.",
+    "keywords": [
+      "turn speed",
+      "25",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_026.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 3,
+    "explanation_zh": "ADVISORY TURN SPEED 25 MPH：The recommended speed for the turn is 25 mph. 司机应采取行动：Slow down before turning.",
+    "explanation_es": "ADVISORY TURN SPEED 25 MPH: The recommended speed for the turn is 25 mph. Acción del conductor: Slow down before turning.",
+    "explanation_hi": "ADVISORY TURN SPEED 25 MPH: The recommended speed for the turn is 25 mph. ड्राइवर की कार्रवाई: Slow down before turning.",
+    "explanation_pa": "ADVISORY TURN SPEED 25 MPH: The recommended speed for the turn is 25 mph. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down before turning.",
+    "explanation_vi": "ADVISORY TURN SPEED 25 MPH: The recommended speed for the turn is 25 mph. Hành động của tài xế: Slow down before turning."
+  },
+  {
+    "sign_code": "PDF_SIGN_027",
+    "name": "RAILROAD CROSSING AHEAD",
+    "category": "Railroad / Light Rail",
+    "meaning": "A railroad crossing is ahead.",
+    "action": "Slow down and watch for trains.",
+    "keywords": [
+      "railroad",
+      "crossing",
+      "train"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_027.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "RAILROAD CROSSING AHEAD：A railroad crossing is ahead. 司机应采取行动：Slow down and watch for trains.",
+    "explanation_es": "RAILROAD CROSSING AHEAD: A railroad crossing is ahead. Acción del conductor: Slow down and watch for trains.",
+    "explanation_hi": "RAILROAD CROSSING AHEAD: A railroad crossing is ahead. ड्राइवर की कार्रवाई: Slow down and watch for trains.",
+    "explanation_pa": "RAILROAD CROSSING AHEAD: A railroad crossing is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for trains.",
+    "explanation_vi": "RAILROAD CROSSING AHEAD: A railroad crossing is ahead. Hành động của tài xế: Slow down and watch for trains."
+  },
+  {
+    "sign_code": "PDF_SIGN_028",
+    "name": "LOW GROUND CLEARANCE AT TRACKS",
+    "category": "Railroad / Light Rail",
+    "meaning": "Low ground clearance exists at the railroad tracks.",
+    "action": "Do not cross if your trailer may get stuck.",
+    "keywords": [
+      "low ground clearance",
+      "tracks",
+      "trailer"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_028.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "LOW GROUND CLEARANCE AT TRACKS：Low ground clearance exists at the railroad tracks. 司机应采取行动：Do not cross if your trailer may get stuck.",
+    "explanation_es": "LOW GROUND CLEARANCE AT TRACKS: Low ground clearance exists at the railroad tracks. Acción del conductor: Do not cross if your trailer may get stuck.",
+    "explanation_hi": "LOW GROUND CLEARANCE AT TRACKS: Low ground clearance exists at the railroad tracks. ड्राइवर की कार्रवाई: Do not cross if your trailer may get stuck.",
+    "explanation_pa": "LOW GROUND CLEARANCE AT TRACKS: Low ground clearance exists at the railroad tracks. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not cross if your trailer may get stuck.",
+    "explanation_vi": "LOW GROUND CLEARANCE AT TRACKS: Low ground clearance exists at the railroad tracks. Hành động của tài xế: Do not cross if your trailer may get stuck."
+  },
+  {
+    "sign_code": "PDF_SIGN_029",
+    "name": "HIGHWAY-RAIL CROSSING ON SIDE ROAD",
+    "category": "Railroad / Light Rail",
+    "meaning": "A side road has a railroad crossing.",
+    "action": "Watch for vehicles slowing or turning near tracks.",
+    "keywords": [
+      "highway rail crossing",
+      "side road",
+      "tracks"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_029.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "HIGHWAY-RAIL CROSSING ON SIDE ROAD：A side road has a railroad crossing. 司机应采取行动：Watch for vehicles slowing or turning near tracks.",
+    "explanation_es": "HIGHWAY-RAIL CROSSING ON SIDE ROAD: A side road has a railroad crossing. Acción del conductor: Watch for vehicles slowing or turning near tracks.",
+    "explanation_hi": "HIGHWAY-RAIL CROSSING ON SIDE ROAD: A side road has a railroad crossing. ड्राइवर की कार्रवाई: Watch for vehicles slowing or turning near tracks.",
+    "explanation_pa": "HIGHWAY-RAIL CROSSING ON SIDE ROAD: A side road has a railroad crossing. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch for vehicles slowing or turning near tracks.",
+    "explanation_vi": "HIGHWAY-RAIL CROSSING ON SIDE ROAD: A side road has a railroad crossing. Hành động của tài xế: Watch for vehicles slowing or turning near tracks."
+  },
+  {
+    "sign_code": "PDF_SIGN_030",
+    "name": "LIMITED VEHICLE STORAGE SPACE",
+    "category": "Railroad / Light Rail",
+    "meaning": "Limited space exists between the intersection and tracks.",
+    "action": "Do not stop on tracks or block the intersection.",
+    "keywords": [
+      "limited storage space",
+      "tracks",
+      "intersection"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_030.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "LIMITED VEHICLE STORAGE SPACE：Limited space exists between the intersection and tracks. 司机应采取行动：Do not stop on tracks or block the intersection.",
+    "explanation_es": "LIMITED VEHICLE STORAGE SPACE: Limited space exists between the intersection and tracks. Acción del conductor: Do not stop on tracks or block the intersection.",
+    "explanation_hi": "LIMITED VEHICLE STORAGE SPACE: Limited space exists between the intersection and tracks. ड्राइवर की कार्रवाई: Do not stop on tracks or block the intersection.",
+    "explanation_pa": "LIMITED VEHICLE STORAGE SPACE: Limited space exists between the intersection and tracks. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not stop on tracks or block the intersection.",
+    "explanation_vi": "LIMITED VEHICLE STORAGE SPACE: Limited space exists between the intersection and tracks. Hành động của tài xế: Do not stop on tracks or block the intersection."
+  },
+  {
+    "sign_code": "PDF_SIGN_031",
+    "name": "TRACKS AND HIGHWAY DISTANCE",
+    "category": "Railroad / Light Rail",
+    "meaning": "A short distance exists between tracks and the highway.",
+    "action": "Make sure your truck can clear the tracks completely.",
+    "keywords": [
+      "tracks",
+      "highway",
+      "clear tracks"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_031.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "TRACKS AND HIGHWAY DISTANCE：A short distance exists between tracks and the highway. 司机应采取行动：Make sure your truck can clear the tracks completely.",
+    "explanation_es": "TRACKS AND HIGHWAY DISTANCE: A short distance exists between tracks and the highway. Acción del conductor: Make sure your truck can clear the tracks completely.",
+    "explanation_hi": "TRACKS AND HIGHWAY DISTANCE: A short distance exists between tracks and the highway. ड्राइवर की कार्रवाई: Make sure your truck can clear the tracks completely.",
+    "explanation_pa": "TRACKS AND HIGHWAY DISTANCE: A short distance exists between tracks and the highway. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Make sure your truck can clear the tracks completely.",
+    "explanation_vi": "TRACKS AND HIGHWAY DISTANCE: A short distance exists between tracks and the highway. Hành động của tài xế: Make sure your truck can clear the tracks completely."
+  },
+  {
+    "sign_code": "PDF_SIGN_032",
+    "name": "NO LEFT TURN ACROSS TRACKS",
+    "category": "Railroad / Light Rail",
+    "meaning": "Left turns across tracks are prohibited.",
+    "action": "Do not turn left across the tracks.",
+    "keywords": [
+      "no left turn",
+      "tracks",
+      "prohibited"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_032.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "NO LEFT TURN ACROSS TRACKS：Left turns across tracks are prohibited. 司机应采取行动：Do not turn left across the tracks.",
+    "explanation_es": "NO LEFT TURN ACROSS TRACKS: Left turns across tracks are prohibited. Acción del conductor: Do not turn left across the tracks.",
+    "explanation_hi": "NO LEFT TURN ACROSS TRACKS: Left turns across tracks are prohibited. ड्राइवर की कार्रवाई: Do not turn left across the tracks.",
+    "explanation_pa": "NO LEFT TURN ACROSS TRACKS: Left turns across tracks are prohibited. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not turn left across the tracks.",
+    "explanation_vi": "NO LEFT TURN ACROSS TRACKS: Left turns across tracks are prohibited. Hành động của tài xế: Do not turn left across the tracks."
+  },
+  {
+    "sign_code": "PDF_SIGN_033",
+    "name": "DO NOT DRIVE ON TRACKS",
+    "category": "Railroad / Light Rail",
+    "meaning": "Driving on tracks is prohibited.",
+    "action": "Stay off the tracks.",
+    "keywords": [
+      "do not drive",
+      "tracks",
+      "prohibited"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_033.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "DO NOT DRIVE ON TRACKS：Driving on tracks is prohibited. 司机应采取行动：Stay off the tracks.",
+    "explanation_es": "DO NOT DRIVE ON TRACKS: Driving on tracks is prohibited. Acción del conductor: Stay off the tracks.",
+    "explanation_hi": "DO NOT DRIVE ON TRACKS: Driving on tracks is prohibited. ड्राइवर की कार्रवाई: Stay off the tracks.",
+    "explanation_pa": "DO NOT DRIVE ON TRACKS: Driving on tracks is prohibited. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stay off the tracks.",
+    "explanation_vi": "DO NOT DRIVE ON TRACKS: Driving on tracks is prohibited. Hành động của tài xế: Stay off the tracks."
+  },
+  {
+    "sign_code": "PDF_SIGN_034",
+    "name": "NO TRAIN HORN",
+    "category": "Railroad / Light Rail",
+    "meaning": "Trains may not sound horns in this area.",
+    "action": "Look carefully and do not rely on hearing a horn.",
+    "keywords": [
+      "no train horn",
+      "look",
+      "trains"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_034.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "NO TRAIN HORN：Trains may not sound horns in this area. 司机应采取行动：Look carefully and do not rely on hearing a horn.",
+    "explanation_es": "NO TRAIN HORN: Trains may not sound horns in this area. Acción del conductor: Look carefully and do not rely on hearing a horn.",
+    "explanation_hi": "NO TRAIN HORN: Trains may not sound horns in this area. ड्राइवर की कार्रवाई: Look carefully and do not rely on hearing a horn.",
+    "explanation_pa": "NO TRAIN HORN: Trains may not sound horns in this area. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Look carefully and do not rely on hearing a horn.",
+    "explanation_vi": "NO TRAIN HORN: Trains may not sound horns in this area. Hành động của tài xế: Look carefully and do not rely on hearing a horn."
+  },
+  {
+    "sign_code": "PDF_SIGN_035",
+    "name": "NO SIGNAL AT TRACKS",
+    "category": "Railroad / Light Rail",
+    "meaning": "There may be no signal at the railroad crossing.",
+    "action": "Look both ways and cross only when safe.",
+    "keywords": [
+      "no signal",
+      "tracks",
+      "look"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_035.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 4,
+    "explanation_zh": "NO SIGNAL AT TRACKS：There may be no signal at the railroad crossing. 司机应采取行动：Look both ways and cross only when safe.",
+    "explanation_es": "NO SIGNAL AT TRACKS: There may be no signal at the railroad crossing. Acción del conductor: Look both ways and cross only when safe.",
+    "explanation_hi": "NO SIGNAL AT TRACKS: There may be no signal at the railroad crossing. ड्राइवर की कार्रवाई: Look both ways and cross only when safe.",
+    "explanation_pa": "NO SIGNAL AT TRACKS: There may be no signal at the railroad crossing. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Look both ways and cross only when safe.",
+    "explanation_vi": "NO SIGNAL AT TRACKS: There may be no signal at the railroad crossing. Hành động của tài xế: Look both ways and cross only when safe."
+  },
+  {
+    "sign_code": "PDF_SIGN_036",
+    "name": "WORKERS AHEAD",
+    "category": "Temporary Traffic Control",
+    "meaning": "Workers are ahead in or near the roadway.",
+    "action": "Slow down and watch for workers.",
+    "keywords": [
+      "workers ahead",
+      "slow down",
+      "workers"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_036.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "WORKERS AHEAD：Workers are ahead in or near the roadway. 司机应采取行动：Slow down and watch for workers.",
+    "explanation_es": "WORKERS AHEAD: Workers are ahead in or near the roadway. Acción del conductor: Slow down and watch for workers.",
+    "explanation_hi": "WORKERS AHEAD: Workers are ahead in or near the roadway. ड्राइवर की कार्रवाई: Slow down and watch for workers.",
+    "explanation_pa": "WORKERS AHEAD: Workers are ahead in or near the roadway. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for workers.",
+    "explanation_vi": "WORKERS AHEAD: Workers are ahead in or near the roadway. Hành động của tài xế: Slow down and watch for workers."
+  },
+  {
+    "sign_code": "PDF_SIGN_037",
+    "name": "FLAGGER AHEAD",
+    "category": "Temporary Traffic Control",
+    "meaning": "A flagger is controlling traffic ahead.",
+    "action": "Slow down and follow the flagger instructions.",
+    "keywords": [
+      "flagger ahead",
+      "instructions",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_037.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "FLAGGER AHEAD：A flagger is controlling traffic ahead. 司机应采取行动：Slow down and follow the flagger instructions.",
+    "explanation_es": "FLAGGER AHEAD: A flagger is controlling traffic ahead. Acción del conductor: Slow down and follow the flagger instructions.",
+    "explanation_hi": "FLAGGER AHEAD: A flagger is controlling traffic ahead. ड्राइवर की कार्रवाई: Slow down and follow the flagger instructions.",
+    "explanation_pa": "FLAGGER AHEAD: A flagger is controlling traffic ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and follow the flagger instructions.",
+    "explanation_vi": "FLAGGER AHEAD: A flagger is controlling traffic ahead. Hành động của tài xế: Slow down and follow the flagger instructions."
+  },
+  {
+    "sign_code": "PDF_SIGN_038",
+    "name": "UTILITY WORK AHEAD",
+    "category": "Temporary Traffic Control",
+    "meaning": "Utility work is ahead.",
+    "action": "Slow down and watch for workers and equipment.",
+    "keywords": [
+      "utility work",
+      "work ahead",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_038.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "UTILITY WORK AHEAD：Utility work is ahead. 司机应采取行动：Slow down and watch for workers and equipment.",
+    "explanation_es": "UTILITY WORK AHEAD: Utility work is ahead. Acción del conductor: Slow down and watch for workers and equipment.",
+    "explanation_hi": "UTILITY WORK AHEAD: Utility work is ahead. ड्राइवर की कार्रवाई: Slow down and watch for workers and equipment.",
+    "explanation_pa": "UTILITY WORK AHEAD: Utility work is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for workers and equipment.",
+    "explanation_vi": "UTILITY WORK AHEAD: Utility work is ahead. Hành động của tài xế: Slow down and watch for workers and equipment."
+  },
+  {
+    "sign_code": "PDF_SIGN_039",
+    "name": "SHOULDER WORK",
+    "category": "Temporary Traffic Control",
+    "meaning": "Workers or equipment are on the shoulder.",
+    "action": "Stay in lane and avoid the shoulder.",
+    "keywords": [
+      "shoulder work",
+      "shoulder"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_039.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "SHOULDER WORK：Workers or equipment are on the shoulder. 司机应采取行动：Stay in lane and avoid the shoulder.",
+    "explanation_es": "SHOULDER WORK: Workers or equipment are on the shoulder. Acción del conductor: Stay in lane and avoid the shoulder.",
+    "explanation_hi": "SHOULDER WORK: Workers or equipment are on the shoulder. ड्राइवर की कार्रवाई: Stay in lane and avoid the shoulder.",
+    "explanation_pa": "SHOULDER WORK: Workers or equipment are on the shoulder. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stay in lane and avoid the shoulder.",
+    "explanation_vi": "SHOULDER WORK: Workers or equipment are on the shoulder. Hành động của tài xế: Stay in lane and avoid the shoulder."
+  },
+  {
+    "sign_code": "PDF_SIGN_040",
+    "name": "RIGHT SHOULDER CLOSED",
+    "category": "Temporary Traffic Control",
+    "meaning": "The right shoulder is closed.",
+    "action": "Do not use the right shoulder.",
+    "keywords": [
+      "right shoulder closed",
+      "shoulder"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_040.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "RIGHT SHOULDER CLOSED：The right shoulder is closed. 司机应采取行动：Do not use the right shoulder.",
+    "explanation_es": "RIGHT SHOULDER CLOSED: The right shoulder is closed. Acción del conductor: Do not use the right shoulder.",
+    "explanation_hi": "RIGHT SHOULDER CLOSED: The right shoulder is closed. ड्राइवर की कार्रवाई: Do not use the right shoulder.",
+    "explanation_pa": "RIGHT SHOULDER CLOSED: The right shoulder is closed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not use the right shoulder.",
+    "explanation_vi": "RIGHT SHOULDER CLOSED: The right shoulder is closed. Hành động của tài xế: Do not use the right shoulder."
+  },
+  {
+    "sign_code": "PDF_SIGN_041",
+    "name": "RIGHT TWO LANES CLOSED",
+    "category": "Temporary Traffic Control",
+    "meaning": "The right two lanes are closed ahead.",
+    "action": "Merge left early and slow down.",
+    "keywords": [
+      "two lanes closed",
+      "merge left",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_041.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "RIGHT TWO LANES CLOSED：The right two lanes are closed ahead. 司机应采取行动：Merge left early and slow down.",
+    "explanation_es": "RIGHT TWO LANES CLOSED: The right two lanes are closed ahead. Acción del conductor: Merge left early and slow down.",
+    "explanation_hi": "RIGHT TWO LANES CLOSED: The right two lanes are closed ahead. ड्राइवर की कार्रवाई: Merge left early and slow down.",
+    "explanation_pa": "RIGHT TWO LANES CLOSED: The right two lanes are closed ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Merge left early and slow down.",
+    "explanation_vi": "RIGHT TWO LANES CLOSED: The right two lanes are closed ahead. Hành động của tài xế: Merge left early and slow down."
+  },
+  {
+    "sign_code": "PDF_SIGN_042",
+    "name": "EXIT CLOSED",
+    "category": "Temporary Traffic Control",
+    "meaning": "The exit is closed.",
+    "action": "Use a different exit or route.",
+    "keywords": [
+      "exit closed",
+      "different route"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_042.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "EXIT CLOSED：The exit is closed. 司机应采取行动：Use a different exit or route.",
+    "explanation_es": "EXIT CLOSED: The exit is closed. Acción del conductor: Use a different exit or route.",
+    "explanation_hi": "EXIT CLOSED: The exit is closed. ड्राइवर की कार्रवाई: Use a different exit or route.",
+    "explanation_pa": "EXIT CLOSED: The exit is closed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use a different exit or route.",
+    "explanation_vi": "EXIT CLOSED: The exit is closed. Hành động của tài xế: Use a different exit or route."
+  },
+  {
+    "sign_code": "PDF_SIGN_043",
+    "name": "DETOUR",
+    "category": "Temporary Traffic Control",
+    "meaning": "A detour route is provided.",
+    "action": "Follow the detour signs.",
+    "keywords": [
+      "detour",
+      "follow signs"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_043.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "DETOUR：A detour route is provided. 司机应采取行动：Follow the detour signs.",
+    "explanation_es": "DETOUR: A detour route is provided. Acción del conductor: Follow the detour signs.",
+    "explanation_hi": "DETOUR: A detour route is provided. ड्राइवर की कार्रवाई: Follow the detour signs.",
+    "explanation_pa": "DETOUR: A detour route is provided. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Follow the detour signs.",
+    "explanation_vi": "DETOUR: A detour route is provided. Hành động của tài xế: Follow the detour signs."
+  },
+  {
+    "sign_code": "PDF_SIGN_044",
+    "name": "ROAD WORK NEXT 5 MILES",
+    "category": "Temporary Traffic Control",
+    "meaning": "Road work continues for the next five miles.",
+    "action": "Slow down and stay alert.",
+    "keywords": [
+      "road work",
+      "5 miles",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_044.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "ROAD WORK NEXT 5 MILES：Road work continues for the next five miles. 司机应采取行动：Slow down and stay alert.",
+    "explanation_es": "ROAD WORK NEXT 5 MILES: Road work continues for the next five miles. Acción del conductor: Slow down and stay alert.",
+    "explanation_hi": "ROAD WORK NEXT 5 MILES: Road work continues for the next five miles. ड्राइवर की कार्रवाई: Slow down and stay alert.",
+    "explanation_pa": "ROAD WORK NEXT 5 MILES: Road work continues for the next five miles. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and stay alert.",
+    "explanation_vi": "ROAD WORK NEXT 5 MILES: Road work continues for the next five miles. Hành động của tài xế: Slow down and stay alert."
+  },
+  {
+    "sign_code": "PDF_SIGN_045",
+    "name": "END ROAD WORK",
+    "category": "Temporary Traffic Control",
+    "meaning": "The road work zone ends here.",
+    "action": "Resume normal driving when safe and legal.",
+    "keywords": [
+      "end road work",
+      "work zone ends"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_045.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "END ROAD WORK：The road work zone ends here. 司机应采取行动：Resume normal driving when safe and legal.",
+    "explanation_es": "END ROAD WORK: The road work zone ends here. Acción del conductor: Resume normal driving when safe and legal.",
+    "explanation_hi": "END ROAD WORK: The road work zone ends here. ड्राइवर की कार्रवाई: Resume normal driving when safe and legal.",
+    "explanation_pa": "END ROAD WORK: The road work zone ends here. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Resume normal driving when safe and legal.",
+    "explanation_vi": "END ROAD WORK: The road work zone ends here. Hành động của tài xế: Resume normal driving when safe and legal."
+  },
+  {
+    "sign_code": "PDF_SIGN_046",
+    "name": "SLOW TRAFFIC AHEAD",
+    "category": "Temporary Traffic Control",
+    "meaning": "Slow traffic is ahead.",
+    "action": "Reduce speed and prepare to slow or stop.",
+    "keywords": [
+      "slow traffic",
+      "reduce speed",
+      "prepare to stop"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_046.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 5,
+    "explanation_zh": "SLOW TRAFFIC AHEAD：Slow traffic is ahead. 司机应采取行动：Reduce speed and prepare to slow or stop.",
+    "explanation_es": "SLOW TRAFFIC AHEAD: Slow traffic is ahead. Acción del conductor: Reduce speed and prepare to slow or stop.",
+    "explanation_hi": "SLOW TRAFFIC AHEAD: Slow traffic is ahead. ड्राइवर की कार्रवाई: Reduce speed and prepare to slow or stop.",
+    "explanation_pa": "SLOW TRAFFIC AHEAD: Slow traffic is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Reduce speed and prepare to slow or stop.",
+    "explanation_vi": "SLOW TRAFFIC AHEAD: Slow traffic is ahead. Hành động của tài xế: Reduce speed and prepare to slow or stop."
+  },
+  {
+    "sign_code": "PDF_SIGN_047",
+    "name": "STOP",
+    "category": "Regulatory",
+    "meaning": "You must come to a complete stop.",
+    "action": "Stop completely before moving.",
+    "keywords": [
+      "stop",
+      "complete stop"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_047.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "STOP：You must come to a complete stop. 司机应采取行动：Stop completely before moving.",
+    "explanation_es": "STOP: You must come to a complete stop. Acción del conductor: Stop completely before moving.",
+    "explanation_hi": "STOP: You must come to a complete stop. ड्राइवर की कार्रवाई: Stop completely before moving.",
+    "explanation_pa": "STOP: You must come to a complete stop. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stop completely before moving.",
+    "explanation_vi": "STOP: You must come to a complete stop. Hành động của tài xế: Stop completely before moving."
+  },
+  {
+    "sign_code": "PDF_SIGN_048",
+    "name": "MULTI-WAY STOP",
+    "category": "Regulatory",
+    "meaning": "All approaches have stop signs.",
+    "action": "Stop and take turns according to right-of-way rules.",
+    "keywords": [
+      "multi-way stop",
+      "stop",
+      "right of way"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_048.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "MULTI-WAY STOP：All approaches have stop signs. 司机应采取行动：Stop and take turns according to right-of-way rules.",
+    "explanation_es": "MULTI-WAY STOP: All approaches have stop signs. Acción del conductor: Stop and take turns according to right-of-way rules.",
+    "explanation_hi": "MULTI-WAY STOP: All approaches have stop signs. ड्राइवर की कार्रवाई: Stop and take turns according to right-of-way rules.",
+    "explanation_pa": "MULTI-WAY STOP: All approaches have stop signs. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stop and take turns according to right-of-way rules.",
+    "explanation_vi": "MULTI-WAY STOP: All approaches have stop signs. Hành động của tài xế: Stop and take turns according to right-of-way rules."
+  },
+  {
+    "sign_code": "PDF_SIGN_049",
+    "name": "YIELD",
+    "category": "Regulatory",
+    "meaning": "You must slow down and yield to other traffic.",
+    "action": "Slow down and give the right of way.",
+    "keywords": [
+      "yield",
+      "slow down",
+      "right of way"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_049.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "YIELD：You must slow down and yield to other traffic. 司机应采取行动：Slow down and give the right of way.",
+    "explanation_es": "YIELD: You must slow down and yield to other traffic. Acción del conductor: Slow down and give the right of way.",
+    "explanation_hi": "YIELD: You must slow down and yield to other traffic. ड्राइवर की कार्रवाई: Slow down and give the right of way.",
+    "explanation_pa": "YIELD: You must slow down and yield to other traffic. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and give the right of way.",
+    "explanation_vi": "YIELD: You must slow down and yield to other traffic. Hành động của tài xế: Slow down and give the right of way."
+  },
+  {
+    "sign_code": "PDF_SIGN_050",
+    "name": "DO NOT ENTER",
+    "category": "Regulatory",
+    "meaning": "You must not enter this road or ramp.",
+    "action": "Stop and find another route.",
+    "keywords": [
+      "do not enter",
+      "not enter",
+      "another route"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_050.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "DO NOT ENTER：You must not enter this road or ramp. 司机应采取行动：Stop and find another route.",
+    "explanation_es": "DO NOT ENTER: You must not enter this road or ramp. Acción del conductor: Stop and find another route.",
+    "explanation_hi": "DO NOT ENTER: You must not enter this road or ramp. ड्राइवर की कार्रवाई: Stop and find another route.",
+    "explanation_pa": "DO NOT ENTER: You must not enter this road or ramp. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Stop and find another route.",
+    "explanation_vi": "DO NOT ENTER: You must not enter this road or ramp. Hành động của tài xế: Stop and find another route."
+  },
+  {
+    "sign_code": "PDF_SIGN_051",
+    "name": "NO LEFT TURN",
+    "category": "Regulatory",
+    "meaning": "Left turns are not allowed.",
+    "action": "Do not turn left.",
+    "keywords": [
+      "no left turn",
+      "do not turn left"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_051.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "NO LEFT TURN：Left turns are not allowed. 司机应采取行动：Do not turn left.",
+    "explanation_es": "NO LEFT TURN: Left turns are not allowed. Acción del conductor: Do not turn left.",
+    "explanation_hi": "NO LEFT TURN: Left turns are not allowed. ड्राइवर की कार्रवाई: Do not turn left.",
+    "explanation_pa": "NO LEFT TURN: Left turns are not allowed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not turn left.",
+    "explanation_vi": "NO LEFT TURN: Left turns are not allowed. Hành động của tài xế: Do not turn left."
+  },
+  {
+    "sign_code": "PDF_SIGN_052",
+    "name": "NO U TURN",
+    "category": "Regulatory",
+    "meaning": "U-turns are not allowed.",
+    "action": "Do not make a U-turn.",
+    "keywords": [
+      "no u turn",
+      "u-turns not allowed"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_052.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "NO U TURN：U-turns are not allowed. 司机应采取行动：Do not make a U-turn.",
+    "explanation_es": "NO U TURN: U-turns are not allowed. Acción del conductor: Do not make a U-turn.",
+    "explanation_hi": "NO U TURN: U-turns are not allowed. ड्राइवर की कार्रवाई: Do not make a U-turn.",
+    "explanation_pa": "NO U TURN: U-turns are not allowed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not make a U-turn.",
+    "explanation_vi": "NO U TURN: U-turns are not allowed. Hành động của tài xế: Do not make a U-turn."
+  },
+  {
+    "sign_code": "PDF_SIGN_053",
+    "name": "NO TRUCKS",
+    "category": "Regulatory / Truck Restriction",
+    "meaning": "Trucks are not allowed on this road.",
+    "action": "Use another route.",
+    "keywords": [
+      "no trucks",
+      "trucks not allowed",
+      "another route"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_053.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "NO TRUCKS：Trucks are not allowed on this road. 司机应采取行动：Use another route.",
+    "explanation_es": "NO TRUCKS: Trucks are not allowed on this road. Acción del conductor: Use another route.",
+    "explanation_hi": "NO TRUCKS: Trucks are not allowed on this road. ड्राइवर की कार्रवाई: Use another route.",
+    "explanation_pa": "NO TRUCKS: Trucks are not allowed on this road. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use another route.",
+    "explanation_vi": "NO TRUCKS: Trucks are not allowed on this road. Hành động của tài xế: Use another route."
+  },
+  {
+    "sign_code": "PDF_SIGN_054",
+    "name": "NO PARKING",
+    "category": "Regulatory",
+    "meaning": "Parking is not allowed here.",
+    "action": "Do not park in this area.",
+    "keywords": [
+      "no parking",
+      "do not park"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_054.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "NO PARKING：Parking is not allowed here. 司机应采取行动：Do not park in this area.",
+    "explanation_es": "NO PARKING: Parking is not allowed here. Acción del conductor: Do not park in this area.",
+    "explanation_hi": "NO PARKING: Parking is not allowed here. ड्राइवर की कार्रवाई: Do not park in this area.",
+    "explanation_pa": "NO PARKING: Parking is not allowed here. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not park in this area.",
+    "explanation_vi": "NO PARKING: Parking is not allowed here. Hành động của tài xế: Do not park in this area."
+  },
+  {
+    "sign_code": "PDF_SIGN_055",
+    "name": "HAZARDOUS MATERIALS PROHIBITED",
+    "category": "Regulatory / Hazmat",
+    "meaning": "Hazardous materials are prohibited.",
+    "action": "Do not enter if carrying hazmat.",
+    "keywords": [
+      "hazardous materials",
+      "hazmat",
+      "prohibited"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_055.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "HAZARDOUS MATERIALS PROHIBITED：Hazardous materials are prohibited. 司机应采取行动：Do not enter if carrying hazmat.",
+    "explanation_es": "HAZARDOUS MATERIALS PROHIBITED: Hazardous materials are prohibited. Acción del conductor: Do not enter if carrying hazmat.",
+    "explanation_hi": "HAZARDOUS MATERIALS PROHIBITED: Hazardous materials are prohibited. ड्राइवर की कार्रवाई: Do not enter if carrying hazmat.",
+    "explanation_pa": "HAZARDOUS MATERIALS PROHIBITED: Hazardous materials are prohibited. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not enter if carrying hazmat.",
+    "explanation_vi": "HAZARDOUS MATERIALS PROHIBITED: Hazardous materials are prohibited. Hành động của tài xế: Do not enter if carrying hazmat."
+  },
+  {
+    "sign_code": "PDF_SIGN_056",
+    "name": "SPEED LIMIT",
+    "category": "Regulatory",
+    "meaning": "This is the maximum legal speed.",
+    "action": "Do not drive faster than the posted speed.",
+    "keywords": [
+      "speed limit",
+      "maximum speed",
+      "posted speed"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_056.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "SPEED LIMIT：This is the maximum legal speed. 司机应采取行动：Do not drive faster than the posted speed.",
+    "explanation_es": "SPEED LIMIT: This is the maximum legal speed. Acción del conductor: Do not drive faster than the posted speed.",
+    "explanation_hi": "SPEED LIMIT: This is the maximum legal speed. ड्राइवर की कार्रवाई: Do not drive faster than the posted speed.",
+    "explanation_pa": "SPEED LIMIT: This is the maximum legal speed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not drive faster than the posted speed.",
+    "explanation_vi": "SPEED LIMIT: This is the maximum legal speed. Hành động của tài xế: Do not drive faster than the posted speed."
+  },
+  {
+    "sign_code": "PDF_SIGN_057",
+    "name": "TRUCK WEIGHT LIMIT",
+    "category": "Regulatory / Truck Restriction",
+    "meaning": "Trucks over the posted weight are not allowed.",
+    "action": "Check your gross weight before entering.",
+    "keywords": [
+      "weight limit",
+      "truck weight",
+      "gross weight"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_057.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "TRUCK WEIGHT LIMIT：Trucks over the posted weight are not allowed. 司机应采取行动：Check your gross weight before entering.",
+    "explanation_es": "TRUCK WEIGHT LIMIT: Trucks over the posted weight are not allowed. Acción del conductor: Check your gross weight before entering.",
+    "explanation_hi": "TRUCK WEIGHT LIMIT: Trucks over the posted weight are not allowed. ड्राइवर की कार्रवाई: Check your gross weight before entering.",
+    "explanation_pa": "TRUCK WEIGHT LIMIT: Trucks over the posted weight are not allowed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Check your gross weight before entering.",
+    "explanation_vi": "TRUCK WEIGHT LIMIT: Trucks over the posted weight are not allowed. Hành động của tài xế: Check your gross weight before entering."
+  },
+  {
+    "sign_code": "PDF_SIGN_058",
+    "name": "ONE WAY",
+    "category": "Regulatory",
+    "meaning": "Traffic moves only in one direction.",
+    "action": "Drive only in the direction shown.",
+    "keywords": [
+      "one way",
+      "one direction"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_058.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "ONE WAY：Traffic moves only in one direction. 司机应采取行动：Drive only in the direction shown.",
+    "explanation_es": "ONE WAY: Traffic moves only in one direction. Acción del conductor: Drive only in the direction shown.",
+    "explanation_hi": "ONE WAY: Traffic moves only in one direction. ड्राइवर की कार्रवाई: Drive only in the direction shown.",
+    "explanation_pa": "ONE WAY: Traffic moves only in one direction. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Drive only in the direction shown.",
+    "explanation_vi": "ONE WAY: Traffic moves only in one direction. Hành động của tài xế: Drive only in the direction shown."
+  },
+  {
+    "sign_code": "PDF_SIGN_059",
+    "name": "HOV LANE AHEAD",
+    "category": "Regulatory",
+    "meaning": "An HOV lane is ahead.",
+    "action": "Use the lane only if your vehicle qualifies.",
+    "keywords": [
+      "hov lane",
+      "ahead",
+      "qualifies"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_059.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "HOV LANE AHEAD：An HOV lane is ahead. 司机应采取行动：Use the lane only if your vehicle qualifies.",
+    "explanation_es": "HOV LANE AHEAD: An HOV lane is ahead. Acción del conductor: Use the lane only if your vehicle qualifies.",
+    "explanation_hi": "HOV LANE AHEAD: An HOV lane is ahead. ड्राइवर की कार्रवाई: Use the lane only if your vehicle qualifies.",
+    "explanation_pa": "HOV LANE AHEAD: An HOV lane is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use the lane only if your vehicle qualifies.",
+    "explanation_vi": "HOV LANE AHEAD: An HOV lane is ahead. Hành động của tài xế: Use the lane only if your vehicle qualifies."
+  },
+  {
+    "sign_code": "PDF_SIGN_060",
+    "name": "EMERGENCY SIGNAL",
+    "category": "Regulatory",
+    "meaning": "Traffic signal may be controlled by emergency vehicles.",
+    "action": "Watch the signal and yield to emergency vehicles.",
+    "keywords": [
+      "emergency signal",
+      "emergency vehicle",
+      "yield"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_060.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 6,
+    "explanation_zh": "EMERGENCY SIGNAL：Traffic signal may be controlled by emergency vehicles. 司机应采取行动：Watch the signal and yield to emergency vehicles.",
+    "explanation_es": "EMERGENCY SIGNAL: Traffic signal may be controlled by emergency vehicles. Acción del conductor: Watch the signal and yield to emergency vehicles.",
+    "explanation_hi": "EMERGENCY SIGNAL: Traffic signal may be controlled by emergency vehicles. ड्राइवर की कार्रवाई: Watch the signal and yield to emergency vehicles.",
+    "explanation_pa": "EMERGENCY SIGNAL: Traffic signal may be controlled by emergency vehicles. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch the signal and yield to emergency vehicles.",
+    "explanation_vi": "EMERGENCY SIGNAL: Traffic signal may be controlled by emergency vehicles. Hành động của tài xế: Watch the signal and yield to emergency vehicles."
+  },
+  {
+    "sign_code": "PDF_SIGN_061",
+    "name": "FOOD",
+    "category": "Motorist Services",
+    "meaning": "Food services are available.",
+    "action": "Use this exit if you need food.",
+    "keywords": [
+      "food",
+      "services"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_061.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "FOOD：Food services are available. 司机应采取行动：Use this exit if you need food.",
+    "explanation_es": "FOOD: Food services are available. Acción del conductor: Use this exit if you need food.",
+    "explanation_hi": "FOOD: Food services are available. ड्राइवर की कार्रवाई: Use this exit if you need food.",
+    "explanation_pa": "FOOD: Food services are available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this exit if you need food.",
+    "explanation_vi": "FOOD: Food services are available. Hành động của tài xế: Use this exit if you need food."
+  },
+  {
+    "sign_code": "PDF_SIGN_062",
+    "name": "LODGING",
+    "category": "Motorist Services",
+    "meaning": "Lodging is available.",
+    "action": "Use this exit if you need a place to sleep.",
+    "keywords": [
+      "lodging",
+      "sleep"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_062.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "LODGING：Lodging is available. 司机应采取行动：Use this exit if you need a place to sleep.",
+    "explanation_es": "LODGING: Lodging is available. Acción del conductor: Use this exit if you need a place to sleep.",
+    "explanation_hi": "LODGING: Lodging is available. ड्राइवर की कार्रवाई: Use this exit if you need a place to sleep.",
+    "explanation_pa": "LODGING: Lodging is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this exit if you need a place to sleep.",
+    "explanation_vi": "LODGING: Lodging is available. Hành động của tài xế: Use this exit if you need a place to sleep."
+  },
+  {
+    "sign_code": "PDF_SIGN_063",
+    "name": "TELEPHONE",
+    "category": "Motorist Services",
+    "meaning": "A telephone is available.",
+    "action": "Use it for communication if needed.",
+    "keywords": [
+      "telephone",
+      "phone"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_063.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "TELEPHONE：A telephone is available. 司机应采取行动：Use it for communication if needed.",
+    "explanation_es": "TELEPHONE: A telephone is available. Acción del conductor: Use it for communication if needed.",
+    "explanation_hi": "TELEPHONE: A telephone is available. ड्राइवर की कार्रवाई: Use it for communication if needed.",
+    "explanation_pa": "TELEPHONE: A telephone is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use it for communication if needed.",
+    "explanation_vi": "TELEPHONE: A telephone is available. Hành động của tài xế: Use it for communication if needed."
+  },
+  {
+    "sign_code": "PDF_SIGN_064",
+    "name": "HOSPITAL",
+    "category": "Motorist Services",
+    "meaning": "A hospital is nearby.",
+    "action": "Use it for emergency medical help.",
+    "keywords": [
+      "hospital",
+      "medical"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_064.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "HOSPITAL：A hospital is nearby. 司机应采取行动：Use it for emergency medical help.",
+    "explanation_es": "HOSPITAL: A hospital is nearby. Acción del conductor: Use it for emergency medical help.",
+    "explanation_hi": "HOSPITAL: A hospital is nearby. ड्राइवर की कार्रवाई: Use it for emergency medical help.",
+    "explanation_pa": "HOSPITAL: A hospital is nearby. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use it for emergency medical help.",
+    "explanation_vi": "HOSPITAL: A hospital is nearby. Hành động của tài xế: Use it for emergency medical help."
+  },
+  {
+    "sign_code": "PDF_SIGN_065",
+    "name": "EMERGENCY MEDICAL SERVICES",
+    "category": "Motorist Services",
+    "meaning": "Emergency medical services are available.",
+    "action": "Use this route for medical emergency help.",
+    "keywords": [
+      "emergency medical services",
+      "medical",
+      "emergency"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_065.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "EMERGENCY MEDICAL SERVICES：Emergency medical services are available. 司机应采取行动：Use this route for medical emergency help.",
+    "explanation_es": "EMERGENCY MEDICAL SERVICES: Emergency medical services are available. Acción del conductor: Use this route for medical emergency help.",
+    "explanation_hi": "EMERGENCY MEDICAL SERVICES: Emergency medical services are available. ड्राइवर की कार्रवाई: Use this route for medical emergency help.",
+    "explanation_pa": "EMERGENCY MEDICAL SERVICES: Emergency medical services are available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this route for medical emergency help.",
+    "explanation_vi": "EMERGENCY MEDICAL SERVICES: Emergency medical services are available. Hành động của tài xế: Use this route for medical emergency help."
+  },
+  {
+    "sign_code": "PDF_SIGN_066",
+    "name": "INFORMATION",
+    "category": "Motorist Services",
+    "meaning": "Traveler information is available.",
+    "action": "Use it if you need route or service information.",
+    "keywords": [
+      "information",
+      "traveler"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_066.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "INFORMATION：Traveler information is available. 司机应采取行动：Use it if you need route or service information.",
+    "explanation_es": "INFORMATION: Traveler information is available. Acción del conductor: Use it if you need route or service information.",
+    "explanation_hi": "INFORMATION: Traveler information is available. ड्राइवर की कार्रवाई: Use it if you need route or service information.",
+    "explanation_pa": "INFORMATION: Traveler information is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use it if you need route or service information.",
+    "explanation_vi": "INFORMATION: Traveler information is available. Hành động của tài xế: Use it if you need route or service information."
+  },
+  {
+    "sign_code": "PDF_SIGN_067",
+    "name": "GAS",
+    "category": "Motorist Services",
+    "meaning": "Gasoline is available.",
+    "action": "Use this exit if you need fuel.",
+    "keywords": [
+      "gas",
+      "fuel"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_067.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "GAS：Gasoline is available. 司机应采取行动：Use this exit if you need fuel.",
+    "explanation_es": "GAS: Gasoline is available. Acción del conductor: Use this exit if you need fuel.",
+    "explanation_hi": "GAS: Gasoline is available. ड्राइवर की कार्रवाई: Use this exit if you need fuel.",
+    "explanation_pa": "GAS: Gasoline is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this exit if you need fuel.",
+    "explanation_vi": "GAS: Gasoline is available. Hành động của tài xế: Use this exit if you need fuel."
+  },
+  {
+    "sign_code": "PDF_SIGN_068",
+    "name": "DIESEL FUEL",
+    "category": "Motorist Services / Truck Services",
+    "meaning": "Diesel fuel is available.",
+    "action": "Use this exit if your truck needs diesel.",
+    "keywords": [
+      "diesel",
+      "fuel",
+      "truck"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_068.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "DIESEL FUEL：Diesel fuel is available. 司机应采取行动：Use this exit if your truck needs diesel.",
+    "explanation_es": "DIESEL FUEL: Diesel fuel is available. Acción del conductor: Use this exit if your truck needs diesel.",
+    "explanation_hi": "DIESEL FUEL: Diesel fuel is available. ड्राइवर की कार्रवाई: Use this exit if your truck needs diesel.",
+    "explanation_pa": "DIESEL FUEL: Diesel fuel is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this exit if your truck needs diesel.",
+    "explanation_vi": "DIESEL FUEL: Diesel fuel is available. Hành động của tài xế: Use this exit if your truck needs diesel."
+  },
+  {
+    "sign_code": "PDF_SIGN_069",
+    "name": "ALTERNATIVE FUEL CNG",
+    "category": "Motorist Services",
+    "meaning": "Compressed natural gas fuel is available.",
+    "action": "Use only if your vehicle can use CNG.",
+    "keywords": [
+      "alternative fuel",
+      "cng",
+      "fuel"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_069.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "ALTERNATIVE FUEL CNG：Compressed natural gas fuel is available. 司机应采取行动：Use only if your vehicle can use CNG.",
+    "explanation_es": "ALTERNATIVE FUEL CNG: Compressed natural gas fuel is available. Acción del conductor: Use only if your vehicle can use CNG.",
+    "explanation_hi": "ALTERNATIVE FUEL CNG: Compressed natural gas fuel is available. ड्राइवर की कार्रवाई: Use only if your vehicle can use CNG.",
+    "explanation_pa": "ALTERNATIVE FUEL CNG: Compressed natural gas fuel is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use only if your vehicle can use CNG.",
+    "explanation_vi": "ALTERNATIVE FUEL CNG: Compressed natural gas fuel is available. Hành động của tài xế: Use only if your vehicle can use CNG."
+  },
+  {
+    "sign_code": "PDF_SIGN_070",
+    "name": "ELECTRIC VEHICLE CHARGING",
+    "category": "Motorist Services",
+    "meaning": "Electric vehicle charging is available.",
+    "action": "Use if your vehicle needs charging.",
+    "keywords": [
+      "electric vehicle",
+      "charging"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_070.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "ELECTRIC VEHICLE CHARGING：Electric vehicle charging is available. 司机应采取行动：Use if your vehicle needs charging.",
+    "explanation_es": "ELECTRIC VEHICLE CHARGING: Electric vehicle charging is available. Acción del conductor: Use if your vehicle needs charging.",
+    "explanation_hi": "ELECTRIC VEHICLE CHARGING: Electric vehicle charging is available. ड्राइवर की कार्रवाई: Use if your vehicle needs charging.",
+    "explanation_pa": "ELECTRIC VEHICLE CHARGING: Electric vehicle charging is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use if your vehicle needs charging.",
+    "explanation_vi": "ELECTRIC VEHICLE CHARGING: Electric vehicle charging is available. Hành động của tài xế: Use if your vehicle needs charging."
+  },
+  {
+    "sign_code": "PDF_SIGN_071",
+    "name": "REST AREA",
+    "category": "Motorist Services / Truck Services",
+    "meaning": "A rest area is ahead.",
+    "action": "Use it if you need a safe break.",
+    "keywords": [
+      "rest area",
+      "break",
+      "safe"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_071.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "REST AREA：A rest area is ahead. 司机应采取行动：Use it if you need a safe break.",
+    "explanation_es": "REST AREA: A rest area is ahead. Acción del conductor: Use it if you need a safe break.",
+    "explanation_hi": "REST AREA: A rest area is ahead. ड्राइवर की कार्रवाई: Use it if you need a safe break.",
+    "explanation_pa": "REST AREA: A rest area is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use it if you need a safe break.",
+    "explanation_vi": "REST AREA: A rest area is ahead. Hành động của tài xế: Use it if you need a safe break."
+  },
+  {
+    "sign_code": "PDF_SIGN_072",
+    "name": "BATHROOMS",
+    "category": "Motorist Services",
+    "meaning": "Restrooms are available.",
+    "action": "Use this stop if you need a restroom.",
+    "keywords": [
+      "bathrooms",
+      "restrooms"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_072.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "BATHROOMS：Restrooms are available. 司机应采取行动：Use this stop if you need a restroom.",
+    "explanation_es": "BATHROOMS: Restrooms are available. Acción del conductor: Use this stop if you need a restroom.",
+    "explanation_hi": "BATHROOMS: Restrooms are available. ड्राइवर की कार्रवाई: Use this stop if you need a restroom.",
+    "explanation_pa": "BATHROOMS: Restrooms are available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this stop if you need a restroom.",
+    "explanation_vi": "BATHROOMS: Restrooms are available. Hành động của tài xế: Use this stop if you need a restroom."
+  },
+  {
+    "sign_code": "PDF_SIGN_073",
+    "name": "DRINKING WATER",
+    "category": "Motorist Services",
+    "meaning": "Drinking water is available.",
+    "action": "Use it if you need water.",
+    "keywords": [
+      "drinking water",
+      "water"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_073.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "DRINKING WATER：Drinking water is available. 司机应采取行动：Use it if you need water.",
+    "explanation_es": "DRINKING WATER: Drinking water is available. Acción del conductor: Use it if you need water.",
+    "explanation_hi": "DRINKING WATER: Drinking water is available. ड्राइवर की कार्रवाई: Use it if you need water.",
+    "explanation_pa": "DRINKING WATER: Drinking water is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use it if you need water.",
+    "explanation_vi": "DRINKING WATER: Drinking water is available. Hành động của tài xế: Use it if you need water."
+  },
+  {
+    "sign_code": "PDF_SIGN_074",
+    "name": "AUTO MECHANIC",
+    "category": "Motorist Services / Truck Services",
+    "meaning": "Mechanical repair services are available.",
+    "action": "Use this exit if your vehicle needs repair.",
+    "keywords": [
+      "auto mechanic",
+      "repair",
+      "mechanic"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_074.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "AUTO MECHANIC：Mechanical repair services are available. 司机应采取行动：Use this exit if your vehicle needs repair.",
+    "explanation_es": "AUTO MECHANIC: Mechanical repair services are available. Acción del conductor: Use this exit if your vehicle needs repair.",
+    "explanation_hi": "AUTO MECHANIC: Mechanical repair services are available. ड्राइवर की कार्रवाई: Use this exit if your vehicle needs repair.",
+    "explanation_pa": "AUTO MECHANIC: Mechanical repair services are available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this exit if your vehicle needs repair.",
+    "explanation_vi": "AUTO MECHANIC: Mechanical repair services are available. Hành động của tài xế: Use this exit if your vehicle needs repair."
+  },
+  {
+    "sign_code": "PDF_SIGN_075",
+    "name": "PARKING",
+    "category": "Motorist Services / Truck Services",
+    "meaning": "Parking is available.",
+    "action": "Use this area for safe parking.",
+    "keywords": [
+      "parking",
+      "available"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_075.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 8,
+    "explanation_zh": "PARKING：Parking is available. 司机应采取行动：Use this area for safe parking.",
+    "explanation_es": "PARKING: Parking is available. Acción del conductor: Use this area for safe parking.",
+    "explanation_hi": "PARKING: Parking is available. ड्राइवर की कार्रवाई: Use this area for safe parking.",
+    "explanation_pa": "PARKING: Parking is available. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use this area for safe parking.",
+    "explanation_vi": "PARKING: Parking is available. Hành động của tài xế: Use this area for safe parking."
+  },
+  {
+    "sign_code": "PDF_SIGN_076",
+    "name": "NO PEDESTRIANS",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "Pedestrians are not allowed.",
+    "action": "Do not allow pedestrians to enter this area.",
+    "keywords": [
+      "no pedestrians",
+      "not allowed"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_076.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "NO PEDESTRIANS：Pedestrians are not allowed. 司机应采取行动：Do not allow pedestrians to enter this area.",
+    "explanation_es": "NO PEDESTRIANS: Pedestrians are not allowed. Acción del conductor: Do not allow pedestrians to enter this area.",
+    "explanation_hi": "NO PEDESTRIANS: Pedestrians are not allowed. ड्राइवर की कार्रवाई: Do not allow pedestrians to enter this area.",
+    "explanation_pa": "NO PEDESTRIANS: Pedestrians are not allowed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Do not allow pedestrians to enter this area.",
+    "explanation_vi": "NO PEDESTRIANS: Pedestrians are not allowed. Hành động của tài xế: Do not allow pedestrians to enter this area."
+  },
+  {
+    "sign_code": "PDF_SIGN_077",
+    "name": "NO BICYCLES",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "Bicycles are not allowed.",
+    "action": "Watch for restrictions and do not enter by bicycle.",
+    "keywords": [
+      "no bicycles",
+      "not allowed"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_077.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "NO BICYCLES：Bicycles are not allowed. 司机应采取行动：Watch for restrictions and do not enter by bicycle.",
+    "explanation_es": "NO BICYCLES: Bicycles are not allowed. Acción del conductor: Watch for restrictions and do not enter by bicycle.",
+    "explanation_hi": "NO BICYCLES: Bicycles are not allowed. ड्राइवर की कार्रवाई: Watch for restrictions and do not enter by bicycle.",
+    "explanation_pa": "NO BICYCLES: Bicycles are not allowed. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch for restrictions and do not enter by bicycle.",
+    "explanation_vi": "NO BICYCLES: Bicycles are not allowed. Hành động của tài xế: Watch for restrictions and do not enter by bicycle."
+  },
+  {
+    "sign_code": "PDF_SIGN_078",
+    "name": "BICYCLE ROUTE",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "This is a bicycle route.",
+    "action": "Watch for bicycles.",
+    "keywords": [
+      "bicycle route",
+      "bicycles"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_078.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "BICYCLE ROUTE：This is a bicycle route. 司机应采取行动：Watch for bicycles.",
+    "explanation_es": "BICYCLE ROUTE: This is a bicycle route. Acción del conductor: Watch for bicycles.",
+    "explanation_hi": "BICYCLE ROUTE: This is a bicycle route. ड्राइवर की कार्रवाई: Watch for bicycles.",
+    "explanation_pa": "BICYCLE ROUTE: This is a bicycle route. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Watch for bicycles.",
+    "explanation_vi": "BICYCLE ROUTE: This is a bicycle route. Hành động của tài xế: Watch for bicycles."
+  },
+  {
+    "sign_code": "PDF_SIGN_079",
+    "name": "SLIPPERY WHEN WET BICYCLE",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "The bicycle route may be slippery when wet.",
+    "action": "Use caution and reduce speed.",
+    "keywords": [
+      "slippery",
+      "wet",
+      "caution"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_079.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "SLIPPERY WHEN WET BICYCLE：The bicycle route may be slippery when wet. 司机应采取行动：Use caution and reduce speed.",
+    "explanation_es": "SLIPPERY WHEN WET BICYCLE: The bicycle route may be slippery when wet. Acción del conductor: Use caution and reduce speed.",
+    "explanation_hi": "SLIPPERY WHEN WET BICYCLE: The bicycle route may be slippery when wet. ड्राइवर की कार्रवाई: Use caution and reduce speed.",
+    "explanation_pa": "SLIPPERY WHEN WET BICYCLE: The bicycle route may be slippery when wet. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Use caution and reduce speed.",
+    "explanation_vi": "SLIPPERY WHEN WET BICYCLE: The bicycle route may be slippery when wet. Hành động của tài xế: Use caution and reduce speed."
+  },
+  {
+    "sign_code": "PDF_SIGN_080",
+    "name": "PEDESTRIAN CROSSING",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "Pedestrians may cross here.",
+    "action": "Slow down and be prepared to stop.",
+    "keywords": [
+      "pedestrian crossing",
+      "pedestrian",
+      "stop"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_080.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "PEDESTRIAN CROSSING：Pedestrians may cross here. 司机应采取行动：Slow down and be prepared to stop.",
+    "explanation_es": "PEDESTRIAN CROSSING: Pedestrians may cross here. Acción del conductor: Slow down and be prepared to stop.",
+    "explanation_hi": "PEDESTRIAN CROSSING: Pedestrians may cross here. ड्राइवर की कार्रवाई: Slow down and be prepared to stop.",
+    "explanation_pa": "PEDESTRIAN CROSSING: Pedestrians may cross here. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and be prepared to stop.",
+    "explanation_vi": "PEDESTRIAN CROSSING: Pedestrians may cross here. Hành động của tài xế: Slow down and be prepared to stop."
+  },
+  {
+    "sign_code": "PDF_SIGN_081",
+    "name": "PLAYGROUND AHEAD",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "A playground is ahead.",
+    "action": "Slow down and watch for children.",
+    "keywords": [
+      "playground",
+      "children",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_081.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "PLAYGROUND AHEAD：A playground is ahead. 司机应采取行动：Slow down and watch for children.",
+    "explanation_es": "PLAYGROUND AHEAD: A playground is ahead. Acción del conductor: Slow down and watch for children.",
+    "explanation_hi": "PLAYGROUND AHEAD: A playground is ahead. ड्राइवर की कार्रवाई: Slow down and watch for children.",
+    "explanation_pa": "PLAYGROUND AHEAD: A playground is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for children.",
+    "explanation_vi": "PLAYGROUND AHEAD: A playground is ahead. Hành động của tài xế: Slow down and watch for children."
+  },
+  {
+    "sign_code": "PDF_SIGN_082",
+    "name": "BICYCLE CROSSING",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "Bicycles may cross here.",
+    "action": "Slow down and watch for bicycles.",
+    "keywords": [
+      "bicycle crossing",
+      "bicycles",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_082.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "BICYCLE CROSSING：Bicycles may cross here. 司机应采取行动：Slow down and watch for bicycles.",
+    "explanation_es": "BICYCLE CROSSING: Bicycles may cross here. Acción del conductor: Slow down and watch for bicycles.",
+    "explanation_hi": "BICYCLE CROSSING: Bicycles may cross here. ड्राइवर की कार्रवाई: Slow down and watch for bicycles.",
+    "explanation_pa": "BICYCLE CROSSING: Bicycles may cross here. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for bicycles.",
+    "explanation_vi": "BICYCLE CROSSING: Bicycles may cross here. Hành động của tài xế: Slow down and watch for bicycles."
+  },
+  {
+    "sign_code": "PDF_SIGN_083",
+    "name": "SCHOOL CROSSWALK AHEAD",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "A school crosswalk is ahead.",
+    "action": "Slow down and watch for children.",
+    "keywords": [
+      "school crosswalk",
+      "children",
+      "slow down"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_083.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "SCHOOL CROSSWALK AHEAD：A school crosswalk is ahead. 司机应采取行动：Slow down and watch for children.",
+    "explanation_es": "SCHOOL CROSSWALK AHEAD: A school crosswalk is ahead. Acción del conductor: Slow down and watch for children.",
+    "explanation_hi": "SCHOOL CROSSWALK AHEAD: A school crosswalk is ahead. ड्राइवर की कार्रवाई: Slow down and watch for children.",
+    "explanation_pa": "SCHOOL CROSSWALK AHEAD: A school crosswalk is ahead. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Slow down and watch for children.",
+    "explanation_vi": "SCHOOL CROSSWALK AHEAD: A school crosswalk is ahead. Hành động của tài xế: Slow down and watch for children."
+  },
+  {
+    "sign_code": "PDF_SIGN_084",
+    "name": "SCHOOL CROSSWALK",
+    "category": "Pedestrian / Bicycle",
+    "meaning": "Children may cross here.",
+    "action": "Be prepared to stop for school pedestrians.",
+    "keywords": [
+      "school crosswalk",
+      "children",
+      "stop"
+    ],
+    "image_path": "assets/signs/PDF_SIGN_084.png",
+    "source_pdf": "us_road_symbol_signs.pdf",
+    "source_page": 9,
+    "explanation_zh": "SCHOOL CROSSWALK：Children may cross here. 司机应采取行动：Be prepared to stop for school pedestrians.",
+    "explanation_es": "SCHOOL CROSSWALK: Children may cross here. Acción del conductor: Be prepared to stop for school pedestrians.",
+    "explanation_hi": "SCHOOL CROSSWALK: Children may cross here. ड्राइवर की कार्रवाई: Be prepared to stop for school pedestrians.",
+    "explanation_pa": "SCHOOL CROSSWALK: Children may cross here. ਡਰਾਈਵਰ ਦੀ ਕਾਰਵਾਈ: Be prepared to stop for school pedestrians.",
+    "explanation_vi": "SCHOOL CROSSWALK: Children may cross here. Hành động của tài xế: Be prepared to stop for school pedestrians."
+  }
+]
