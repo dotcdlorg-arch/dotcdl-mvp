@@ -44,6 +44,7 @@ const DT = {
     voiceError: 'Voice failed to load, using system voice',
     previewAll: '▶ Preview all questions', stopPlay: '⏸ Pause',
     autoConv: '▶ Auto loop conversation', practicing: 'Repeat practice — follow the pronunciation',
+    prev: '← Previous', next: 'Next →',
   },
   zh: {
     title: '🚗 驾驶模式 — 边开车边练习',
@@ -72,6 +73,7 @@ const DT = {
     voiceError: '声音加载失败，使用系统声音',
     previewAll: '▶ 预听所有问题', stopPlay: '⏸ 暂停',
     autoConv: '▶ 自动循环播放', practicing: '跟读练习 — 请跟读发音',
+    prev: '← 上一题', next: '下一题 →',
   },
   es: {
     title: '🚗 Modo Conducción — Practica mientras manejas',
@@ -100,6 +102,7 @@ const DT = {
     voiceError: 'Error de voz, usando sistema',
     previewAll: '▶ Vista previa de preguntas', stopPlay: '⏸ Pausar',
     autoConv: '▶ Auto repetir todo', practicing: 'Repite la pronunciación',
+    prev: '← Anterior', next: 'Siguiente →',
   },
   hi: {
     title: '🚗 ड्राइव मोड — गाड़ी चलाते हुए अभ्यास',
@@ -128,6 +131,7 @@ const DT = {
     voiceError: 'आवाज़ त्रुटि, सिस्टम उपयोग कर रहे हैं',
     previewAll: '▶ सभी प्रश्न सुनें', stopPlay: '⏸ रोकें',
     autoConv: '▶ स्वतः दोहराएं', practicing: 'उच्चारण का अभ्यास करें',
+    prev: '← पिछला', next: 'अगला →',
   },
   pa: {
     title: '🚗 ਡ੍ਰਾਈਵ ਮੋਡ — ਗੱਡੀ ਚਲਾਉਂਦੇ ਅਭਿਆਸ',
@@ -156,6 +160,7 @@ const DT = {
     voiceError: 'ਆਵਾਜ਼ ਗਲਤੀ, ਸਿਸਟਮ ਵਰਤ ਰਹੇ ਹਾਂ',
     previewAll: '▶ ਸਾਰੇ ਸਵਾਲ ਸੁਣੋ', stopPlay: '⏸ ਰੋਕੋ',
     autoConv: '▶ ਆਪਣੇ ਆਪ ਦੋਹਰਾਓ', practicing: 'ਉਚਾਰਣ ਅਭਿਆਸ ਕਰੋ',
+    prev: '← ਪਿਛਲਾ', next: 'ਅਗਲਾ →',
   },
   vi: {
     title: '🚗 Chế độ lái xe — Luyện tập khi lái',
@@ -184,6 +189,7 @@ const DT = {
     voiceError: 'Lỗi giọng nói, dùng hệ thống',
     previewAll: '▶ Nghe trước tất cả câu hỏi', stopPlay: '⏸ Dừng',
     autoConv: '▶ Tự động lặp lại', practicing: 'Luyện phát âm theo',
+    prev: '← Trước', next: 'Tiếp theo →',
   },
 }
 
@@ -390,6 +396,15 @@ export default function DrivePage() {
     const q = list[idx]
     setConvHistory(prev => [...prev, { role: 'officer', text: q.officer_question_en }])
     speak(q.officer_question_en, null)
+  }
+
+  function gotoQuestion(idx) {
+    const list = questionsRef.current
+    if (idx < 0 || idx >= list.length) return
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }
+    if (typeof window !== 'undefined') window.speechSynthesis.cancel()
+    setQIdx(idx)
+    speak(list[idx].officer_question_en, null)
   }
 
   async function startListening() {
@@ -652,6 +667,14 @@ export default function DrivePage() {
           <div className="card" style={{ textAlign: 'center', padding: '20px' }}>
             <div style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: 10 }}>{dt(lang, 'yourTurn')}</div>
             <div className="q-officer" style={{ marginBottom: 16 }}>{currentQ.officer_question_en}</div>
+            <div className="flex-c" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
+              <button className="btn btn-sm" onClick={() => gotoQuestion(qIdx - 1)} disabled={qIdx === 0}>
+                {dt(lang, 'prev')}
+              </button>
+              <button className="btn btn-sm" onClick={() => gotoQuestion(qIdx + 1)} disabled={qIdx >= questions.length - 1}>
+                {dt(lang, 'next')}
+              </button>
+            </div>
             <div className="flex-c" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
               <button className="btn btn-drive btn-lg" onClick={startListening}>
                 {dt(lang, 'tap2speak')}

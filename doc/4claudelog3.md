@@ -96,3 +96,106 @@ can hear the model answer in a real human voice and repeat for practice.
 
 - `git checkout HEAD~ -- app/signs/page.js` removes the helper and the
   new button.
+
+---
+
+## Session 24 — Drive Mode Prev/Next nav (2026-05-25)
+
+### Action 46 — Drive conversation: add Previous / Next buttons
+
+**Request:** User asked to add Previous and Next buttons under Drive
+Mode (and all scenarios) pages. Clarified via AskUserQuestion → user
+chose "Drive conversation phase" (skip between the 8 generated
+questions without recording, mirroring the mock page's Prev/Next).
+
+**File modified:** `app/drive/page.js`
+
+**Changes:**
+
+1. **i18n keys** — added `prev` / `next` to all 7 language tables in
+   the `DT` object. Reused the exact strings already shipped on
+   `app/mock/page.js` lines 53/84/115/146/177/208 so the two pages
+   stay visually consistent:
+   - en: `'← Previous'` / `'Next →'`
+   - zh: `'← 上一题'` / `'下一题 →'`
+   - es: `'← Anterior'` / `'Siguiente →'`
+   - hi: `'← पिछला'` / `'अगला →'`
+   - pa: `'← ਪਿਛਲਾ'` / `'ਅਗਲਾ →'`
+   - vi: `'← Trước'` / `'Tiếp theo →'`
+
+2. **New helper** `gotoQuestion(idx)` (added directly under
+   `askQuestion`):
+   - Bounds-checks `idx` against `questionsRef.current.length`.
+   - Stops any in-flight `audioRef.current` and cancels the browser
+     `speechSynthesis` queue — same defensive pattern as
+     `stopDrivePreview` / `stopAutoConv`.
+   - Sets `qIdx` and calls `speak(...)` so the user hears the
+     newly-selected question immediately.
+   - Intentionally does **not** push to `convHistory`. The
+     conversation thread is chronological by design (driver answer
+     gets appended after each recording); duplicating officer lines
+     on every nav click would clutter the thread. The card at the
+     bottom of the page is what shows the "current" question.
+
+3. **Prev / Next button row** — inserted into the existing
+   `!isAutoConv && driverState === 'idle'` controls card, **above**
+   the Tap-to-record action row. Mirrors the layout in
+   `app/mock/page.js:618-626` (justify-space-between row, btn-sm,
+   disabled at boundaries):
+   ```jsx
+   <div className="flex-c" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
+     <button className="btn btn-sm" onClick={() => gotoQuestion(qIdx - 1)} disabled={qIdx === 0}>
+       {dt(lang, 'prev')}
+     </button>
+     <button className="btn btn-sm" onClick={() => gotoQuestion(qIdx + 1)} disabled={qIdx >= questions.length - 1}>
+       {dt(lang, 'next')}
+     </button>
+   </div>
+   ```
+   - Disabled state at the boundaries (`qIdx === 0` for prev,
+     `qIdx >= questions.length - 1` for next). The very last
+     question's "Next" stays disabled — to advance past it the user
+     records (which triggers `scoreAndAdvance` → result phase) or
+     uses "End session."
+
+**Design notes:**
+
+- **Visible only when idle.** The row sits inside the same conditional
+  as Tap-to-record, so it disappears during `speaking` / `listening` /
+  `processing` and during auto-loop. That avoids racing with audio
+  playback or active recording.
+- **Why not also in the scenario picker?** The user explicitly chose
+  "Drive conversation phase" via AskUserQuestion. The scenario grid
+  has only 4-6 cards and fits on screen — no pagination needed.
+- **Conversation thread retention.** Pressing Prev does not roll back
+  `convHistory` — the user's previously-scored answers stay visible.
+  This is intentional: if the user moves back to review a question,
+  they still want to see what they already said.
+
+**Not changed:**
+
+- `convHistory` mutation logic, `askQuestion`, `scoreAndAdvance`, or
+  any other navigation path.
+- The scenario selection grid, voice picker, auto-loop card, result
+  card, and `End session` button — all untouched.
+- No other page modified. Helper isolated to drive page.
+
+**Verification:**
+
+- `npx next build` → ✓ 16/16 routes compiled. `/drive` 8.43 → 8.69 kB
+  (+0.26 kB — 7 translation pairs + helper + button row JSX).
+- Manual flow:
+  - `/drive` → pick voice → pick scenario → Start.
+  - Idle card now shows `← Previous` and `Next →` row above the
+    Tap-to-record button.
+  - Prev disabled on Q1, Next disabled on Q8 (boundary check works).
+  - Clicking Next at Q3 → officer reads Q4 in selected voice, qIdx
+    advances, conv thread unchanged (no duplicate Q4 prepended).
+  - Clicking Prev → previous question replays. Audio of any
+    currently-playing question is cut cleanly.
+  - In all 7 languages the button text updates correctly via `dt()`.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/drive/page.js` reverts the i18n keys,
+  helper, and button row.
