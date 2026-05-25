@@ -236,6 +236,27 @@ export default function AppShell({ children, lang = 'zh', setLang, stats }) {
           {children}
         </main>
       </div>
+
+      <nav className="mobile-tabs" aria-label="Primary mobile navigation">
+        {[
+          { href: '/practice', icon: '📖', labelKey: 'text' },
+          { href: '/signs',    icon: '🚦', labelKey: 'signs' },
+          { href: '/mock',     icon: '🚔', labelKey: 'mock' },
+          { href: '/drive',    icon: '🚗', labelKey: 'drive' },
+        ].map(tab => {
+          const active = pathname === tab.href || pathname.startsWith(tab.href + '/')
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={`mobile-tab ${active ? 'active' : ''}`}
+            >
+              <span className="mobile-tab-icon">{tab.icon}</span>
+              <span>{nl(lang, tab.labelKey)}</span>
+            </Link>
+          )
+        })}
+      </nav>
     </>
   )
 }
