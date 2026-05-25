@@ -23,8 +23,37 @@ function buildMock() {
   return shuffle(items)
 }
 
-// i18n for all 5 languages (fix #2 & #6)
+// i18n
 const MT = {
+  en: {
+    title: '🚔 Mock Roadside Inspection',
+    subtitle: 'Randomized officer Q&A and traffic signs. Answer verbally in English to get AI scoring and a readiness assessment.',
+    mode: 'Choose answer mode',
+    modeWrite: '✍️ Written mode — type answers',
+    modeSpeak: '🎤 Speaking mode — voice answers',
+    modeWriteDesc: 'Good for learning and review. Submit typed English answers for scoring.',
+    modeSpeakDesc: 'Real-world practice for drivers. Record each answer and get AI scoring.',
+    startWrite: '▶ Start written inspection',
+    startSpeak: '▶ Start spoken inspection',
+    answered: 'answered',
+    submit: '🏆 Submit inspection',
+    result: '🏆 Inspection result',
+    excellent: 'Ready for the road!', good: 'Keep practicing.', poor: 'Needs more practice',
+    breakdown: 'Per-question breakdown',
+    tryAgain: 'Try again', fullReport: '📊 Full report', practice: 'Keep practicing',
+    disclaimer: '⚠️ Training only. Not an official DOT assessment.',
+    typeHere: 'Type your answer in English…',
+    signQ: 'What does this sign mean? What should you do?',
+    tap2speak: '🎤 Record answer',
+    stopRec: '⏹ Stop',
+    listening: 'Recording…', processing: 'Processing…',
+    score: 'AI score',
+    yourAns: 'Your answer', modelAns: 'Model answer',
+    nextQ: 'Next →', skip: 'Skip',
+    complete: 'Complete',
+    officerQ: 'Officer question', signLabel: 'Traffic sign',
+    autoPlay: '▶ Play all', stopPlay: '⏸ Pause',
+  },
   zh: {
     title: '🚔 模拟路边检查',
     subtitle: '19道随机题：14道警官问答 + 5道交通标志。用英语口头回答，获得 AI 评分和准备度评估。',
@@ -173,8 +202,8 @@ const MT = {
 }
 
 function mt(lang, key) {
-  const t = MT[lang] || MT.zh
-  return t[key] !== undefined ? t[key] : (MT.zh[key] || key)
+  const t = MT[lang] || MT.en
+  return t[key] !== undefined ? t[key] : (MT.en[key] || key)
 }
 
 // ── Speak helper — real OpenAI voice with browser-synth fallback ─────

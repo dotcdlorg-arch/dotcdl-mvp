@@ -67,3 +67,4 @@ follow ./AGENTS.md as guidelines.
 first check doc/4claudelog2.md to find out what was done. 
 After any action, append what you did in detail to doc/4claudelog2.md
 Check 4claudelog2.md, if content is longer than 800 lines, creaet another file doc/4claudelog3.md and next to doc/4claudelog4.md... keep adding last number of the file name and append the action to that file accordingly. 
+After finish any action, provide proper github command to the user

@@ -239,3 +239,116 @@ and language-picker logic; structure of the rendered tree is otherwise identical
 - `git checkout HEAD -- app/page.js` restores the prior server-component version
   with the original `140` / `84` / `19` numbers and no language selector.
 
+---
+
+### Action 39 — Add English option to every language-selector translation table
+
+**Request:** User asked to add English as a selectable language across every page that
+has a language selection function (i.e. propagate the `en` option that the homepage
+already has, to the rest of the app's language picker, which lives in `AppShell`).
+
+**Discovery:** Grep showed 5 files participate in language selection:
+- `components/AppShell.js` — the shared header `<select>` used by /practice, /signs,
+  /mock, /drive (plus its own `NAV_LABELS` for the sidebar nav copy).
+- `app/practice/page.js` — own `T` table + `t(lang, key)` helper.
+- `app/mock/page.js` — own `MT` table + `mt(lang, key)`.
+- `app/drive/page.js` — own `DT` table + `dt(lang, key)`.
+- `app/signs/page.js` — no own table; only uses AppShell + `getExplanation()`.
+
+Before this change all five had `zh / es / hi / pa / vi` only. Default state in each
+page is still `useState('zh')` — not changed.
+
+**Files modified (5 total):**
+
+1. **`components/AppShell.js`**
+   - Added `en: 'English'` as the FIRST entry in `LANGS` (renders at top of the
+     `<select>`, before 中文).
+   - Added an `en: {...}` block at the top of `NAV_LABELS` covering all 17 keys
+     (`training`, `premium`, `progress`, `text`, `listen`, `speak`, `signs`,
+     `mock`, `drive`, `report`, `stats`, `seen`, `understood`, `review`,
+     `avgScore`, `mocks`, `disclaimer`).
+   - Changed the fallback in `nl(lang, key)` from `NAV_LABELS.zh` → `NAV_LABELS.en`
+     so any unknown lang falls back to English (more sensible default for a
+     primarily-English driver-training site).
+
+2. **`app/practice/page.js`**
+   - Added an `en: {...}` block at the top of `T` (all 36 keys: `all`, `search`,
+     `reviewOnly`, …, `autoPlay`, `stopPlay`).
+   - Changed `t(lang, key)` fallback from `T.zh` → `T.en`.
+
+3. **`app/mock/page.js`**
+   - Added an `en: {...}` block at the top of `MT` (all 37 keys: `title` through
+     `stopPlay`). English subtitle reworded to not reference the previously
+     literal "19 questions / 14 Q&A + 5 signs" counts — uses
+     "Randomized officer Q&A and traffic signs" so it parallels the homepage
+     copy that just lost its numbers in Action 38.
+   - Updated comment `// i18n for all 5 languages` → `// i18n` (now 6).
+   - Changed `mt(lang, key)` fallback from `MT.zh` → `MT.en`.
+
+4. **`app/drive/page.js`**
+   - Added an `en: {...}` block at the top of `DT` (all 35 keys: `title` through
+     `practicing`).
+   - Changed `dt(lang, key)` fallback from `DT.zh` → `DT.en`.
+
+5. **`lib/data.js`**
+   - `getExplanation(item, lang)` previously returned `item[explanation_${lang}]`
+     and silently fell back to `explanation_zh`. Since the questions/signs JSON
+     has no `explanation_en` key (English text is already the primary content via
+     `officer_question_en` / `simple_driver_answer_en` / sign `meaning` + `action`),
+     a user picking English would have seen Chinese text in the explanation slot.
+     Added a single line `if (lang === 'en') return ''` so the explanation panel
+     stays empty for English (the existing `getExplanation(...) && <p>` guard in
+     `app/signs/page.js` already hides empty values; in `app/practice/page.js`
+     it renders an empty `<p>` block, harmless).
+
+**Not changed:**
+
+- Default language is still `zh` everywhere (per "surgical changes" — user only
+  asked to add `en` as an option, not flip the default).
+- No new files, no new dependencies, no API/middleware/CSS changes.
+- The signs/practice/mock/drive pages did not need any JSX changes — the picker
+  already iterates `Object.entries(LANGS)` so the new `en` option appeared
+  automatically once `LANGS` was extended.
+- `data/questions.json` and `data/signs.json` are unchanged (no `explanation_en`
+  key added; the English-speaker UI surfaces the existing `officer_question_en`
+  / `simple_driver_answer_en` / sign `meaning` + `action` fields directly).
+
+**Translation key coverage added (English):**
+
+- AppShell NAV_LABELS: 17 keys
+- practice T: 36 keys
+- mock MT: 37 keys
+- drive DT: 35 keys
+- **Total: 125 new English strings inline across 4 translation tables.**
+
+**Verification:**
+
+- `npx next build` → ✓ Compiled successfully. All 16 routes built:
+  - `/` 27.3 kB (unchanged)
+  - `/practice` 7.07 kB (was 6.76)
+  - `/mock` 8.53 kB (was 8.08)
+  - `/drive` 8.42 kB (was 8.02)
+  - `/signs` 2.07 kB (unchanged — picks up `en` from AppShell automatically)
+- Linting and type-check passed.
+- Manual sanity: opening `/practice`, `/mock`, `/drive`, `/signs` and choosing
+  English from the header picker should render all UI strings in English; the
+  Explanation panel under each question/sign is hidden/empty for English (the
+  English answer is already shown elsewhere on the same card).
+
+**Net diff (approximate):**
+
+- `components/AppShell.js`: +19 lines (added `en: 'English'` + 18-key `en: {...}`
+  block + 2-char fallback change).
+- `app/practice/page.js`: +14 lines (compact one-block `en:{…}` matching existing
+  formatting).
+- `app/mock/page.js`: +30 lines (own-line-per-key, matches existing formatting).
+- `app/drive/page.js`: +29 lines.
+- `lib/data.js`: +1 line.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- components/AppShell.js app/practice/page.js
+  app/mock/page.js app/drive/page.js lib/data.js` (relative to the commit that
+  bundles this change) restores the 5-language-only state. The fallback flip
+  from `zh` → `en` in each helper is part of the same revert.
+

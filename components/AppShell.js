@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
 
 export const LANGS = {
+  en: 'English',
   zh: '中文',
   es: 'Español',
   hi: 'हिन्दी',
@@ -12,8 +13,27 @@ export const LANGS = {
   vi: 'Tiếng Việt',
 }
 
-// Nav labels translated for all 5 languages (fix #1 & #6)
+// Nav labels translated for all supported languages
 const NAV_LABELS = {
+  en: {
+    training: 'Training',
+    premium: 'Premium',
+    progress: 'Progress',
+    text: 'Text practice',
+    listen: 'Listening',
+    speak: 'Speak + AI score',
+    signs: 'Traffic signs',
+    mock: 'Mock inspection',
+    drive: 'Drive Mode',
+    report: 'Progress report',
+    stats: 'Session stats',
+    seen: 'Questions seen',
+    understood: 'Understood',
+    review: 'Needs review',
+    avgScore: 'Average score',
+    mocks: 'Mock tests',
+    disclaimer: '⚠️ Training only. Not affiliated with DOT, FMCSA, or CVSA.',
+  },
   zh: {
     training: '训练',
     premium: '高级',
@@ -112,7 +132,7 @@ const NAV_LABELS = {
 }
 
 function nl(lang, key) {
-  return (NAV_LABELS[lang] || NAV_LABELS.zh)[key] || NAV_LABELS.zh[key] || key
+  return (NAV_LABELS[lang] || NAV_LABELS.en)[key] || NAV_LABELS.en[key] || key
 }
 
 export default function AppShell({ children, lang = 'zh', setLang, stats }) {

@@ -6,6 +6,18 @@ import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords 
 
 // ── i18n ──────────────────────────────────────────
 const T = {
+  en:{ all:'All', search:'Search questions…', reviewOnly:'Review only', prev:'← Previous', next:'Next →',
+    understood:'✓ Understood', needReview:'⚑ Review', officer:'Officer question', answer:'Standard answer',
+    explanation:'Explanation', keywords:'Keywords', mistakes:'Common mistakes',
+    listenTitle:'Listening practice mode', speakTitle:'Speak + AI pronunciation score',
+    slow:'Slow 0.7×', normal:'Normal 1×', fast:'Fast 1.3×',
+    playQ:'🔊 Play question', startRec:'🎤 Start recording', stopRec:'⏹ Stop', clearAns:'Clear',
+    typeHere:'Type or record your English answer here…',
+    scoreBtn:'🏆 AI score', scoreTitle:'AI score result', keyHits:'Keyword matches',
+    good:'Clear answer with complete keywords!', partial:'Partially correct, keep practicing.', bad:'Needs more practice.',
+    betterAns:'Model answer', pronTitle:'Pronunciation analysis',
+    pronGood:'Pronunciation correct', pronOk:'Can be improved', pronMiss:'Needs practice',
+    noQ:'No questions match. Adjust your filters.', autoPlay:'▶ Play all', stopPlay:'⏸ Pause' },
   zh:{ all:'全部', search:'搜索题目…', reviewOnly:'只看复习', prev:'← 上一题', next:'下一题 →',
     understood:'✓ 已理解', needReview:'⚑ 复习', officer:'警官问题', answer:'标准答案',
     explanation:'母语解释', keywords:'关键词', mistakes:'常见错误',
@@ -68,7 +80,7 @@ const T = {
     noQ:'Không có câu hỏi. Thay đổi bộ lọc.', autoPlay:'▶ Phát tất cả', stopPlay:'⏸ Dừng' },
 }
 
-function t(lang, key) { return (T[lang] || T.zh)[key] || T.zh[key] || key }
+function t(lang, key) { return (T[lang] || T.en)[key] || T.en[key] || key }
 
 // Real human voice via OpenAI TTS, fallback to browser synthesis on failure.
 let currentAudio = null

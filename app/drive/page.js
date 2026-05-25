@@ -17,6 +17,33 @@ const OFFICER_VOICES = [
 
 // ── i18n ──────────────────────────────────────────────────────
 const DT = {
+  en: {
+    title: '🚗 Drive Mode — Practice while you drive',
+    subtitle: 'The officer speaks in a real human voice. Answer verbally in English. Built for CDL drivers.',
+    selectVoice: 'Choose officer voice',
+    voicePreview: '▶ Preview',
+    previewing: 'Playing…',
+    selectScenario: 'Choose scenario',
+    start: '▶ Start conversation',
+    restart: '🔄 Restart',
+    officerSays: 'Officer says',
+    yourTurn: 'Your turn',
+    sessionResult: 'Session result',
+    excellent: 'Excellent! You are ready for the roadside.',
+    good: 'Good performance. Keep practicing weak areas.',
+    needsPractice: 'Needs more practice. Run these scenarios daily.',
+    disclaimer: '⚠️ Training only. Not affiliated with DOT, FMCSA, or CVSA.',
+    aiScore: 'AI score', perfectAns: 'Model answer',
+    easy: 'Easy', medium: 'Medium', hard: 'Hard',
+    listening: 'Recording…', processing: 'Processing…', speaking: 'Officer speaking…',
+    tap2speak: '🎤 Tap to record', stopRec: '⏹ Stop recording',
+    replayQ: '🔊 Replay', endEarly: 'End session',
+    tryAgain: 'Try again', fullReport: '📊 Full report',
+    loadingVoice: 'Loading voice…',
+    voiceError: 'Voice failed to load, using system voice',
+    previewAll: '▶ Preview all questions', stopPlay: '⏸ Pause',
+    autoConv: '▶ Auto loop conversation', practicing: 'Repeat practice — follow the pronunciation',
+  },
   zh: {
     title: '🚗 驾驶模式 — 边开车边练习',
     subtitle: '警官用真实人声说话，你用英语口头回答。专为 CDL 驾驶员设计的语音练习。',
@@ -155,8 +182,8 @@ const DT = {
 }
 
 function dt(lang, key) {
-  const t = DT[lang] || DT.zh
-  return t[key] !== undefined ? t[key] : (DT.zh[key] || key)
+  const t = DT[lang] || DT.en
+  return t[key] !== undefined ? t[key] : (DT.en[key] || key)
 }
 
 const DIFFICULTY_COLORS = { Easy: 'badge-green', Medium: 'badge-amber', Hard: 'badge-red' }
