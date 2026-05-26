@@ -486,15 +486,6 @@ export default function DrivePage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ questionCode: q.question_code, status: 'viewed', lastScore: scoreResult.score, lastTranscript: text })
     }).catch(() => {})
-
-    const nextIdx = currentIdx + 1
-    qIdxRef.current = nextIdx
-    setQIdx(nextIdx)
-    if (nextIdx < qs.length) {
-      setTimeout(() => askQuestion(nextIdx, qs), 900)
-    } else {
-      setTimeout(() => setPhase('result'), 900)
-    }
   }
 
   const avgScore = sessionScores.length

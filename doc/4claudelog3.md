@@ -537,3 +537,120 @@ Two stale-closure / race issues introduced by the Prev/Next nav
 
 - `git checkout HEAD~ -- app/drive/page.js` removes the ref, the
   ref writes, and the dropdown's recorder-stop block.
+
+---
+
+### Action 50 — Drive conversation: remove post-grade auto-advance (user-reported root cause)
+
+**Request:** User reported the "frozen at next question" symptom
+**still occurred** after Action 49's defensive ref refactor, and
+directly identified the cause: "remove the auto play question with
+interval for answering function, which is the bug caused this
+problem, please refer the log for correct code." → reference is
+the mock page (Action 42), where the user manually advances via
+the Next button after recording.
+
+**File modified:** `app/drive/page.js`
+
+**Root cause (final):**
+
+The previous fixes in Action 49 made the closure safer but kept
+the auto-advance `setTimeout(askQuestion, 900)` in
+`scoreAndAdvance`. That auto-call was the real culprit:
+
+- It raced with React's state batching of `setDriverState('idle')`
+  + `setQIdx(nextIdx)` + new `convHistory` entries.
+- The 900 ms timer fired `askQuestion`, which called `speak`,
+  which set state to 'speaking' — but if the browser had not yet
+  reconciled the `setDriverState('idle')` from line 477, the
+  rapid back-to-back state transitions could leave the UI stuck
+  on the processing/idle in-between card while the speak audio
+  silently failed/queued.
+- Combined with the new dropdown + Prev/Next nav, the surface
+  area of state interactions made auto-advance unreliable.
+
+The mock page (`app/mock/page.js`, Action 42) has no such
+auto-advance — `nextSpeakQ` is bound to a user button click. That
+is the "correct code" the user referenced.
+
+**Changes:**
+
+Removed the post-grade advance block from `scoreAndAdvance`:
+
+```js
+// REMOVED:
+const nextIdx = currentIdx + 1
+qIdxRef.current = nextIdx
+setQIdx(nextIdx)
+if (nextIdx < qs.length) {
+  setTimeout(() => askQuestion(nextIdx, qs), 900)
+} else {
+  setTimeout(() => setPhase('result'), 900)
+}
+```
+
+`scoreAndAdvance` now ends after the `fetch('/api/progress', ...)`
+fire-and-forget. Its job is now: score, record bubble, return to
+idle. Nothing else.
+
+**New flow (matches mock page):**
+
+1. Officer asks Q1 → `speak` → audio plays.
+2. `audio.onended` → `setDriverState('idle')` → idle card visible
+   (Prev/Next + Tap to record + Hear answer + model answer
+   reference).
+3. User taps record → speaks → stop → transcribe → grade.
+4. Driver bubble appears in thread with score, word-level
+   pronunciation, feedback, and the "💡 model answer" reference.
+5. `setDriverState('idle')` returns the idle card. **`qIdx` does
+   not change.** The card still shows the same question's model
+   answer for review/re-practice.
+6. User clicks **Next →** → `gotoQuestion(qIdx + 1)` → Q2 is
+   appended to the thread and spoken.
+7. Or user taps record again to retry the same question.
+8. Or user clicks **End session** in the footer to jump to the
+   result phase.
+
+**Why this is the right fix:**
+
+- It removes the timing-dependent race that was producing the
+  freeze (any state batching + audio loading + closure capture
+  interaction could break it). No timer = no race.
+- It puts the user in control of pacing, matching mock-page UX
+  and the user's explicit request.
+- It is dramatically simpler — less code, fewer interactions.
+
+**Not changed:**
+
+- `qIdxRef` from Action 49 — kept. Still used at line 450 of
+  `scoreAndAdvance` to read the live qIdx safely. (Even though
+  the closure isn't stale in practice anymore, the ref is
+  cheaper than reasoning about React closure timing.)
+- Dropdown's `mrRef.current.onstop = null` + `.stop()` block —
+  kept. Still important for the "switch scenario mid-recording"
+  edge case.
+- Prev / Next buttons (Action 46), model-answer-in-idle-card
+  (Action 47), scenario dropdown (Action 48), idle-state
+  early-return safety (Action 49).
+- The end-of-session path: user uses **End session** in the
+  footer (already wired to `setPhase('result')`). For users on
+  Q8 who want to see the result, that's the path. (The result
+  card already exists at `phase === 'result'`.)
+
+**Verification:**
+
+- `npx next build` → ✓ 16/16 routes. `/drive` 8.91 → 8.88 kB
+  (–0.03 kB, dead code removed).
+- Manual flow (no freeze):
+  - Start scenario → Q1 plays → record → score → driver bubble
+    visible → **idle card stays**, model answer of Q1 visible
+    for review. ✓ No freeze, no auto-jump.
+  - Click Next → Q2 plays cleanly via `gotoQuestion`. ✓
+  - Click Prev → Q1 replays. ✓
+  - Retry: tap record again → re-scores Q1. ✓
+  - At Q8: record → grade → "End session" → result phase. ✓
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/drive/page.js` restores the
+  setTimeout auto-advance block.
