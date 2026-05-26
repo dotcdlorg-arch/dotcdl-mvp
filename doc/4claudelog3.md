@@ -654,3 +654,133 @@ idle. Nothing else.
 
 - `git checkout HEAD~ -- app/drive/page.js` restores the
   setTimeout auto-advance block.
+
+---
+
+## Session 25 — Terminology category (2026-05-26)
+
+### Action 51 — Add Terms category: 6-lang glossary + conversation examples
+
+**Request:** User asked to add a "Terms" category as terminology
+across the app:
+- Quick-access button in phone (mobile) UI
+- Entry in regular (desktop) UI
+- Each term has 6-language translations
+- Explanation shown in the currently-selected interface language
+- Example inspector–driver conversation for real-life use
+- Import all terms from `terms.md`, use `termsConvers.md` for the
+  conversation snippets.
+
+**Files created:**
+
+1. `lib/terms.js` — 63 terms with all 6 language translations
+   (en/zh/vi/es/pa/hi) + matched inspector/driver conversation
+   pairs. Organized into 6 categories:
+   - `core_eld` (12 terms): ELD, paper log, time card, etc.
+   - `hos` (12 terms): HOS rules, 11-hour limit, sleeper berth…
+   - `duty_status` (5 terms): Personal Conveyance, Yard Move…
+   - `inspection` (3 terms): pre-trip / post-trip / DVIR.
+   - `legal_medical` (12 terms): medical examiner cert, endorsements…
+   - `documents` (19 terms): RODS, fuel/toll receipts, IFTA, BOL…
+
+   Each `TERM` entry has shape:
+   ```js
+   { category: 'core_eld', en, zh, vi, es, pa, hi, inspector, driver }
+   ```
+   Conversation pairs are pulled verbatim from termsConvers.md by
+   matching the English term to the section header in that file.
+   `TERM_CATEGORIES` also has per-language category names so the
+   filter chips localize.
+
+2. `app/terms/page.js` — list view with:
+   - `AppShell` wrapper, `lang/setLang` state (defaults to 'zh').
+   - Per-page i18n dict `T` covering all 6 languages for: title,
+     subtitle, category All, search placeholder, "Conversation
+     example" label, "Inspector"/"Driver" labels, hear button,
+     "Show all languages"/"Hide other languages" toggles, empty
+     state.
+   - **Category filter chips** + **search box** (matches against
+     English term and current-lang translation).
+   - **Term card** for each match showing:
+     - English term (bold)
+     - Selected-language translation in brand color
+     - 🔊 Hear button calling `/api/speak` with `voiceId: 'north_m'`
+       (same pattern as `app/signs/page.js`'s `speakSignAnswer`)
+     - Conversation example block ("💬 Conversation example" +
+       Inspector / Driver lines)
+     - "Show all languages" toggle expanding to the other 4
+       translations (excludes the currently-selected lang since
+       it's already prominent at the top)
+   - Module-scope `currentTermAudio` ref for cancelling overlapping
+     TTS clicks. Falls back to `window.speechSynthesis` if
+     `/api/speak` fails (same fallback as signs/drive/mock).
+
+**Files modified:**
+
+3. `components/AppShell.js`:
+   - Added `terms` key to `NAV_LABELS` for all 6 languages
+     (Terms / 术语 / Términos / शब्दावली / ਸ਼ਬਦਾਵਲੀ / Thuật ngữ).
+   - Added `{ href: '/terms', icon: '📚', labelKey: 'terms' }` to
+     the Training group in the sidebar `NAV` array.
+   - Added the same entry to the `mobile-tabs` array — phone UI
+     now has 6 quick-access icons (Listen, Speak, Signs, Mock,
+     Drive, Terms). Per `c68b0dd`, the mobile tabs are icon-only
+     so adding one more is visually consistent.
+
+**Design notes:**
+
+- **Why translations *are* the explanation:** the user asked for
+  "explanations with selected language". The 6-lang translations
+  in `terms.md` are themselves the explanations — showing the
+  current-language version directly under the English term works
+  as the explanation for a non-native English speaker. The
+  conversation example provides the real-life context.
+- **Why include terms with no conversation snippet?** All 63
+  terms from `terms.md` happen to have matching headers in
+  `termsConvers.md`, so all 63 cards show a conversation. If a
+  future term has no match, the card just hides the conversation
+  block (the JSX is gated on `(term.inspector || term.driver)`).
+- **Why not also auto-translate the conversation?** The
+  conversation is intentionally in English — the goal is to
+  practice the real-world English the inspector will speak. The
+  current-lang translation of the *term itself* is what's shown
+  for understanding.
+- **Why 6 mobile tabs not 5:** the user explicitly asked for a
+  phone quick-access button. The previous 5-icon layout still
+  works for screens ≥ 380 px. If real estate becomes too tight
+  on the smallest phones in the future, the mobile-tabs CSS can
+  be tightened separately.
+
+**Not changed:**
+
+- Existing routes (drive/mock/signs/practice/report) — all
+  untouched.
+- `lib/data.js` — terms data lives in `lib/terms.js` to avoid
+  bloating the existing data module.
+- Term selection / progress persistence — out of scope; terms
+  is a reference view, not a scored exercise.
+- The `Premium` and `Progress` groups in sidebar nav.
+
+**Verification:**
+
+- `npx next build` → ✓ 17/17 routes compiled (was 16; `/terms`
+  added). `/terms` 11.8 kB / 144 kB first-load.
+- Manual flow:
+  - Desktop sidebar: Training group now lists 5 items (Listen,
+    Speak, Signs, Mock, **📚 Terms**). Clicking → opens page.
+  - Mobile tab bar: shows 6 icons. Tapping 📚 → opens page.
+  - On page: change language (top-right) → category chip names,
+    page title, subtitle, conversation labels, search placeholder
+    all update.
+  - Filter "📱 Core ELD/HOS" → shows 12 cards.
+  - Search "log" → shows ELD/Paper Log/Log Entry/etc matches in
+    both English and current-lang.
+  - Click "Show all languages" on a card → reveals the other 4
+    translations in a code-style mini grid. Toggling re-collapses.
+  - Click 🔊 Hear on a card → English term spoken via OpenAI TTS.
+
+**Reversal:**
+
+- `rm app/terms/page.js lib/terms.js` and revert
+  `components/AppShell.js` to drop the nav entries and the 6th
+  mobile tab.

@@ -25,6 +25,7 @@ const NAV_LABELS = {
     signs: 'Traffic signs',
     mock: 'Mock inspection',
     drive: 'Drive Mode',
+    terms: 'Terms',
     report: 'Progress report',
     stats: 'Session stats',
     seen: 'Questions seen',
@@ -44,6 +45,7 @@ const NAV_LABELS = {
     signs: '交通标志',
     mock: '模拟检查',
     drive: '驾驶模式',
+    terms: '术语',
     report: '进度报告',
     stats: '本次统计',
     seen: '已看题数',
@@ -63,6 +65,7 @@ const NAV_LABELS = {
     signs: 'Señales de tráfico',
     mock: 'Inspección simulada',
     drive: 'Modo conducción',
+    terms: 'Términos',
     report: 'Informe de progreso',
     stats: 'Estadísticas',
     seen: 'Preguntas vistas',
@@ -82,6 +85,7 @@ const NAV_LABELS = {
     signs: 'यातायात चिह्न',
     mock: 'नकली निरीक्षण',
     drive: 'ड्राइव मोड',
+    terms: 'शब्दावली',
     report: 'प्रगति रिपोर्ट',
     stats: 'सत्र आँकड़े',
     seen: 'देखे गए प्रश्न',
@@ -101,6 +105,7 @@ const NAV_LABELS = {
     signs: 'ਆਵਾਜਾਈ ਚਿੰਨ੍ਹ',
     mock: 'ਨਕਲੀ ਜਾਂਚ',
     drive: 'ਡ੍ਰਾਈਵ ਮੋਡ',
+    terms: 'ਸ਼ਬਦਾਵਲੀ',
     report: 'ਪ੍ਰਗਤੀ ਰਿਪੋਰਟ',
     stats: 'ਸੈਸ਼ਨ ਅੰਕੜੇ',
     seen: 'ਦੇਖੇ ਸਵਾਲ',
@@ -120,6 +125,7 @@ const NAV_LABELS = {
     signs: 'Biển báo giao thông',
     mock: 'Kiểm tra mô phỏng',
     drive: 'Chế độ lái xe',
+    terms: 'Thuật ngữ',
     report: 'Báo cáo tiến độ',
     stats: 'Thống kê phiên',
     seen: 'Câu đã xem',
@@ -154,6 +160,7 @@ export default function AppShell({ children, lang = 'zh', setLang, stats }) {
         { href: '/practice?mode=speak', icon: '🎤', labelKey: 'speak' },
         { href: '/signs', icon: '🚦', labelKey: 'signs' },
         { href: '/mock', icon: '🚔', labelKey: 'mock' },
+        { href: '/terms', icon: '📚', labelKey: 'terms' },
       ],
     },
     {
@@ -263,6 +270,7 @@ export default function AppShell({ children, lang = 'zh', setLang, stats }) {
           { href: '/signs',                icon: '🚦', labelKey: 'signs' },
           { href: '/mock',                 icon: '🚔', labelKey: 'mock' },
           { href: '/drive',                icon: '🚗', labelKey: 'drive' },
+          { href: '/terms',                icon: '📚', labelKey: 'terms' },
         ].map(tab => {
           const active = isActive(tab.href)
           const label = nl(lang, tab.labelKey)
