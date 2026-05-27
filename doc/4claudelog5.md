@@ -752,3 +752,116 @@ clicks.
 - `git checkout HEAD~ -- app/practice/page.js` restores the
   Action 60 state (desktop-working, mobile-silent). The previous
   commit is the desktop-only fix.
+
+---
+
+## Action 62 — Mock (Speak mode): add 🔊 voice button inside the Model Answer card so the driver can hear how to properly respond to the inspector
+
+**Files changed:**
+- `app/mock/page.js`
+
+**Why:**
+User: "add a voice answer button within Model Answer field for driver
+to study how to proper response inspector's question for Mock
+inspection/ speaking mode." The Speak mode already has a "🔊 Replay
+question" button on the officer's question card, but the Model
+Answer card was text-only. A driver studying English pronunciation
+needs to *hear* the correct way to answer the inspector — not just
+read it — so they can mimic intonation and phrasing before
+recording their own response.
+
+### What changed
+
+1. **`speakText` helper extended** (`app/mock/page.js`):
+   Added two optional params `voiceId` and `speed`, defaulting to
+   the existing `'north_m'` / 0.92 so the officer-question call
+   sites remain identical. This lets the new Hear-answer button
+   request a different voice without duplicating the TTS plumbing
+   (token, stop-current, blob fetch, fallback to speechSynthesis).
+
+2. **`MT` translations** — new `hearAns` key added to all six
+   languages:
+   - en: "🔊 Hear answer"
+   - zh: "🔊 听答案"
+   - es: "🔊 Escuchar respuesta"
+   - hi: "🔊 जवाब सुनें"
+   - pa: "🔊 ਜਵਾਬ ਸੁਣੋ"
+   - vi: "🔊 Nghe câu trả lời"
+
+3. **Two new buttons** wired to `speakText(correctAns, null,
+   'west_m', 0.95)`:
+
+   - **Pre-recording Model-Answer reference card** (around line
+     604–620 in `app/mock/page.js`): placed in a flex row next to
+     the existing "✅ Model answer" header. Driver clicks it to
+     hear the correct answer *before* tapping "🎤 Record answer".
+   - **Post-recording done state** (around line 689–706): placed
+     inline next to the "✓ Model answer" label in the answer
+     review block. Useful after the AI scores their attempt so
+     they can compare their pronunciation to the model.
+
+   Voice choice: `'west_m'` (maps to OpenAI **alloy** — neutral
+   western male) instead of the officer's `'north_m'` (OpenAI
+   **onyx** — deep authoritative northern male). The contrasting
+   timbre makes it obvious to the driver that this is the
+   *driver's* voice / how they should sound, not the inspector's.
+   Speed bumped slightly to 0.95 (vs officer's 0.92) — still
+   instructional pace but a touch more natural for a driver
+   response.
+
+   Style: green outlined button (`background: var(--green-light)`,
+   `color: var(--green)`, `border: 1px solid var(--green)`) to
+   match the green ✅/✓ Model-answer accent and visually distinguish
+   from the officer-card's gray "Replay question" button.
+
+### How it works at runtime
+
+- User in Mock → Speak mode advances to a question; the card
+  renders the officer question (with existing 🔊 Replay) and
+  beneath it the Model-Answer card now showing "🔊 Hear answer".
+- Clicking "🔊 Hear answer" calls `stopCurrentMockAudio()` first
+  (cancels any in-flight officer speech), POSTs `correctAns` text
+  to `/api/speak` with `voiceId: 'west_m'`, decodes the returned
+  MP3 blob, plays via `new Audio(url)`.
+- If `/api/speak` returns 429 (rate-limited) or any error, falls
+  back to `SpeechSynthesisUtterance` with the same text — same
+  graceful-degradation path the officer voice already uses.
+- Recording flow is untouched: the existing "🎤 Record answer"
+  button, MediaRecorder hookup, scoring, and Re-record/Next
+  navigation behave exactly as before.
+
+### Not changed
+
+- Written mode — model answer there is for *typing comparison*,
+  not pronunciation study; per surgical-changes rule, no button
+  added.
+- Listening / Practice / Drive pages — out of scope; user
+  specifically called out Mock speaking mode.
+- Officer-question voice, speed, rate-limit, fallback — preserved.
+- Recording, transcription (`/api/transcribe`), scoring
+  (`/api/score`), auto-play chain, prev/next, skip — untouched.
+- `/api/speak` route — no changes; just calling it with a
+  different `voiceId` from the existing `VOICE_MAP`.
+
+### Verification
+
+- `npx next build` → ✓ 18/18 routes generated.
+  `/mock` size: 9.05 kB → 9.05 kB (rounded; ~0.3 kB added for the
+  button JSX + new MT keys + 1-line helper change).
+- No new dependencies. No schema or API changes.
+- Translation keys present for all six supported UI languages —
+  `mt(lang, 'hearAns')` falls back to English if a future language
+  is added before the key is translated, per the `mt()` resolver.
+
+### Reversal
+
+- `git checkout HEAD~ -- app/mock/page.js` restores the previous
+  state (no Hear-answer button). No other files need reverting.
+
+### Suggested commit
+
+```
+git add app/mock/page.js doc/4claudelog5.md
+git commit -m "Mock speak mode: add 🔊 Hear answer button on Model Answer card (driver voice, west_m)"
+git push origin main
+```

@@ -55,6 +55,7 @@ const MT = {
     complete: 'Complete',
     officerQ: 'Officer question', signLabel: 'Traffic sign',
     autoPlay: '▶ Play all', stopPlay: '⏸ Pause',
+    hearAns: '🔊 Hear answer',
   },
   zh: {
     title: '🚔 模拟路边检查',
@@ -86,6 +87,7 @@ const MT = {
     complete: '已完成',
     officerQ: '警官问题', signLabel: '交通标志',
     autoPlay: '▶ 连续播放', stopPlay: '⏸ 暂停',
+    hearAns: '🔊 听答案',
   },
   es: {
     title: '🚔 Inspección simulada de carretera',
@@ -117,6 +119,7 @@ const MT = {
     complete: 'Completado',
     officerQ: 'Pregunta del oficial', signLabel: 'Señal de tráfico',
     autoPlay: '▶ Reproducir todo', stopPlay: '⏸ Pausar',
+    hearAns: '🔊 Escuchar respuesta',
   },
   hi: {
     title: '🚔 नकली सड़क जाँच',
@@ -148,6 +151,7 @@ const MT = {
     complete: 'पूर्ण',
     officerQ: 'अधिकारी प्रश्न', signLabel: 'यातायात चिह्न',
     autoPlay: '▶ सभी चलाएं', stopPlay: '⏸ रोकें',
+    hearAns: '🔊 जवाब सुनें',
   },
   pa: {
     title: '🚔 ਨਕਲੀ ਸੜਕ ਜਾਂਚ',
@@ -179,6 +183,7 @@ const MT = {
     complete: 'ਪੂਰਾ ਹੋਇਆ',
     officerQ: 'ਅਫਸਰ ਸਵਾਲ', signLabel: 'ਆਵਾਜਾਈ ਚਿੰਨ੍ਹ',
     autoPlay: '▶ ਸਾਰੇ ਚਲਾਓ', stopPlay: '⏸ ਰੋਕੋ',
+    hearAns: '🔊 ਜਵਾਬ ਸੁਣੋ',
   },
   vi: {
     title: '🚔 Kiểm tra đường bộ mô phỏng',
@@ -210,6 +215,7 @@ const MT = {
     complete: 'Hoàn thành',
     officerQ: 'Câu hỏi viên chức', signLabel: 'Biển báo giao thông',
     autoPlay: '▶ Phát tất cả', stopPlay: '⏸ Dừng',
+    hearAns: '🔊 Nghe câu trả lời',
   },
 }
 
@@ -226,13 +232,13 @@ function stopCurrentMockAudio() {
   if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
 }
 
-async function speakText(text, onEnd) {
+async function speakText(text, onEnd, voiceId = 'north_m', speed = 0.92) {
   stopCurrentMockAudio()
   try {
     const res = await fetch('/api/speak', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voiceId: 'north_m', speed: 0.92 }),
+      body: JSON.stringify({ text, voiceId, speed }),
     })
     if (!res.ok) throw new Error('TTS ' + res.status)
     const blob = await res.blob()
@@ -603,8 +609,18 @@ export default function MockPage() {
 
         {/* Correct answer + explanation reference */}
         <div className="card" style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: '.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--green)', marginBottom: 6 }}>
-            ✅ {mt(lang, 'modelAns')}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, gap: 8 }}>
+            <div style={{ fontSize: '.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--green)' }}>
+              ✅ {mt(lang, 'modelAns')}
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm"
+              style={{ background: 'var(--green-light, #dcfce7)', color: 'var(--green)', border: '1px solid var(--green)', fontWeight: 600 }}
+              onClick={() => speakText(correctAns, null, 'west_m', 0.95)}
+            >
+              {mt(lang, 'hearAns')}
+            </button>
           </div>
           <div className="answer-block" style={{ marginBottom: explanationText ? 10 : 0 }}>{correctAns}</div>
           {explanationText && (
@@ -686,7 +702,17 @@ export default function MockPage() {
               </div>
             )}
             <div className="answer-block" style={{ marginBottom: 10 }}>
-              <label style={{ color: 'var(--green)' }}>✓ {mt(lang, 'modelAns')}</label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <label style={{ color: 'var(--green)', margin: 0 }}>✓ {mt(lang, 'modelAns')}</label>
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  style={{ background: 'var(--green-light, #dcfce7)', color: 'var(--green)', border: '1px solid var(--green)', fontWeight: 600 }}
+                  onClick={() => speakText(correctAns, null, 'west_m', 0.95)}
+                >
+                  {mt(lang, 'hearAns')}
+                </button>
+              </div>
               <div style={{ fontSize: '.88rem', marginTop: 4 }}>{correctAns}</div>
             </div>
             <div className="flex-c" style={{ justifyContent: 'center', marginTop: 14 }}>
