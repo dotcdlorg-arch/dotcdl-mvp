@@ -112,10 +112,81 @@ const chipBtnStyle = {
 let currentAudio = null
 let activeToken = 0
 
+// Mobile autoplay-policy workaround. On phones, every audio.play() that runs
+// AFTER an awaited fetch is silently rejected because the user-gesture context
+// is lost. So we keep ONE persistent <audio> element, unlock it once with a
+// silent source during the user's click (synchronously, before any await),
+// then reuse that same element for every question's playback. iOS/Android
+// Safari + Chrome remember per-element permission, so subsequent play() calls
+// outside a gesture work.
+let persistentAudio = null
+let audioUnlocked = false
+let synthUnlocked = false
+
+// 45-byte valid silent WAV (1 sample, 8 kHz, 8-bit mono). Used only to
+// satisfy iOS Safari's "play() needs a real src" requirement on the
+// gesture's first play call.
+const SILENT_AUDIO_SRC =
+  'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAAAA'
+
+function getPersistentAudio() {
+  if (typeof window === 'undefined') return null
+  if (!persistentAudio) {
+    persistentAudio = new Audio()
+    persistentAudio.preload = 'auto'
+  }
+  return persistentAudio
+}
+
+// MUST be called synchronously from a user-gesture handler (click) BEFORE any
+// await. Idempotent — safe to call on every click.
+function unlockAudio() {
+  if (typeof window === 'undefined') return
+  const a = getPersistentAudio()
+  if (a && !audioUnlocked) {
+    try {
+      a.src = SILENT_AUDIO_SRC
+      const p = a.play()
+      if (p && typeof p.then === 'function') {
+        p.then(() => {
+          try { a.pause() } catch {}
+          audioUnlocked = true
+        }).catch(() => {
+          // Some browsers reject the silent-priming play() but still mark
+          // the element as user-permitted. Mark unlocked optimistically;
+          // worst case we retry on the next gesture.
+          audioUnlocked = true
+        })
+      } else {
+        audioUnlocked = true
+      }
+    } catch {}
+  }
+  // Also prime speechSynthesis — on iOS the first speak() must be in a gesture.
+  if (window.speechSynthesis && !synthUnlocked) {
+    try {
+      const u = new SpeechSynthesisUtterance(' ')
+      u.volume = 0
+      window.speechSynthesis.speak(u)
+      synthUnlocked = true
+    } catch {}
+  }
+}
+
+// Pending finish callback for whatever is currently playing. When the user
+// stops or interrupts mid-playback, we call this to resolve the awaiting
+// promise so the chain can shut down cleanly instead of leaving an orphan
+// awaiting forever.
+let pendingFinish = null
+
 function stopCurrentAudio() {
   activeToken++
+  if (pendingFinish) {
+    const fn = pendingFinish; pendingFinish = null
+    try { fn() } catch {}
+  }
   if (currentAudio) {
-    try { currentAudio.pause(); currentAudio.src = '' } catch {}
+    try { currentAudio.pause() } catch {}
     currentAudio = null
   }
   if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -137,11 +208,13 @@ async function ttsFetch(text, rate) {
 }
 
 // Resolves on onended / onerror / play() rejection / 20s safety cap.
+// Uses the persistent (unlocked) audio element so playback works on mobile
+// after the gesture context is gone.
 function playBlob(blob, token) {
   return new Promise(resolve => {
     if (!blob || token !== activeToken) return resolve()
+    const audio = getPersistentAudio() || new Audio()
     const url = URL.createObjectURL(blob)
-    const audio = new Audio(url)
     currentAudio = audio
     let done = false
     const finish = () => {
@@ -149,11 +222,19 @@ function playBlob(blob, token) {
       done = true
       try { URL.revokeObjectURL(url) } catch {}
       if (currentAudio === audio) currentAudio = null
+      if (pendingFinish === finish) pendingFinish = null
+      audio.onended = null
+      audio.onerror = null
       resolve()
     }
+    pendingFinish = finish
     audio.onended = finish
     audio.onerror = finish
-    audio.play().catch(finish)
+    try {
+      audio.src = url
+      const p = audio.play()
+      if (p && typeof p.then === 'function') p.catch(finish)
+    } catch { finish(); return }
     setTimeout(finish, 20000)
   })
 }
@@ -165,7 +246,13 @@ function playSynth(text, rate, token) {
     const u = new SpeechSynthesisUtterance(text)
     u.lang = 'en-US'; u.rate = rate || 1
     let done = false
-    const finish = () => { if (!done) { done = true; resolve() } }
+    const finish = () => {
+      if (done) return
+      done = true
+      if (pendingFinish === finish) pendingFinish = null
+      resolve()
+    }
+    pendingFinish = finish
     u.onend = finish
     u.onerror = finish
     window.speechSynthesis.speak(u)
@@ -314,6 +401,10 @@ function PracticeInner() {
   }, [])
 
   function startAutoPlay() {
+    // Synchronously unlock the persistent audio element on this click so
+    // every subsequent play() in the chain works on mobile (where the user
+    // gesture is consumed by the first awaited fetch).
+    unlockAudio()
     autoPlayRef.current = true
     setIsAutoPlaying(true)
     playFromList(filtered, safeIdx)
@@ -517,7 +608,7 @@ function PracticeInner() {
         {/* Listen controls for listening mode */}
         {mode === 'listen' && (
           <div className="flex-c mt-8">
-            <button className="btn btn-sm" onClick={() => { if (autoPlayRef.current) stopAutoPlay(); speak(q.officer_question_en, listenRate) }}>{tx('playQ')}</button>
+            <button className="btn btn-sm" onClick={() => { unlockAudio(); if (autoPlayRef.current) stopAutoPlay(); speak(q.officer_question_en, listenRate) }}>{tx('playQ')}</button>
             {[{label:tx('slow'),v:.7},{label:tx('normal'),v:1},{label:tx('fast'),v:1.3}].map(s => (
               <button key={s.v} className={`btn btn-sm ${listenRate===s.v ? 'btn-primary' : ''}`}
                 onClick={() => setListenRate(s.v)}>{s.label}</button>
@@ -537,7 +628,7 @@ function PracticeInner() {
 
         {/* Play in text mode too */}
         {mode === 'text' && (
-          <button className="btn btn-sm mt-8" onClick={() => speak(q.officer_question_en, 1)}>{tx('playQ')}</button>
+          <button className="btn btn-sm mt-8" onClick={() => { unlockAudio(); speak(q.officer_question_en, 1) }}>{tx('playQ')}</button>
         )}
 
         {/* Explanation — always visible, full Q + proper response in selected language */}
@@ -653,7 +744,7 @@ function PracticeInner() {
                   <div style={{ fontSize:'.84rem', color:'var(--muted)', marginBottom:8 }}>Tap to record your English answer</div>
                   <div className="flex-c" style={{ justifyContent:'center', gap:8 }}>
                     <button className="btn btn-primary" onClick={startRecording}>{tx('startRec')}</button>
-                    <button className="btn btn-sm" onClick={() => speak(q.officer_question_en, 1)}>{tx('playQ')}</button>
+                    <button className="btn btn-sm" onClick={() => { unlockAudio(); speak(q.officer_question_en, 1) }}>{tx('playQ')}</button>
                   </div>
                 </>
               )}

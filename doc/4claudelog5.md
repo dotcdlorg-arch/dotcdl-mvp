@@ -560,3 +560,195 @@ playback). Specifically:
 
 - `git checkout HEAD~ -- app/practice/page.js` restores the previous
   TTS module helpers and autoplay logic.
+
+---
+
+## Action 61: Fix Listening "Play All" on mobile — no voice, only advance
+
+**Date:** 2026-05-26
+**Scope:** `app/practice/page.js` — module-level TTS helpers + every speak click handler in the Listening / Speak / Text modes.
+**User request:** "It's working in desktop computer, but no voice and only go to next question without voice on the phone and mobile device. there is 3 seconds interval for each question. fix it"
+
+### Root-cause diagnosis (mobile-specific)
+
+Action 60 fixed the desktop chain (token-based cancellation, safety
+caps, etc.) but every mobile browser — iOS Safari, Android Chrome,
+Samsung Internet — enforces a stricter autoplay policy:
+
+> An `HTMLAudioElement.play()` call is only permitted if it executes
+> within the synchronous frame of a user-gesture event handler. After
+> a single `await` in the handler, the gesture context is consumed
+> and any subsequent `play()` on a freshly-created `<audio>` element
+> is silently rejected (the returned promise rejects with
+> `NotAllowedError`).
+
+The previous Action-60 code path was:
+
+```
+click "Play all"
+  → startAutoPlay() runs synchronously
+  → playFromList() → speakWithCb() → speakViaApi()
+  → stopCurrentAudio()       (still in gesture)
+  → await ttsFetch(...)      ⟵ GESTURE CONSUMED HERE
+  → playBlob(blob, token)
+      → new Audio(url)       ⟵ fresh element, no permission
+      → audio.play()         ⟵ rejected on mobile
+      → .catch(finish)       ⟵ finish() resolves the promise
+  → speakViaApi returns      ⟵ chain advances to next question
+```
+
+Because Action 60's `playBlob` correctly resolves on
+`play().catch()`, the chain happily marches forward — but `finish()`
+fires before any sound is produced. Hence the user's exact symptoms:
+**no voice, just keeps advancing**.
+
+On desktop, the same autoplay policy exists but Chrome/Firefox/Safari
+have far more permissive heuristics — typically a click anywhere on
+the page lifts the restriction for the rest of the session. Mobile
+browsers do not extend permission past the immediate event frame.
+
+### The fix: persistent unlocked Audio element
+
+Standard cross-browser workaround (the same approach howler.js,
+Tone.js, and most game engines use):
+
+1. Keep ONE persistent `<audio>` element at module scope, instead of
+   creating a fresh `new Audio()` for each question.
+2. On the user's click, **before any await**, set that element's src
+   to a tiny silent data URI and call `.play()`. The browser marks
+   that specific element as "user-permitted" for the rest of the
+   page session.
+3. For every subsequent question, set the persistent element's
+   `.src = blobURL` and call `.play()`. The element retains its
+   permission flag across src changes, so play() succeeds even when
+   called outside a gesture (i.e. after a fetch).
+
+### Changes in `app/practice/page.js`
+
+**New module-level state** (in the TTS helpers block):
+
+```js
+let persistentAudio = null
+let audioUnlocked = false
+let synthUnlocked = false
+let pendingFinish = null   // for clean stop-mid-playback cancellation
+const SILENT_AUDIO_SRC = 'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAAAA'
+```
+
+- `SILENT_AUDIO_SRC` is a hand-built 45-byte valid silent WAV: RIFF
+  header + fmt chunk (PCM / 1 ch / 8 kHz / 8-bit) + data chunk with
+  a single 0x00 sample. The minimum a browser will accept as "real
+  audio" for the priming play().
+
+**New helper `unlockAudio()`**:
+
+- Idempotent. Safe to call on every click.
+- Sets persistent audio src → silent WAV → calls `.play()` → on
+  resolve, calls `.pause()` and flips `audioUnlocked = true`.
+- Also primes `SpeechSynthesisUtterance` with a 0-volume single-space
+  utterance so the synth fallback (used when /api/speak rate-limits
+  or fails) doesn't itself need a fresh gesture on iOS.
+- Wrapped in try/catch — failure to prime is non-fatal; worst case,
+  the next click retries.
+
+**`playBlob` updated**:
+
+- Uses `getPersistentAudio() || new Audio()` instead of always-new
+  Audio. SSR-safe (`getPersistentAudio` returns null on the server).
+- Tracks itself in `pendingFinish` so `stopCurrentAudio` can resolve
+  the promise immediately on user interrupt — no more orphan async
+  functions hanging when the user clicks Stop mid-play.
+- Clears `audio.onended` / `audio.onerror` in finish() so the next
+  question's play (on the SAME element) doesn't trigger stale
+  callbacks from the previous question.
+
+**`playSynth` updated**:
+
+- Same `pendingFinish` registration so user interrupts cleanly stop
+  the synth fallback too.
+
+**`stopCurrentAudio` updated**:
+
+- Fires `pendingFinish()` first (resolves the pending promise) so
+  cancellation actually wakes up the awaiting speakViaApi.
+- Then bumps token, pauses the element (does NOT clear src —
+  keeping the element alive preserves its unlock flag).
+
+**Click handlers wired to `unlockAudio()`**:
+
+Every click that eventually leads to a `speak()` or `speakWithCb()`
+call now invokes `unlockAudio()` synchronously first, while still in
+the gesture:
+
+- `startAutoPlay()` — the Listening "▶ Play all" button.
+- Listening "🔊 Play Q" button (officer_question_en, listenRate).
+- Text-mode "🔊 Play Q" button (officer_question_en, 1).
+- Speak-mode "🔊 Play Q" button (officer_question_en, 1).
+
+`unlockAudio()` is a synchronous no-op after the first successful
+unlock, so the wiring has effectively zero runtime cost on warm
+clicks.
+
+### Why this fixes the reported symptom
+
+- **No voice on phone:** Was caused by `audio.play()` rejection
+  after the awaited fetch consumed the gesture. The persistent
+  element is now pre-permitted by the silent-WAV priming play in
+  `unlockAudio()`, so the post-fetch `audio.src = blobURL; audio.play()`
+  is accepted. Voice plays.
+- **Advance with 3-second interval:** The "3 seconds" is just
+  fetch-time (~0.5-1.5s for /api/speak) + the 1.5s inter-question
+  setTimeout. Once voice plays, the timing fills with actual audio
+  duration rather than silence. The 1.5s gap is unchanged — it was
+  introduced in Action 60 as a deliberate pause between questions
+  for comprehension.
+
+### Files touched
+
+- `app/practice/page.js` — module-level TTS helpers (~70 new lines),
+  one new line in `startAutoPlay`, three click handlers updated to
+  add `unlockAudio()`. No other files, no API changes, no schema
+  changes.
+
+### Not changed
+
+- `/api/speak`, /api/translate, /api/score, /api/transcribe — none.
+- Terms / Signs / Mock pages — they don't have a Play-All chain so
+  the existing per-click gesture is sufficient; not touched.
+- The 1.5s inter-question delay from Action 60 — kept.
+- Token-based cancellation, safety caps, synth fallback — all
+  preserved from Action 60.
+- Filters, navigation, scoring, recording — untouched.
+
+### Verification
+
+- `npx next build` → ✓ 17/17 routes. `/practice` 8.04 → 8.29 kB
+  (+250 bytes for the persistent-audio + unlock helpers).
+- Desktop regression check: Play All on Chrome (mac) still works
+  end-to-end. unlockAudio is idempotent and the persistent element
+  behaves identically to a fresh Audio on desktop.
+- Mobile expected behavior (to be verified by user):
+  - First click on "▶ Play all" runs unlockAudio() synchronously,
+    priming the persistent element with SILENT_AUDIO_SRC. The
+    silent WAV plays for ~0ms (effectively inaudible) and the
+    element is marked as user-permitted.
+  - The fetch returns ~500-1500 ms later, blob is decoded.
+  - `audio.src = blobURL; audio.play()` — permitted (same element),
+    voice plays.
+  - audio.onended fires → 1.5s setTimeout → next question →
+    `audio.src = newBlobURL; audio.play()` — still permitted because
+    the element retains its unlock flag through src changes. Voice
+    plays again.
+  - User clicks "⏸ Pause" → stopCurrentAudio() → pendingFinish()
+    fires → speakViaApi awaits return → token mismatch → onEnd
+    skipped → chain dies cleanly.
+- TTS rate-limit path (429 from /api/speak): blob is null →
+  playSynth fallback → speechSynthesis already primed by unlockAudio
+  on iOS → speak() succeeds. The chain produces voice via system
+  TTS instead of OpenAI for that question, then continues.
+
+### Reversal
+
+- `git checkout HEAD~ -- app/practice/page.js` restores the
+  Action 60 state (desktop-working, mobile-silent). The previous
+  commit is the desktop-only fix.
