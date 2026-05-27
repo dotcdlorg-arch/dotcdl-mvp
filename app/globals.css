@@ -59,6 +59,18 @@ a:hover{text-decoration:underline}
 .topbar-title{font-size:.92rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-sub{font-size:.68rem;color:#475569}
 .topbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar-page-actions{display:flex;align-items:center;gap:6px;flex:1 1 auto;justify-content:center;min-width:0;overflow:hidden}
+.topbar-page-actions .tpa-btn{
+  background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:8px;
+  width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:1.05rem;line-height:1;cursor:pointer;padding:0;flex-shrink:0;
+  transition:background var(--transition),border-color var(--transition),transform var(--transition);
+}
+.topbar-page-actions .tpa-btn:hover:not(:disabled){background:#334155;border-color:#475569}
+.topbar-page-actions .tpa-btn:active:not(:disabled){transform:scale(.94)}
+.topbar-page-actions .tpa-btn:disabled{opacity:.35;cursor:not-allowed}
+.topbar-page-actions .tpa-btn.tpa-rec{background:#dc2626;border-color:#dc2626;color:#fff}
+.topbar-page-actions .tpa-btn.tpa-rec:hover:not(:disabled){background:#b91c1c}
 .lang-select{
   background:#1e293b;color:#e2e8f0;border:1px solid #334155;
   border-radius:var(--rs);padding:5px 9px;font-size:.77rem;
@@ -447,9 +459,14 @@ code{background:var(--bg3);border:1px solid var(--line);border-radius:4px;paddin
   .card { padding: 14px; border-radius: 12px; margin-bottom: 12px; }
   .card-title { font-size: .95rem; }
 
-  .topbar { padding: 0 12px; }
+  .topbar { padding: 0 10px; gap: 8px; }
   .topbar-title { font-size: .85rem; }
-  .lang-select { padding: 6px 8px; font-size: .8rem; }
+  .topbar-brand { gap: 6px; }
+  .topbar-logo { font-size: 1.25rem; }
+  .lang-select { padding: 4px 6px; font-size: .72rem; max-width: 64px; }
+  .topbar-actions { gap: 4px; }
+  .topbar-page-actions { gap: 4px; }
+  .topbar-page-actions .tpa-btn { width: 34px; height: 34px; font-size: .95rem; }
 
   .nav-btn { padding: 12px; font-size: .9rem; min-height: 44px; }
 

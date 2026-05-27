@@ -514,8 +514,45 @@ function PracticeInner() {
   const diffClass = q.difficulty === 'Beginner' ? 'badge-green' : q.difficulty === 'Mock Test' ? 'badge-red' : 'badge-amber'
   const scoreColor = scoreData ? (scoreData.score >= 80 ? 'var(--green)' : scoreData.score >= 55 ? 'var(--amber)' : 'var(--red)') : 'var(--muted)'
 
+  const topbarActions = (
+    <>
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={goPrev}
+        disabled={safeIdx === 0}
+        aria-label={tx('prev')}
+        title={tx('prev')}
+      >⏮</button>
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={() => { unlockAudio(); if (autoPlayRef.current) stopAutoPlay(); speak(q.officer_question_en, mode === 'listen' ? listenRate : 1) }}
+        aria-label={tx('playQ')}
+        title={tx('playQ')}
+      >🔊</button>
+      {mode === 'speak' && (
+        <button
+          type="button"
+          className={`tpa-btn ${isRecording ? 'tpa-rec' : ''}`}
+          onClick={isRecording ? stopRecording : startRecording}
+          aria-label={isRecording ? tx('stopRec') : tx('startRec')}
+          title={isRecording ? tx('stopRec') : tx('startRec')}
+        >{isRecording ? '⏹' : '🎤'}</button>
+      )}
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={goNext}
+        disabled={safeIdx >= filtered.length - 1}
+        aria-label={tx('next')}
+        title={tx('next')}
+      >⏭</button>
+    </>
+  )
+
   return (
-    <AppShell lang={lang} setLang={setLang} stats={stats}>
+    <AppShell lang={lang} setLang={setLang} stats={stats} topbarActions={topbarActions}>
       {/* Category + difficulty chips (Terms-style, single-line scrollable on phone) */}
       <div className="card" style={{ marginBottom: 12 }}>
         <div style={chipRowStyle}>
@@ -577,13 +614,11 @@ function PracticeInner() {
           {p?.score != null && <span className="badge badge-gray">{p.score}/100</span>}
         </div>
 
-        {/* Top prev/next — always visible near the question on phone */}
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:10 }}>
-          <button className="btn btn-sm" onClick={goPrev} disabled={safeIdx === 0}>{tx('prev')}</button>
+        {/* Question position indicator (Prev/Next moved to top bar) */}
+        <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
           <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>
             {filtered.length ? `${safeIdx + 1} / ${filtered.length}` : ''}
           </span>
-          <button className="btn btn-sm btn-primary" onClick={goNext} disabled={safeIdx === filtered.length - 1}>{tx('next')}</button>
         </div>
 
         {/* Officer question */}
@@ -592,10 +627,9 @@ function PracticeInner() {
         </div>
         <p className="q-officer">{q.officer_question_en}</p>
 
-        {/* Listen controls for listening mode */}
+        {/* Listen controls — Play Q moved to top bar; speed + auto-play stay here */}
         {mode === 'listen' && (
           <div className="flex-c mt-8">
-            <button className="btn btn-sm" onClick={() => { unlockAudio(); if (autoPlayRef.current) stopAutoPlay(); speak(q.officer_question_en, listenRate) }}>{tx('playQ')}</button>
             {[{label:tx('slow'),v:.7},{label:tx('normal'),v:1},{label:tx('fast'),v:1.3}].map(s => (
               <button key={s.v} className={`btn btn-sm ${listenRate===s.v ? 'btn-primary' : ''}`}
                 onClick={() => setListenRate(s.v)}>{s.label}</button>
@@ -613,10 +647,7 @@ function PracticeInner() {
         </div>
         <div className="answer-block">{q.simple_driver_answer_en}</div>
 
-        {/* Play in text mode too */}
-        {mode === 'text' && (
-          <button className="btn btn-sm mt-8" onClick={() => { unlockAudio(); speak(q.officer_question_en, 1) }}>{tx('playQ')}</button>
-        )}
+        {/* Play Q moved to top bar — applies to text mode too */}
 
         {/* Explanation — always visible, full Q + proper response in selected language */}
         {lang !== 'en' && getExplanation(q, lang) && (
@@ -715,27 +746,16 @@ function PracticeInner() {
           <div style={{ marginTop:16, background:'var(--bg3)', borderRadius:'var(--rs)', border:'1px solid var(--line)', padding:16 }}>
             <div style={{ fontWeight:700, fontSize:'.82rem', marginBottom:10 }}>🎤 {tx('speakTitle')}</div>
 
-            {/* Recording zone */}
-            <div className={`rec-zone ${isRecording ? 'recording' : ''}`}>
-              {isRecording ? (
-                <>
-                  <span className="rec-dot" />
-                  <span style={{ fontSize:'.84rem', fontWeight:600, color:'var(--red)' }}>Recording…</span>
-                  <div className="waveform" style={{ marginTop:8 }}>
-                    {[1,2,3,4,5].map(i => <span key={i} style={{ height: 8 + Math.random()*20 + 'px' }} />)}
-                  </div>
-                  <button className="btn btn-danger btn-sm" style={{ marginTop:8 }} onClick={stopRecording}>{tx('stopRec')}</button>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontSize:'.84rem', color:'var(--muted)', marginBottom:8 }}>Tap to record your English answer</div>
-                  <div className="flex-c" style={{ justifyContent:'center', gap:8 }}>
-                    <button className="btn btn-primary" onClick={startRecording}>{tx('startRec')}</button>
-                    <button className="btn btn-sm" onClick={() => { unlockAudio(); speak(q.officer_question_en, 1) }}>{tx('playQ')}</button>
-                  </div>
-                </>
-              )}
-            </div>
+            {/* Recording state display — Start/Play moved to top bar */}
+            {isRecording && (
+              <div className="rec-zone recording">
+                <span className="rec-dot" />
+                <span style={{ fontSize:'.84rem', fontWeight:600, color:'var(--red)' }}>Recording…</span>
+                <div className="waveform" style={{ marginTop:8 }}>
+                  {[1,2,3,4,5].map(i => <span key={i} style={{ height: 8 + Math.random()*20 + 'px' }} />)}
+                </div>
+              </div>
+            )}
 
             <label style={{ marginTop:12 }}>Your answer (edit if needed)</label>
             <textarea

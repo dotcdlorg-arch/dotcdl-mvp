@@ -141,7 +141,7 @@ function nl(lang, key) {
   return (NAV_LABELS[lang] || NAV_LABELS.en)[key] || NAV_LABELS.en[key] || key
 }
 
-export default function AppShell({ children, lang = 'zh', setLang, stats }) {
+export default function AppShell({ children, lang = 'zh', setLang, stats, topbarActions }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -185,10 +185,15 @@ export default function AppShell({ children, lang = 'zh', setLang, stats }) {
         <div className="topbar-brand">
           <span className="topbar-logo">🚛</span>
           <div>
-            <div className="topbar-title">CDL English Pro</div>
+            <div className="topbar-title">ELP</div>
             <div className="topbar-sub">Not affiliated with DOT · FMCSA · CVSA</div>
           </div>
         </div>
+        {topbarActions && (
+          <div className="topbar-page-actions">
+            {topbarActions}
+          </div>
+        )}
         <div className="topbar-actions">
           <select
             className="lang-select"
