@@ -6,7 +6,7 @@ import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords 
 
 // ── i18n ──────────────────────────────────────────
 const T = {
-  en:{ all:'All', search:'Search questions…', reviewOnly:'Review only', prev:'← Previous', next:'Next →',
+  en:{ all:'All', reviewOnly:'Review only', prev:'← Previous', next:'Next →',
     understood:'✓ Understood', needReview:'⚑ Review', officer:'Officer question', answer:'Standard answer',
     explanation:'Explanation', keywords:'Keywords', mistakes:'Common mistakes',
     qaTrans:'Q&A translation', translating:'Translating…',
@@ -19,7 +19,7 @@ const T = {
     betterAns:'Model answer', pronTitle:'Pronunciation analysis',
     pronGood:'Pronunciation correct', pronOk:'Can be improved', pronMiss:'Needs practice',
     noQ:'No questions match. Adjust your filters.', autoPlay:'▶ Play all', stopPlay:'⏸ Pause' },
-  zh:{ all:'全部', search:'搜索题目…', reviewOnly:'只看复习', prev:'← 上一题', next:'下一题 →',
+  zh:{ all:'全部', reviewOnly:'只看复习', prev:'← 上一题', next:'下一题 →',
     understood:'✓ 已理解', needReview:'⚑ 复习', officer:'警官问题', answer:'标准答案',
     explanation:'母语解释', keywords:'关键词', mistakes:'常见错误',
     qaTrans:'问答翻译', translating:'翻译中…',
@@ -32,7 +32,7 @@ const T = {
     betterAns:'参考答案', pronTitle:'发音分析',
     pronGood:'发音准确', pronOk:'可以改善', pronMiss:'需要练习',
     noQ:'没有符合条件的题目。请调整筛选条件。', autoPlay:'▶ 连续播放', stopPlay:'⏸ 暂停' },
-  es:{ all:'Todo', search:'Buscar…', reviewOnly:'Solo repaso', prev:'← Anterior', next:'Siguiente →',
+  es:{ all:'Todo', reviewOnly:'Solo repaso', prev:'← Anterior', next:'Siguiente →',
     understood:'✓ Entendido', needReview:'⚑ Repasar', officer:'Pregunta del oficial', answer:'Respuesta',
     explanation:'Explicación', keywords:'Palabras clave', mistakes:'Errores comunes',
     qaTrans:'Traducción de Q&A', translating:'Traduciendo…',
@@ -45,7 +45,7 @@ const T = {
     betterAns:'Respuesta modelo', pronTitle:'Análisis de pronunciación',
     pronGood:'Pronunciación correcta', pronOk:'Puede mejorar', pronMiss:'Necesita práctica',
     noQ:'No hay preguntas. Cambie los filtros.', autoPlay:'▶ Reproducir todo', stopPlay:'⏸ Pausar' },
-  hi:{ all:'सभी', search:'खोजें…', reviewOnly:'केवल समीक्षा', prev:'← पिछला', next:'अगला →',
+  hi:{ all:'सभी', reviewOnly:'केवल समीक्षा', prev:'← पिछला', next:'अगला →',
     understood:'✓ समझ गया', needReview:'⚑ समीक्षा', officer:'अधिकारी प्रश्न', answer:'उत्तर',
     explanation:'व्याख्या', keywords:'कीवर्ड', mistakes:'गलतियाँ',
     qaTrans:'प्रश्न-उत्तर अनुवाद', translating:'अनुवाद हो रहा है…',
@@ -58,7 +58,7 @@ const T = {
     betterAns:'बेहतर उत्तर', pronTitle:'उच्चारण विश्लेषण',
     pronGood:'सही उच्चारण', pronOk:'सुधार हो सकता है', pronMiss:'अभ्यास जरूरी',
     noQ:'कोई प्रश्न नहीं। फ़िल्टर बदलें।', autoPlay:'▶ सभी चलाएं', stopPlay:'⏸ रोकें' },
-  pa:{ all:'ਸਾਰੇ', search:'ਖੋਜੋ…', reviewOnly:'ਕੇਵਲ ਦੁਹਰਾਈ', prev:'← ਪਿਛਲਾ', next:'ਅਗਲਾ →',
+  pa:{ all:'ਸਾਰੇ', reviewOnly:'ਕੇਵਲ ਦੁਹਰਾਈ', prev:'← ਪਿਛਲਾ', next:'ਅਗਲਾ →',
     understood:'✓ ਸਮਝ ਗਿਆ', needReview:'⚑ ਦੁਹਰਾਈ', officer:'ਅਫਸਰ ਸਵਾਲ', answer:'ਜਵਾਬ',
     explanation:'ਵਿਆਖਿਆ', keywords:'ਕੀਵਰਡ', mistakes:'ਗਲਤੀਆਂ',
     qaTrans:'ਸਵਾਲ-ਜਵਾਬ ਅਨੁਵਾਦ', translating:'ਅਨੁਵਾਦ ਹੋ ਰਿਹਾ ਹੈ…',
@@ -71,7 +71,7 @@ const T = {
     betterAns:'ਬਿਹਤਰ ਜਵਾਬ', pronTitle:'ਉਚਾਰਣ ਵਿਸ਼ਲੇਸ਼ਣ',
     pronGood:'ਸਹੀ ਉਚਾਰਣ', pronOk:'ਸੁਧਾਰ ਹੋ ਸਕਦਾ', pronMiss:'ਅਭਿਆਸ ਲੋੜੀਂਦਾ',
     noQ:'ਕੋਈ ਸਵਾਲ ਨਹੀਂ।', autoPlay:'▶ ਸਾਰੇ ਚਲਾਓ', stopPlay:'⏸ ਰੋਕੋ' },
-  vi:{ all:'Tất cả', search:'Tìm kiếm…', reviewOnly:'Chỉ ôn lại', prev:'← Trước', next:'Tiếp →',
+  vi:{ all:'Tất cả', reviewOnly:'Chỉ ôn lại', prev:'← Trước', next:'Tiếp →',
     understood:'✓ Đã hiểu', needReview:'⚑ Ôn lại', officer:'Câu hỏi viên chức', answer:'Câu trả lời',
     explanation:'Giải thích', keywords:'Từ khóa', mistakes:'Lỗi thường gặp',
     qaTrans:'Bản dịch Hỏi-Đáp', translating:'Đang dịch…',
@@ -290,7 +290,6 @@ function PracticeInner() {
   const [lang, setLang] = useState('zh')
   const [filterCat, setFilterCat] = useState('all')
   const [filterDiff, setFilterDiff] = useState('all')
-  const [search, setSearch] = useState('')
   const [reviewOnly, setReviewOnly] = useState(false)
   const [qIdx, setQIdx] = useState(0)
   const [listenRate, setListenRate] = useState(1)
@@ -314,11 +313,6 @@ function PracticeInner() {
     const list = QUESTIONS.filter(q => {
       if (filterCat !== 'all' && q.category !== filterCat) return false
       if (filterDiff !== 'all' && q.difficulty !== filterDiff) return false
-      if (search) {
-        const s = search.toLowerCase()
-        if (!q.officer_question_en.toLowerCase().includes(s) &&
-            !q.simple_driver_answer_en.toLowerCase().includes(s)) return false
-      }
       return true
     })
     // Fisher-Yates shuffle — random order, not source order.
@@ -327,7 +321,7 @@ function PracticeInner() {
       ;[list[i], list[j]] = [list[j], list[i]]
     }
     return list
-  }, [filterCat, filterDiff, search])
+  }, [filterCat, filterDiff])
 
   const filtered = reviewOnly
     ? baseFiltered.filter(q => progress[q.question_code]?.status === 'needs_review')
@@ -562,13 +556,6 @@ function PracticeInner() {
             </button>
           ))}
         </div>
-        <input
-          type="search"
-          value={search}
-          onChange={e => { setSearch(e.target.value); setQIdx(0) }}
-          placeholder={tx('search')}
-          style={{ marginTop: 10, width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink)', fontSize: '.9rem' }}
-        />
         <label style={{ cursor:'pointer', display:'inline-flex', alignItems:'center', gap:6,
           marginTop:10, fontSize:'.83rem', fontWeight:500, color:'var(--ink2)',
           textTransform:'none', letterSpacing:0 }}>

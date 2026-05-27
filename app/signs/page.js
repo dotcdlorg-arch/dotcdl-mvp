@@ -51,7 +51,6 @@ async function speakSignAnswer(text) {
 export default function SignsPage() {
   const [lang, setLang] = useState('zh')
   const [filterCat, setFilterCat] = useState('all')
-  const [search, setSearch] = useState('')
   const [idx, setIdx] = useState(0)
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState(null)
@@ -62,7 +61,6 @@ export default function SignsPage() {
   const filtered = useMemo(() => {
     const list = SIGNS.filter(s => {
       if (filterCat !== 'all' && s.category !== filterCat) return false
-      if (search && !s.name.toLowerCase().includes(search.toLowerCase())) return false
       return true
     })
     for (let i = list.length - 1; i > 0; i--) {
@@ -70,7 +68,7 @@ export default function SignsPage() {
       ;[list[i], list[j]] = [list[j], list[i]]
     }
     return list
-  }, [filterCat, search])
+  }, [filterCat])
   const sign = filtered[Math.min(idx, filtered.length - 1)]
   const pct = filtered.length > 0 ? Math.round((idx + 1) / filtered.length * 100) : 0
 
@@ -126,13 +124,6 @@ export default function SignsPage() {
             </button>
           ))}
         </div>
-        <input
-          type="search"
-          value={search}
-          onChange={e => { setSearch(e.target.value); setIdx(0); setResult(null); setAnswer('') }}
-          placeholder="Search sign name…"
-          style={{ marginTop: 10, width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink)', fontSize: '.9rem' }}
-        />
       </div>
 
       <div className="card">
