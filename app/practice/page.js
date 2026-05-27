@@ -106,37 +106,82 @@ const chipBtnStyle = {
 }
 
 // Real human voice via OpenAI TTS, fallback to browser synthesis on failure.
+// Token-based cancellation: every stop bumps the token; in-flight playback
+// checks myToken !== activeToken and bails. Avoids the shared-flag race that
+// made Play All hang or play silently when interrupted.
 let currentAudio = null
+let activeToken = 0
 
 function stopCurrentAudio() {
-  if (currentAudio) { try { currentAudio.pause() } catch {} ; currentAudio = null }
-  if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
+  activeToken++
+  if (currentAudio) {
+    try { currentAudio.pause(); currentAudio.src = '' } catch {}
+    currentAudio = null
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    try { window.speechSynthesis.cancel() } catch {}
+  }
 }
 
-async function speakViaApi(text, rate, onEnd) {
-  stopCurrentAudio()
+async function ttsFetch(text, rate) {
+  if (!text) return null
   try {
     const res = await fetch('/api/speak', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, voiceId: 'north_m', speed: rate || 1 }),
     })
-    if (!res.ok) throw new Error('TTS ' + res.status)
-    const blob = await res.blob()
+    if (!res.ok) return null
+    return await res.blob()
+  } catch { return null }
+}
+
+// Resolves on onended / onerror / play() rejection / 20s safety cap.
+function playBlob(blob, token) {
+  return new Promise(resolve => {
+    if (!blob || token !== activeToken) return resolve()
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
     currentAudio = audio
-    audio.onended = () => { URL.revokeObjectURL(url); if (currentAudio === audio) currentAudio = null; onEnd?.() }
-    audio.onerror = () => { URL.revokeObjectURL(url); if (currentAudio === audio) currentAudio = null; onEnd?.() }
-    await audio.play()
-  } catch (e) {
-    console.error('Practice TTS fallback:', e)
-    if (typeof window === 'undefined' || !window.speechSynthesis) { setTimeout(() => onEnd?.(), 100); return }
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      try { URL.revokeObjectURL(url) } catch {}
+      if (currentAudio === audio) currentAudio = null
+      resolve()
+    }
+    audio.onended = finish
+    audio.onerror = finish
+    audio.play().catch(finish)
+    setTimeout(finish, 20000)
+  })
+}
+
+function playSynth(text, rate, token) {
+  return new Promise(resolve => {
+    if (token !== activeToken) return resolve()
+    if (typeof window === 'undefined' || !window.speechSynthesis) return resolve()
     const u = new SpeechSynthesisUtterance(text)
     u.lang = 'en-US'; u.rate = rate || 1
-    if (onEnd) { u.onend = () => onEnd(); u.onerror = () => onEnd() }
+    let done = false
+    const finish = () => { if (!done) { done = true; resolve() } }
+    u.onend = finish
+    u.onerror = finish
     window.speechSynthesis.speak(u)
-  }
+    setTimeout(finish, 15000)
+  })
+}
+
+async function speakViaApi(text, rate, onEnd) {
+  stopCurrentAudio()
+  const myToken = activeToken
+  const blob = await ttsFetch(text, rate)
+  if (myToken !== activeToken) return
+  if (blob) await playBlob(blob, myToken)
+  else await playSynth(text, rate, myToken)
+  if (myToken !== activeToken) return
+  onEnd?.()
 }
 
 function speak(text, rate) { speakViaApi(text, rate, null) }
@@ -287,14 +332,17 @@ function PracticeInner() {
     setQIdx(idx)
     setTranscript(''); setScoreData(null)
     speakWithCb(list[idx].officer_question_en, listenRate, () => {
-      setTimeout(() => playFromList(list, idx + 1), 4000)
+      if (!autoPlayRef.current) return
+      setTimeout(() => playFromList(list, idx + 1), 1500)
     })
   }
 
   function goNext() {
+    if (autoPlayRef.current) stopAutoPlay()
     if (safeIdx < filtered.length - 1) { setQIdx(safeIdx + 1); resetSpeak() }
   }
   function goPrev() {
+    if (autoPlayRef.current) stopAutoPlay()
     if (safeIdx > 0) { setQIdx(safeIdx - 1); resetSpeak() }
   }
   function resetSpeak() { setTranscript(''); setScoreData(null) }
@@ -469,7 +517,7 @@ function PracticeInner() {
         {/* Listen controls for listening mode */}
         {mode === 'listen' && (
           <div className="flex-c mt-8">
-            <button className="btn btn-sm" onClick={() => speak(q.officer_question_en, listenRate)}>{tx('playQ')}</button>
+            <button className="btn btn-sm" onClick={() => { if (autoPlayRef.current) stopAutoPlay(); speak(q.officer_question_en, listenRate) }}>{tx('playQ')}</button>
             {[{label:tx('slow'),v:.7},{label:tx('normal'),v:1},{label:tx('fast'),v:1.3}].map(s => (
               <button key={s.v} className={`btn btn-sm ${listenRate===s.v ? 'btn-primary' : ''}`}
                 onClick={() => setListenRate(s.v)}>{s.label}</button>

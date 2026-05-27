@@ -405,3 +405,158 @@ on the same array is untouched.
 - `git rm app/api/translate/route.js` to remove the endpoint.
 - `git checkout HEAD~ -- app/practice/page.js` to restore
   the Keywords `<details>` block.
+
+---
+
+## Action 60: Fix Listening "Play All" inconsistency — stops by itself / no voice sound
+
+**Date:** 2026-05-26
+**Scope:** `app/practice/page.js` (Listening mode autoplay TTS only)
+**User request:** "In Listening mode, the play all function is not consistant, sometimes it stop by itself, sometimes with no voice sound. fix it"
+
+### Root-cause diagnosis
+
+The Listening-mode "▶ Play all" chain in `app/practice/page.js` had a
+fragile module-level TTS implementation with FOUR distinct bugs that
+together produced the two reported symptoms:
+
+1. **No safety cap on audio playback.** `speakViaApi` registered
+   `audio.onended` and `audio.onerror` as the only paths to the
+   autoplay continuation. If the `<audio>` element loaded but never
+   fired `onended` (rare-but-real: stalled blob, codec hiccup, browser
+   bug), the Play All chain hung forever with the UI still showing
+   "⏸ Pause". → "stops by itself" symptom.
+
+2. **`audio.play().catch(...)` triggered the synth fallback.**
+   `await audio.play()` is rejected by browsers when the play promise
+   is interrupted (typical: a second `audio.play()` starts before the
+   first finishes loading, or browser autoplay policy blocks the 2nd+
+   audio in a 4-second-spaced chain on mobile). The outer try/catch
+   then ran a `SpeechSynthesisUtterance` fallback. On a chunk of real
+   browsers (iOS Safari, Chrome on macOS without an enabled system
+   voice, some Linux builds) speechSynthesis is effectively silent —
+   no error, no sound. → "no voice sound" symptom.
+
+3. **No token-based cancellation.** Any interaction that triggered
+   `stopCurrentAudio()` mid-playback (`speak()` from Play Q button,
+   another button calling `stopCurrentAudio`, etc.) called
+   `audio.pause()`. `pause` does NOT fire `onended`, so the autoplay
+   chain's `onEnd` callback never ran. `autoPlayRef.current` stayed
+   `true`, `setIsAutoPlaying(true)` stayed true, the UI kept showing
+   the Pause button — but the chain was dead. → second flavor of
+   "stops by itself".
+
+4. **Manual buttons (Prev/Next/Play Q) didn't stop autoplay.** They
+   each indirectly called `stopCurrentAudio()` via `speak()` or
+   re-rendered the question without halting the chain, so when the
+   currently-playing audio finished (or after the 4-second
+   setTimeout), the chain forcibly set `qIdx` back to its tracked
+   index, overriding the user's navigation. This created a racing
+   feeling where the page seemed unresponsive during Play All.
+
+### What changed
+
+Ported the proven token-based TTS pattern from `app/terms/page.js`
+(which has been working reliably for the Terms & Conversations
+playback). Specifically:
+
+**Replaced module-level TTS helpers** (`app/practice/page.js` lines
+~108-143 originally):
+
+- Added `activeToken` counter alongside `currentAudio`.
+- `stopCurrentAudio()` now bumps `activeToken++`, clears `audio.src`
+  (not just `pause()`), and wraps `speechSynthesis.cancel()` in
+  try/catch.
+- Split monolithic `speakViaApi` into three pieces:
+  - `ttsFetch(text, rate)` → returns the blob or `null` (no
+    playback). Failures are swallowed and the caller falls back.
+  - `playBlob(blob, token)` → returns a Promise that resolves on
+    `onended`, `onerror`, `play().catch()`, or a 20-second safety
+    cap. Token check at entry bails if cancelled.
+  - `playSynth(text, rate, token)` → Promise wrapper around
+    `SpeechSynthesisUtterance` with 15-second safety cap.
+- New `speakViaApi` is a clean async sequence:
+  1. `stopCurrentAudio()` → bump token, kill anything in flight.
+  2. Capture `myToken = activeToken`.
+  3. Fetch blob.
+  4. If token still active: play blob if we got one, otherwise
+     synth-fallback.
+  5. If token still active at the end: fire `onEnd?.()`.
+  - Cancellation is automatic at every `await` boundary — no more
+    "chain alive but UI lying about it" state.
+
+**Tightened autoplay chain + UX** (lines ~271-300):
+
+- `playFromList` continuation guards on `autoPlayRef.current` before
+  scheduling the next `setTimeout`, so a stopAutoPlay between speak
+  and setTimeout doesn't leak a delayed advance.
+- Inter-question delay reduced **4000ms → 1500ms**. 4 seconds of
+  dead silence between questions was way too long and was almost
+  certainly the source of some "did it stop?" confusion reports
+  even when the chain was technically alive.
+- `goPrev` / `goNext` now call `stopAutoPlay()` when autoplay is
+  active, so manual navigation halts the chain instead of racing it.
+- The Listening-mode "🔊 Play Q" button now also calls
+  `stopAutoPlay()` first, so a manual single-question replay during
+  Play All cleanly takes over.
+
+### Why this fixes both reported symptoms
+
+- **"Sometimes it stops by itself":** All three causes — missing
+  safety cap, missing token cancellation on pause, broken interaction
+  with manual buttons — are now covered. The chain is driven by
+  `await` on a promise that ALWAYS resolves (onended OR onerror OR
+  play-reject OR 20s timeout). After the await, the chain checks
+  the token; if still active, it proceeds. Hang is impossible.
+
+- **"Sometimes with no voice sound":** Previously, an interrupted
+  `audio.play()` threw → catch block ran SpeechSynthesisUtterance →
+  silent on certain browsers. Now `audio.play().catch(finish)` just
+  resolves the promise without falling back to synth. We only fall
+  back to synth when the FETCH itself failed (rate limit, network
+  error). When fetch succeeded but play got interrupted, we move on
+  silently rather than trying a fallback that's likely to also be
+  silent — and crucially, the chain keeps going.
+
+### Files touched
+
+- `app/practice/page.js` — TTS helpers and Play All logic only.
+  No other modes (Speak, Text), no other pages, no API routes.
+
+### Not changed
+
+- `/api/speak` endpoint — unchanged. The 20/min rate limit still
+  applies, but the new fetch failure path is graceful (resolve and
+  continue).
+- Terms / Signs / Mock playback — unchanged. They already used the
+  robust pattern; this fix brings Practice in line.
+- The Speak mode in Practice — unchanged. Its single-shot `speak()`
+  calls benefit from the same hardened helpers but the autoplay
+  chain logic is not used there.
+- Q&A translation, filters, navigation, scoring — all untouched.
+- The 4-second pause was replaced with 1.5s — if the user wants the
+  longer delay back, that's a one-character knob.
+
+### Verification
+
+- `npx next build` → ✓ 17/17 routes. `/practice` 7.95 kB → 8.04 kB
+  (+~90 bytes for the token logic, finish wrappers, and safety caps).
+- Manual flow walkthrough (browser, dev server):
+  - Click "▶ Play all" on a list of 10+ questions → each question
+    plays via OpenAI TTS, 1.5s gap, next plays. Chain runs to end.
+  - During autoplay, click "▶ Play Q" on current → autoplay stops,
+    single question replays, chain stays stopped.
+  - During autoplay, click Next/Prev → autoplay stops cleanly, user's
+    navigation takes effect, no zombie advance after 4s.
+  - Simulate /api/speak 429 (would happen at ~20 plays): fetch
+    returns null → playSynth fallback runs → chain continues. No
+    silent hang.
+  - Simulate audio.play() rejection (rapid double-click "Play all"
+    or browser autoplay block on 2nd+ audio): play promise rejects
+    → finish() resolves the playback promise → chain continues to
+    next question. No silent fallback that doesn't work.
+
+### Reversal
+
+- `git checkout HEAD~ -- app/practice/page.js` restores the previous
+  TTS module helpers and autoplay logic.
