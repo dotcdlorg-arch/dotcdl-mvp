@@ -517,3 +517,121 @@ git add components/AppShell.js app/globals.css app/practice/page.js doc/4claudel
 git commit -m "Restore desktop UI to original layout; keep Action 65 top-bar icons as phone-only"
 git push origin main
 ```
+
+---
+
+## Action 67 — Phone UI for Traffic Signs: add top-bar icon controls (Prev / Hear answer / Reveal answer / Next); desktop unchanged
+
+**Files changed:**
+- `app/signs/page.js`
+
+**Why:**
+User: "applied the same edit in phone UI for traffic signs category
+with symbols on top of screen for previous, next, hear answer, and
+reveal answer. this only apply to phone UI for traffic signs
+section." Mirrors the Action-65/66 pattern (top-bar icon row on
+phone, original layout on desktop) onto `/signs`.
+
+### What changed
+
+Single file: `app/signs/page.js`.
+
+1. **Built `topbarActions` fragment** inside `SignsPage()` right
+   after `scoreColor`. Four `.tpa-btn` icon buttons (the class
+   defined in `app/globals.css` during Action 65):
+   - **⏮ Prev** → `prev`, disabled at `idx === 0`. Same handler
+     the in-page "← Prev" button uses.
+   - **🔊 Hear answer** → `speakSignAnswer(\`This sign means
+     ${sign.meaning}. As a driver, I should ${sign.action}.\`)`.
+     Same string the in-page "🔊 Hear answer" green button uses,
+     so audio is identical.
+   - **👁 Reveal answer** → `setResult({ score: null, revealed:
+     true })`. Same state mutation as the in-page "👁 Reveal
+     Answer" button.
+   - **⏭ Next** → `next`. The existing `next()` already wraps via
+     `(i + 1) % filtered.length`, so it's never disabled (matches
+     the in-page "Next Sign →" behavior).
+   Each button has `aria-label` + `title` set to the English
+   action name (Signs page is English-only for sign content, no
+   `tt()` helper).
+
+2. **Passed to AppShell**: `<AppShell ... topbarActions=
+   {topbarActions}>` on the main return path. The no-signs early
+   return (line 96) does NOT pass it — correct, no sign to
+   act on.
+
+3. **In-page Prev/Next bar** (above the textarea): split into
+   two siblings.
+   - Original `<div>` with "← Prev" / "X% complete" / "Next Sign
+     →" → tagged `hide-on-phone`.
+   - New `<div className="hide-on-desktop">` showing just the
+     centered "X% complete" line, so phone users still see their
+     progress without the redundant nav buttons.
+
+4. **Actions row** (under the textarea):
+   - "👁 Reveal Answer" button → added `hide-on-phone`. Phone user
+     taps the top-bar 👁 instead.
+   - "🔊 Hear answer" button → added `hide-on-phone`. Phone user
+     taps the top-bar 🔊.
+   - "✓ Check Answer" and "Clear" buttons → **kept on both**.
+     Check Answer is the primary scoring action (essential
+     in-page workflow), and Clear lives next to the textarea
+     it's clearing. Not part of the user's "move to top" list.
+
+### Behavior matrix
+
+| Element | Desktop (>600px) | Phone (≤600px) |
+|---|---|---|
+| Top-bar icon row | hidden (CSS) | ⏮ 🔊 👁 ⏭ shown |
+| In-page Prev/Next bar | full bar (← Prev / % / Next Sign →) | only "X% complete" indicator |
+| Reveal Answer button | shown (in actions row) | hidden |
+| Hear answer button | shown (in actions row) | hidden |
+| Check Answer button | shown | shown |
+| Clear button | shown | shown |
+| Image / name / textarea / score result | shown | shown |
+
+### Not changed
+
+- Category chip filter, sign image rendering, progress bar,
+  category badge, score badge — all unchanged.
+- The `speakSignAnswer` TTS helper itself — same `north_m` voice,
+  same fallback path. Top-bar 🔊 and in-page 🔊 call the same
+  function with the same string.
+- The "Check Answer" scoring flow (`scoreKeywords` + `/api/progress`
+  POST) — untouched.
+- The `result` panel (score ring, percentage bar, answer-block
+  with Name / Meaning / Driver action / Explanation / Keywords) —
+  untouched. Renders identically on both breakpoints.
+- AppShell, globals.css, practice page, mock page, terms page —
+  none touched. The `topbarActions` plumbing + `.hide-on-phone` /
+  `.hide-on-desktop` utility classes were already in place from
+  Actions 65–66; this action just wires `/signs` into them.
+
+### Verification
+
+- `npx next build` → ✓ 18/18 routes. `/signs` 2.46 → **2.66 kB**
+  (+200 bytes for the topbarActions JSX + 4 icon-button blocks +
+  the duplicated progress indicator). No type / lint errors.
+- Desktop check (1280px): topbar still shows "CDL English Pro"
+  brand with no icon row in the middle (the `.topbar-page-actions`
+  container is `display:none` outside the ≤600px query). In-page
+  Prev/Next bar visible, Reveal Answer + Hear answer buttons
+  visible in the actions row — matches pre-Action-67 layout.
+- Phone check (≤600px): topbar shows "ELP" + ⏮ 🔊 👁 ⏭ + lang +
+  avatar + ☰. In-page Prev/Next bar hidden (only "X% complete"
+  centered shown). Actions row reduced to "✓ Check Answer" +
+  "Clear".
+
+### Reversal
+
+`git checkout HEAD~ -- app/signs/page.js` restores the previous
+signs-page layout (no top-bar icons, full in-page controls on
+both breakpoints).
+
+### Suggested commit
+
+```
+git add app/signs/page.js doc/4claudelog6.md
+git commit -m "Signs (phone UI only): add top-bar ⏮ 🔊 👁 ⏭ icon controls; desktop layout unchanged"
+git push origin main
+```

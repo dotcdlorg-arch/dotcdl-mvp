@@ -101,8 +101,42 @@ export default function SignsPage() {
 
   const scoreColor = result ? (result.score>=80?'var(--green)':result.score>=55?'var(--amber)':'var(--red)') : 'var(--muted)'
 
+  const topbarActions = (
+    <>
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={prev}
+        disabled={idx === 0}
+        aria-label="Previous"
+        title="Previous"
+      >⏮</button>
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={() => speakSignAnswer(`This sign means ${sign.meaning}. As a driver, I should ${sign.action}.`)}
+        aria-label="Hear answer"
+        title="Hear answer"
+      >🔊</button>
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={() => setResult({ score: null, revealed: true })}
+        aria-label="Reveal answer"
+        title="Reveal answer"
+      >👁</button>
+      <button
+        type="button"
+        className="tpa-btn"
+        onClick={next}
+        aria-label="Next"
+        title="Next"
+      >⏭</button>
+    </>
+  )
+
   return (
-    <AppShell lang={lang} setLang={setLang} stats={stats}>
+    <AppShell lang={lang} setLang={setLang} stats={stats} topbarActions={topbarActions}>
       {/* Category chips (Terms-style, single-line scrollable on phone) */}
       <div className="card" style={{ marginBottom: 12 }}>
         <div style={chipRowStyle}>
@@ -151,11 +185,16 @@ export default function SignsPage() {
 
         <p style={{ fontWeight:800, fontSize:'1rem', marginBottom:12 }}>{sign.name}</p>
 
-        {/* Prev/Next moved here — easy reach on phone, no scrolling to bottom */}
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:12 }}>
+        {/* Desktop: full Prev/Next bar */}
+        <div className="hide-on-phone" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:12 }}>
           <button className="btn btn-sm" onClick={prev} disabled={idx === 0}>← Prev</button>
           <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>{pct}% complete</span>
           <button className="btn btn-sm btn-primary" onClick={next}>Next Sign →</button>
+        </div>
+
+        {/* Phone: just progress (Prev/Next live in top bar) */}
+        <div className="hide-on-desktop" style={{ display:'flex', justifyContent:'center', marginBottom:12 }}>
+          <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>{pct}% complete</span>
         </div>
 
         <label>Your English answer — explain this sign and what a driver must do</label>
@@ -168,8 +207,8 @@ export default function SignsPage() {
 
         <div className="actions">
           <button className="btn btn-primary" onClick={checkAnswer} disabled={!answer.trim()}>✓ Check Answer</button>
-          <button className="btn" onClick={() => setResult({ score: null, revealed: true })}>👁 Reveal Answer</button>
-          <button className="btn btn-success btn-sm" onClick={() => speakSignAnswer(`This sign means ${sign.meaning}. As a driver, I should ${sign.action}.`)}>🔊 Hear answer</button>
+          <button className="btn hide-on-phone" onClick={() => setResult({ score: null, revealed: true })}>👁 Reveal Answer</button>
+          <button className="btn btn-success btn-sm hide-on-phone" onClick={() => speakSignAnswer(`This sign means ${sign.meaning}. As a driver, I should ${sign.action}.`)}>🔊 Hear answer</button>
           <button className="btn btn-sm" onClick={() => { setAnswer(''); setResult(null) }}>Clear</button>
         </div>
 
