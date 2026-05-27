@@ -635,3 +635,114 @@ git add app/signs/page.js doc/4claudelog6.md
 git commit -m "Signs (phone UI only): add top-bar ⏮ 🔊 👁 ⏭ icon controls; desktop layout unchanged"
 git push origin main
 ```
+
+---
+
+## Action 68 — Audit project content data and produce `data.md` summary
+
+**Files changed:**
+- `data.md` (new file at project root)
+
+**Why:**
+User: "fully check the project database and create a data.md showing
+individually each section questionary, terms, conversations and other
+related sections amount individually." A static inventory of all
+shipped content so the user can see at a glance how many questions /
+signs / terms / conversations / scenarios the app carries, broken
+down by category, difficulty, language coverage, etc.
+
+### What was audited
+
+Read every static data source the app ships with:
+
+- `data/questions.json` (329 KB) — officer Q&A bank
+- `data/signs.json` (97 KB) — traffic-sign bank
+- `lib/terms.js` (101 KB) — trucking terms + conversation pairs
+- `lib/data.js` — exports, `SCENARIOS`, `Q_CATEGORIES`, etc.
+- `app/mock/page.js → buildMock()` — composition logic for Mock
+- `public/signs/` — image asset directory (84 PNGs)
+
+Audit was done with `node -e "..."` one-liners (no new scripts
+checked in) — required-keyword tallies, category histograms,
+per-language coverage checks, training-mode tag counts.
+
+### Key counts surfaced in `data.md`
+
+- **140 questions** across 5 categories (Identity 30, Route/Cargo
+  30, HOS/ELD 30, Vehicle 30, Accident 20) and 3 difficulties
+  (Beginner 40, Intermediate 56, Mock Test 44). Every Q has
+  explanations in all 5 non-English languages → **700 translated
+  explanations**.
+- **84 traffic signs** across 9 categories (Warning 26 is the
+  largest, Regulatory/Hazmat 1 the smallest). 100% have PNG
+  assets in `public/signs/`. Every sign has explanations in 5
+  languages → **420 translated explanations**.
+- **63 trucking terms** across 6 categories (Documents 19,
+  Core ELD/HOS 12, HOS Concepts 12, Legal/Medical 12, PC/Yard 5,
+  Inspection 3). Every term is fully translated and every term
+  carries a 2-line conversation pair (`inspector` + `driver`)
+  translated into all 5 languages → **315 translated term names
+  + 315 translated conversation pairs (756 lines total across
+  all 6 languages)**.
+- **6 Drive Mode scenarios** defined in `lib/data.js`
+  (`SCENARIOS`).
+- **Mock Inspection** assembles 19 items per attempt: 14 Q
+  (3-3-3-3-2 by category) + 5 random signs.
+
+### Structure of `data.md`
+
+8 numbered sections:
+
+1. Officer Questions — totals, category, difficulty, grid,
+   multilingual coverage, training-mode tags, scoring metadata,
+   per-row schema.
+2. Traffic Signs — same shape as Q but 9 sign categories.
+3. Trucking Terms + Conversations — categories, term-name
+   translations, English conversation count, `convTrans` per-lang
+   coverage, combined totals, per-row schema.
+4. Mock Inspection composition — buildMock plan, 19 items/run.
+5. Drive Mode Scenarios — 6 scenarios with difficulty + source
+   categories.
+6. Languages supported — 6 UI languages and which content each
+   covers.
+7. Grand totals — single flat table of every aggregate count.
+8. Where each section is rendered — URL routes + source files
+   mapping.
+
+### Not changed
+
+- No code changes. `data.md` is pure documentation — does not
+  affect bundle, build, or runtime.
+- No data files (`*.json`, `lib/terms.js`) were modified.
+- No new scripts checked in; the one-liner audit ran via `node
+  -e` in the shell.
+
+### Verification
+
+- File saved at `/Users/jj/.../data.md` (project root, alongside
+  the existing `terms.md` and `termsConvers.md` working notes).
+- Spot-checked counts against the raw data:
+  - `q.length === 140` ✓
+  - `s.length === 84` ✓
+  - `TERMS.length === 63` ✓
+  - `SCENARIOS.length === 6` ✓
+  - All `explanation_*` field-fill checks return n/n ✓
+  - All `convTrans[lang]` checks return 63/63 ✓
+- `npx next build` was **not** re-run for this action (no JS / CSS
+  / config touched, only a new markdown file). Previous green
+  build still applies.
+
+### Refresh policy
+
+`data.md` is a manual snapshot, dated `2026-05-27` at the top. If
+the question/sign/term banks grow, re-run the audit and update.
+The structure is stable, so an LLM can refresh the numbers by
+re-running the same Node.js inspection one-liners.
+
+### Suggested commit
+
+```
+git add data.md doc/4claudelog6.md
+git commit -m "doc: add data.md content inventory (questions / signs / terms / conversations / scenarios)"
+git push origin main
+```
