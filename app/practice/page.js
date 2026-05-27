@@ -447,11 +447,31 @@ function PracticeInner() {
           <button className="btn btn-sm mt-8" onClick={() => speak(q.officer_question_en, 1)}>{tx('playQ')}</button>
         )}
 
-        {/* Explanation */}
-        <details style={{ marginTop:10 }}>
-          <summary>💬 {tx('explanation')}</summary>
-          <p>{getExplanation(q, lang)}</p>
-        </details>
+        {/* Explanation — always visible, full Q + proper response in selected language */}
+        {lang !== 'en' && getExplanation(q, lang) && (
+          <div style={{
+            marginTop: 12,
+            padding: '12px 14px',
+            background: 'var(--bg3)',
+            borderRadius: 6,
+            borderLeft: '3px solid var(--brand)',
+          }}>
+            <div style={{
+              fontSize:'.7rem', fontWeight:700, textTransform:'uppercase',
+              letterSpacing:'.06em', color:'var(--muted)', marginBottom:8,
+              display:'flex', alignItems:'center', gap:8
+            }}>
+              <span>💬 {tx('explanation')}</span>
+              <span style={{
+                fontSize:'.62rem', padding:'1px 6px', borderRadius:4,
+                background:'var(--brand)', color:'#fff', letterSpacing:0, fontWeight:700
+              }}>{lang.toUpperCase()}</span>
+            </div>
+            <p style={{ fontSize:'.88rem', lineHeight:1.65, color:'var(--ink)', margin:0 }}>
+              {getExplanation(q, lang)}
+            </p>
+          </div>
+        )}
 
         {q.required_keywords?.length > 0 && (
           <details>
