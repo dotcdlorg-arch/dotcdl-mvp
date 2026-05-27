@@ -185,7 +185,10 @@ export default function AppShell({ children, lang = 'zh', setLang, stats, topbar
         <div className="topbar-brand">
           <span className="topbar-logo">🚛</span>
           <div>
-            <div className="topbar-title">ELP</div>
+            <div className="topbar-title">
+              <span className="hide-on-phone">CDL English Pro</span>
+              <span className="hide-on-desktop">ELP</span>
+            </div>
             <div className="topbar-sub">Not affiliated with DOT · FMCSA · CVSA</div>
           </div>
         </div>

@@ -614,11 +614,20 @@ function PracticeInner() {
           {p?.score != null && <span className="badge badge-gray">{p.score}/100</span>}
         </div>
 
-        {/* Question position indicator (Prev/Next moved to top bar) */}
-        <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
+        {/* Phone: just position indicator (Prev/Next live in top bar) */}
+        <div className="hide-on-desktop" style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
           <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>
             {filtered.length ? `${safeIdx + 1} / ${filtered.length}` : ''}
           </span>
+        </div>
+
+        {/* Desktop: in-page Prev/Next bar */}
+        <div className="hide-on-phone" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:10 }}>
+          <button className="btn btn-sm" onClick={goPrev} disabled={safeIdx === 0}>{tx('prev')}</button>
+          <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>
+            {filtered.length ? `${safeIdx + 1} / ${filtered.length}` : ''}
+          </span>
+          <button className="btn btn-sm btn-primary" onClick={goNext} disabled={safeIdx === filtered.length - 1}>{tx('next')}</button>
         </div>
 
         {/* Officer question */}
@@ -627,9 +636,10 @@ function PracticeInner() {
         </div>
         <p className="q-officer">{q.officer_question_en}</p>
 
-        {/* Listen controls — Play Q moved to top bar; speed + auto-play stay here */}
+        {/* Listen controls — Play Q is desktop-only (phone uses top bar); speed + auto-play universal */}
         {mode === 'listen' && (
           <div className="flex-c mt-8">
+            <button className="btn btn-sm hide-on-phone" onClick={() => { unlockAudio(); if (autoPlayRef.current) stopAutoPlay(); speak(q.officer_question_en, listenRate) }}>{tx('playQ')}</button>
             {[{label:tx('slow'),v:.7},{label:tx('normal'),v:1},{label:tx('fast'),v:1.3}].map(s => (
               <button key={s.v} className={`btn btn-sm ${listenRate===s.v ? 'btn-primary' : ''}`}
                 onClick={() => setListenRate(s.v)}>{s.label}</button>
@@ -647,7 +657,10 @@ function PracticeInner() {
         </div>
         <div className="answer-block">{q.simple_driver_answer_en}</div>
 
-        {/* Play Q moved to top bar — applies to text mode too */}
+        {/* Play Q for text mode — desktop-only (phone uses top bar) */}
+        {mode === 'text' && (
+          <button className="btn btn-sm mt-8 hide-on-phone" onClick={() => { unlockAudio(); speak(q.officer_question_en, 1) }}>{tx('playQ')}</button>
+        )}
 
         {/* Explanation — always visible, full Q + proper response in selected language */}
         {lang !== 'en' && getExplanation(q, lang) && (
@@ -746,16 +759,27 @@ function PracticeInner() {
           <div style={{ marginTop:16, background:'var(--bg3)', borderRadius:'var(--rs)', border:'1px solid var(--line)', padding:16 }}>
             <div style={{ fontWeight:700, fontSize:'.82rem', marginBottom:10 }}>🎤 {tx('speakTitle')}</div>
 
-            {/* Recording state display — Start/Play moved to top bar */}
-            {isRecording && (
-              <div className="rec-zone recording">
-                <span className="rec-dot" />
-                <span style={{ fontSize:'.84rem', fontWeight:600, color:'var(--red)' }}>Recording…</span>
-                <div className="waveform" style={{ marginTop:8 }}>
-                  {[1,2,3,4,5].map(i => <span key={i} style={{ height: 8 + Math.random()*20 + 'px' }} />)}
-                </div>
-              </div>
-            )}
+            {/* Recording zone — desktop keeps full controls; phone gets status only when recording (Start/Stop in top bar) */}
+            <div className={`rec-zone ${isRecording ? 'recording' : 'hide-on-phone'}`}>
+              {isRecording ? (
+                <>
+                  <span className="rec-dot" />
+                  <span style={{ fontSize:'.84rem', fontWeight:600, color:'var(--red)' }}>Recording…</span>
+                  <div className="waveform" style={{ marginTop:8 }}>
+                    {[1,2,3,4,5].map(i => <span key={i} style={{ height: 8 + Math.random()*20 + 'px' }} />)}
+                  </div>
+                  <button className="btn btn-danger btn-sm hide-on-phone" style={{ marginTop:8 }} onClick={stopRecording}>{tx('stopRec')}</button>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize:'.84rem', color:'var(--muted)', marginBottom:8 }}>Tap to record your English answer</div>
+                  <div className="flex-c" style={{ justifyContent:'center', gap:8 }}>
+                    <button className="btn btn-primary" onClick={startRecording}>{tx('startRec')}</button>
+                    <button className="btn btn-sm" onClick={() => { unlockAudio(); speak(q.officer_question_en, 1) }}>{tx('playQ')}</button>
+                  </div>
+                </>
+              )}
+            </div>
 
             <label style={{ marginTop:12 }}>Your answer (edit if needed)</label>
             <textarea

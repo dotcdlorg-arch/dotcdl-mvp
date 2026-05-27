@@ -369,3 +369,151 @@ git add components/AppShell.js app/globals.css app/practice/page.js doc/4claudel
 git commit -m "Phone UI: move Prev/Next/Play/Record to top bar as icon-only buttons; brand CDL English Pro → ELP"
 git push origin main
 ```
+
+---
+
+## Action 66 — Restore desktop UI to its pre-Action-65 layout; keep Action 65's top-bar icons as phone-only
+
+**Files changed:**
+- `app/globals.css`
+- `components/AppShell.js`
+- `app/practice/page.js`
+
+**Why:**
+User: "All the last edit was only apply to phone UI. recover the
+computer UI to the original layout before the last edit." Action 65
+moved Prev/Next/Play/Record into the top bar and removed the
+in-page versions wholesale — that was meant for phone ergonomics
+only, but it also stripped the desktop layout the user prefers.
+
+### What changed
+
+#### `app/globals.css` — utility visibility classes + scope-narrow the top-bar action slot
+
+- New `.hide-on-phone` (no-op above 600px, `display:none!important`
+  at ≤600px) and `.hide-on-desktop` (`display:none!important` above
+  600px, `display:revert!important` at ≤600px). `display:revert`
+  restores whatever the element's default/inline display is, so
+  flex / block / inline-flex layouts all resume cleanly when the
+  class kicks in.
+- `.topbar-page-actions` now `display:none` by default and only
+  flips to `display:flex` inside the `@media(max-width:600px)`
+  query. Effect: the icon-only action row is **invisible on
+  desktop**, even when a page passes `topbarActions={...}`. Desktop
+  topbars look exactly as they did before Action 65.
+
+#### `components/AppShell.js` — dual brand title
+
+- Replaced the single "ELP" text with two sibling spans inside
+  `.topbar-title`:
+  - `<span className="hide-on-phone">CDL English Pro</span>` →
+    visible on desktop.
+  - `<span className="hide-on-desktop">ELP</span>` → visible on
+    phone.
+- The CSS visibility utilities collapse the other span on each
+  breakpoint, so only one renders at a time. No JS / media-query
+  hook needed.
+- The optional `topbarActions` prop still renders into
+  `.topbar-page-actions`. Because that container is now
+  display:none on desktop (see above), desktop users never see
+  the icon row even though the React tree still contains it. No
+  conditional rendering at the page level required.
+
+#### `app/practice/page.js` — restore in-page Prev/Next, Play Q, idle rec-zone for desktop
+
+Each removed-in-Action-65 element is re-added and tagged with
+`hide-on-phone`. The phone-specific simplifications from Action 65
+are kept and tagged `hide-on-desktop`:
+
+- **Prev/Next bar above the question card**:
+  - Desktop (restored, original styling): full `<div>` with
+    Prev / "N / total" / Next buttons → marked `hide-on-phone`.
+  - Phone (Action 65 simplification): centered "N / total" only →
+    marked `hide-on-desktop`.
+- **Listen-mode 🔊 Play Q button** (line ~598): restored as the
+  first child of the `.flex-c mt-8` row, marked `hide-on-phone`.
+  Speed chips and ▶ Play all / ⏸ Pause stay universal — they
+  always rendered on both breakpoints.
+- **Text-mode 🔊 Play Q button** (line ~617): restored, marked
+  `hide-on-phone`.
+- **Speak-mode `.rec-zone` block** (line ~720):
+  - Full original `isRecording ? recording-UI : idle-UI` ternary
+    restored.
+  - Recording branch keeps the `.rec-dot` + "Recording…" +
+    waveform always (status display still useful on phone), but
+    the Stop button inside it is marked `hide-on-phone` (phone
+    user taps the top-bar ⏹).
+  - Idle branch (the "Tap to record" hint + Start Recording +
+    Play Q) renders normally; the **wrapper** rec-zone div gets
+    `hide-on-phone` appended to its className when not recording,
+    so the dashed-border idle box disappears entirely on phone.
+    Without this, an empty rec-zone box would still draw its
+    dashed border on phone — ugly.
+
+### Behavior matrix
+
+| Element | Desktop (>600px) | Phone (≤600px) |
+|---|---|---|
+| Brand title | CDL English Pro | ELP |
+| Topbar icon row | hidden | ⏮ 🔊 🎤/⏹ ⏭ shown |
+| In-page Prev/Next bar | full bar | only "N / total" indicator |
+| Listen Play Q button | shown | hidden (use top bar) |
+| Text Play Q button | shown | hidden (use top bar) |
+| Speak rec-zone (idle) | full idle UI | not rendered |
+| Speak rec-zone (recording) | red dot + waveform + Stop | red dot + waveform only |
+| Speak top-bar 🎤/⏹ | hidden | shown (in mode === 'speak') |
+
+### Not changed
+
+- Action 65's `topbarActions` plumbing (AppShell prop, the
+  `<>⏮ 🔊 🎤/⏹ ⏭</>` JSX in practice page) — preserved verbatim.
+  The CSS visibility flip does the desktop hiding, so no React
+  state / page logic changes were needed.
+- Phone-specific topbar polish from Action 65 (smaller .topbar
+  padding/gap, smaller .topbar-logo, narrower .lang-select, 34×34
+  .tpa-btn at ≤600px) — kept. Those rules live inside the existing
+  `@media(max-width:600px)` block; they don't affect desktop.
+- All Q&A translation, explanation, scoring, transcript, score
+  result, badges, chips — untouched.
+- Mock / Signs / Terms / Drive / Report — unchanged (they never
+  passed `topbarActions`, so they render the same on both
+  breakpoints, just with the brand-title toggle).
+
+### Verification
+
+- `npx next build` → ✓ 18/18 routes. `/practice` 8.12 → **8.32 kB**
+  (+200 bytes for the duplicated in-page elements + visibility
+  class strings). No type / lint errors.
+- Desktop check (Chrome devtools at 1280px): topbar reads "CDL
+  English Pro · Not affiliated with DOT · FMCSA · CVSA"; no icon
+  row between brand and right-side controls; in-page Prev/Next
+  bar, Play Q in listen/text modes, full Speak idle rec-zone all
+  visible — matches the original layout.
+- Phone check (375×667 viewport): topbar reads "ELP" + ⏮ 🔊 🎤
+  (in speak mode) ⏭ + lang + avatar + menu; in-page Prev/Next bar
+  hidden (only "N / total" centered indicator visible); in-page
+  Play Q buttons hidden; idle rec-zone hidden when not recording;
+  red-dot status visible when recording.
+
+### Reversal
+
+If the user later wants phone-only OR desktop-only behavior
+again, the CSS utility classes are the swing point:
+
+- To revert Action 66 (= apply Action 65 everywhere again):
+  remove the `.hide-on-phone` / `.hide-on-desktop` rules and the
+  `display:none` default on `.topbar-page-actions`. The in-page
+  duplicates can be deleted by removing the elements tagged
+  `hide-on-phone` in `app/practice/page.js`.
+- To revert all the way (= original pre-65 desktop everywhere):
+  ```
+  git checkout HEAD~2 -- components/AppShell.js app/globals.css app/practice/page.js
+  ```
+
+### Suggested commit
+
+```
+git add components/AppShell.js app/globals.css app/practice/page.js doc/4claudelog6.md
+git commit -m "Restore desktop UI to original layout; keep Action 65 top-bar icons as phone-only"
+git push origin main
+```
