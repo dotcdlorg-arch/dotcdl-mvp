@@ -741,3 +741,85 @@ in-card placement, just unaffected by the chip rule.
 
 - `git checkout HEAD~ -- app/practice/page.js app/signs/page.js`
   restores wrap-style chips and bottom-only Prev/Next.
+
+---
+
+## Action 57 — Mobile bottom tab bar: fit all 6 tabs on a single row
+
+**Files changed:**
+- `app/globals.css`
+
+**Why:**
+The fixed-position bottom navigation on phones
+(`.mobile-tabs`) declared `grid-template-columns: repeat(5,
+1fr)` but `AppShell.js` renders **6 tabs**:
+🎧 listen, 🎤 speak, 🚦 signs, 🚔 mock, 🚗 drive, 📚 terms.
+With only 5 columns, the 6th tab (📚 terms) wrapped onto a
+second row — doubling the height of the bottom bar, eating
+viewport space, and looking visually broken. User asked for
+all symbols on a single line.
+
+**Changes — `app/globals.css` (inside the `@media (max-width:
+600px)` block):**
+
+1. `grid-template-columns: repeat(5, 1fr)` → `repeat(6, 1fr)`
+   — matches the actual number of tabs.
+2. `.mobile-tab .mobile-tab-icon` font-size `1.75rem` →
+   `1.35rem` — keeps each icon comfortably inside its now
+   narrower column (375px / 6 ≈ 62px per cell) without
+   touching the neighboring icon.
+3. `.mobile-tab` padding `10px 4px` → `8px 2px` — gives the
+   smaller icons a bit more horizontal breathing room within
+   the cell.
+4. `.mobile-tab` min-height `56px` → `52px` — proportional to
+   the smaller icon, recovers ~4px of viewport vertical space
+   on phone.
+
+Active state untouched (`color: var(--brand)`,
+`transform: scale(1.12)` on the icon).
+
+**Design notes:**
+
+- **Why repeat(6) instead of horizontal scroll like the
+  chips:** the bottom tab bar is a primary navigation
+  surface. Hiding tabs behind a horizontal scroll on a
+  permanent bar would violate the "one tap to anywhere"
+  expectation users have for bottom navs. Six fixed tabs at
+  62px each is the standard phone bottom-bar density (iOS
+  Tab Bar default is similar).
+- **Why 1.35rem icon:** at 375px viewport, each cell is ~62px;
+  1.35rem (≈21.6px) leaves ~20px of horizontal margin on
+  each side of the icon — visually balanced. 1.75rem (28px)
+  would leave only ~17px and risk emoji edges touching the
+  next cell on the 320px iPhone SE width.
+- **Why no labels added:** the tab bar is icon-only by
+  design — labels would require ~30% more vertical space and
+  defeat the compactness goal. Each `<Link>` still has
+  `aria-label` and `title` (set in `AppShell.js`) for
+  accessibility.
+- **Why not touch the desktop sidebar:** the sidebar is a
+  separate layout (`.sidebar`, not `.mobile-tabs`) and was
+  already correct. The bug was entirely contained in the
+  phone media query.
+
+**Not changed:**
+
+- `AppShell.js` — the 6 tab definitions are correct; the bug
+  was the CSS column count. No JSX needed to change.
+- The sidebar nav on tablet/desktop.
+- The top bar / language selector / user menu.
+- Any other CSS rules — only the four lines listed above.
+
+**Verification:**
+
+- `npx next build` → ✓ 17/17 routes, all page sizes
+  unchanged (CSS-only change, JS bundle unaffected).
+- Visual sanity at 375px viewport (iPhone SE / 12 mini):
+  6 cells × ~62px = 372px, fits with the 1px border on
+  each side. Icons sit centered with even spacing.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/globals.css` restores the
+  `repeat(5, 1fr)` / 1.75rem icon layout (with the 6th tab
+  wrapping to a second row).
