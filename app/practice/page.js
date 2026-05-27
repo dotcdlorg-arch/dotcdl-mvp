@@ -82,6 +82,23 @@ const T = {
 
 function t(lang, key) { return (T[lang] || T.en)[key] || T.en[key] || key }
 
+// Chip-row styling: single-line horizontal scroll with smaller chips so all
+// categories fit on a phone screen (swipe to see the rest).
+const chipRowStyle = {
+  display: 'flex',
+  flexWrap: 'nowrap',
+  gap: 6,
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
+  paddingBottom: 4,
+}
+const chipBtnStyle = {
+  flex: '0 0 auto',
+  padding: '4px 10px',
+  fontSize: '.72rem',
+  whiteSpace: 'nowrap',
+}
+
 // Real human voice via OpenAI TTS, fallback to browser synthesis on failure.
 let currentAudio = null
 
@@ -321,11 +338,12 @@ function PracticeInner() {
 
   return (
     <AppShell lang={lang} setLang={setLang} stats={stats}>
-      {/* Category + difficulty chips (Terms-style) */}
+      {/* Category + difficulty chips (Terms-style, single-line scrollable on phone) */}
       <div className="card" style={{ marginBottom: 12 }}>
-        <div className="flex-c" style={{ flexWrap: 'wrap', gap: 6 }}>
+        <div style={chipRowStyle}>
           <button
-            className={`btn btn-sm ${filterCat === 'all' ? 'btn-primary' : ''}`}
+            className={`btn ${filterCat === 'all' ? 'btn-primary' : ''}`}
+            style={chipBtnStyle}
             onClick={() => { setFilterCat('all'); setQIdx(0) }}
           >
             {tx('all')}
@@ -333,16 +351,18 @@ function PracticeInner() {
           {Q_CATEGORIES.map(c => (
             <button
               key={c}
-              className={`btn btn-sm ${filterCat === c ? 'btn-primary' : ''}`}
+              className={`btn ${filterCat === c ? 'btn-primary' : ''}`}
+              style={chipBtnStyle}
               onClick={() => { setFilterCat(c); setQIdx(0) }}
             >
               {c}
             </button>
           ))}
         </div>
-        <div className="flex-c" style={{ flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+        <div style={{ ...chipRowStyle, marginTop: 6 }}>
           <button
-            className={`btn btn-sm ${filterDiff === 'all' ? 'btn-primary' : ''}`}
+            className={`btn ${filterDiff === 'all' ? 'btn-primary' : ''}`}
+            style={chipBtnStyle}
             onClick={() => { setFilterDiff('all'); setQIdx(0) }}
           >
             {tx('all')}
@@ -350,7 +370,8 @@ function PracticeInner() {
           {Q_DIFFICULTIES.map(d => (
             <button
               key={d}
-              className={`btn btn-sm ${filterDiff === d ? 'btn-primary' : ''}`}
+              className={`btn ${filterDiff === d ? 'btn-primary' : ''}`}
+              style={chipBtnStyle}
               onClick={() => { setFilterDiff(d); setQIdx(0) }}
             >
               {d}
@@ -383,6 +404,15 @@ function PracticeInner() {
           {p?.status === 'understood' && <span className="badge badge-green">✓ Understood</span>}
           {p?.status === 'needs_review' && <span className="badge badge-amber">⚑ Review</span>}
           {p?.score != null && <span className="badge badge-gray">{p.score}/100</span>}
+        </div>
+
+        {/* Top prev/next — always visible near the question on phone */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:10 }}>
+          <button className="btn btn-sm" onClick={goPrev} disabled={safeIdx === 0}>{tx('prev')}</button>
+          <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>
+            {filtered.length ? `${safeIdx + 1} / ${filtered.length}` : ''}
+          </span>
+          <button className="btn btn-sm btn-primary" onClick={goNext} disabled={safeIdx === filtered.length - 1}>{tx('next')}</button>
         </div>
 
         {/* Officer question */}
@@ -533,21 +563,15 @@ function PracticeInner() {
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="pager" style={{ marginTop:16 }}>
-          <button className="btn" onClick={goPrev} disabled={safeIdx === 0}>{tx('prev')}</button>
-          <div className="flex-c">
-            <button className="btn btn-amber btn-sm" onClick={() => markStatus(q.question_code, 'needs_review')}>
-              {tx('needReview')}
-            </button>
-          </div>
-          <div className="flex-c">
-            <button className="btn btn-success" onClick={() => {
-              markStatus(q.question_code, 'understood')
-              goNext()
-            }}>{tx('understood')}</button>
-            <button className="btn" onClick={goNext} disabled={safeIdx === filtered.length - 1}>{tx('next')}</button>
-          </div>
+        {/* Bottom actions — review / understood. Prev/Next live at top of card. */}
+        <div className="flex-c" style={{ marginTop:16, justifyContent:'space-between', gap:8 }}>
+          <button className="btn btn-amber btn-sm" onClick={() => markStatus(q.question_code, 'needs_review')}>
+            {tx('needReview')}
+          </button>
+          <button className="btn btn-success" onClick={() => {
+            markStatus(q.question_code, 'understood')
+            goNext()
+          }}>{tx('understood')}</button>
         </div>
       </div>
     </AppShell>

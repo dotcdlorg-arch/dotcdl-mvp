@@ -4,6 +4,23 @@ import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { SIGNS, S_CATEGORIES, getExplanation, scoreKeywords } from '@/lib/data'
 
+// Chip-row styling: single-line horizontal scroll with smaller chips so all
+// categories fit on a phone screen (swipe to see the rest).
+const chipRowStyle = {
+  display: 'flex',
+  flexWrap: 'nowrap',
+  gap: 6,
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
+  paddingBottom: 4,
+}
+const chipBtnStyle = {
+  flex: '0 0 auto',
+  padding: '4px 10px',
+  fontSize: '.72rem',
+  whiteSpace: 'nowrap',
+}
+
 let currentSignAudio = null
 async function speakSignAnswer(text) {
   if (currentSignAudio) { try { currentSignAudio.pause() } catch {}; currentSignAudio = null }
@@ -88,19 +105,21 @@ export default function SignsPage() {
 
   return (
     <AppShell lang={lang} setLang={setLang} stats={stats}>
-      {/* Category chips (Terms-style) */}
+      {/* Category chips (Terms-style, single-line scrollable on phone) */}
       <div className="card" style={{ marginBottom: 12 }}>
-        <div className="flex-c" style={{ flexWrap: 'wrap', gap: 6 }}>
+        <div style={chipRowStyle}>
           <button
-            className={`btn btn-sm ${filterCat === 'all' ? 'btn-primary' : ''}`}
+            className={`btn ${filterCat === 'all' ? 'btn-primary' : ''}`}
+            style={chipBtnStyle}
             onClick={() => { setFilterCat('all'); setIdx(0); setResult(null); setAnswer('') }}
           >
-            All Categories
+            All
           </button>
           {S_CATEGORIES.map(c => (
             <button
               key={c}
-              className={`btn btn-sm ${filterCat === c ? 'btn-primary' : ''}`}
+              className={`btn ${filterCat === c ? 'btn-primary' : ''}`}
+              style={chipBtnStyle}
               onClick={() => { setFilterCat(c); setIdx(0); setResult(null); setAnswer('') }}
             >
               {c}
@@ -140,6 +159,13 @@ export default function SignsPage() {
         </div>
 
         <p style={{ fontWeight:800, fontSize:'1rem', marginBottom:12 }}>{sign.name}</p>
+
+        {/* Prev/Next moved here — easy reach on phone, no scrolling to bottom */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:12 }}>
+          <button className="btn btn-sm" onClick={prev} disabled={idx === 0}>← Prev</button>
+          <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>{pct}% complete</span>
+          <button className="btn btn-sm btn-primary" onClick={next}>Next Sign →</button>
+        </div>
 
         <label>Your English answer — explain this sign and what a driver must do</label>
         <textarea
@@ -190,11 +216,6 @@ export default function SignsPage() {
           </div>
         )}
 
-        <div className="pager" style={{ marginTop:16 }}>
-          <button className="btn" onClick={prev} disabled={idx === 0}>← Prev</button>
-          <span className="text-muted text-sm">{pct}% complete</span>
-          <button className="btn btn-primary" onClick={next}>Next Sign →</button>
-        </div>
       </div>
     </AppShell>
   )

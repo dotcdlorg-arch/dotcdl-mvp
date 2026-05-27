@@ -558,3 +558,186 @@ covers both modes.
 - `git checkout HEAD~ -- app/practice/page.js app/signs/page.js`
   restores the `<select>` dropdowns and source-order
   iteration.
+
+---
+
+## Action 56 — Practice + Signs: single-line scrollable chips + Prev/Next lifted to top of question card
+
+**Files changed:**
+- `app/practice/page.js`
+- `app/signs/page.js`
+
+**Why:**
+After Action 55 replaced the dropdowns with wrap-style chip
+buttons, user reported two phone-UX issues:
+
+1. **Chip wrap.** On a phone, long category labels like "Basic
+   Identity / Documents" forced the chip row to wrap onto 2–3
+   lines, hiding the rest of the categories below the fold and
+   making the filter card take a lot of vertical space.
+2. **Buried Prev/Next.** The Prev/Next buttons live at the
+   bottom of the question card. With expanders (explanation,
+   keywords, mistakes) and the speak/listen panels in between,
+   on a phone the user had to scroll past the entire card to
+   navigate to the next question — which on phone is
+   essentially "scroll to bottom of screen, hit Next, scroll
+   back to top."
+
+**Changes — chip styling (both pages):**
+
+Added two module-scope style objects in both
+`app/practice/page.js` and `app/signs/page.js`:
+
+```js
+const chipRowStyle = {
+  display: 'flex',
+  flexWrap: 'nowrap',
+  gap: 6,
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
+  paddingBottom: 4,        // room for scrollbar / shadow
+}
+const chipBtnStyle = {
+  flex: '0 0 auto',
+  padding: '4px 10px',     // was 6px 12px (.btn-sm)
+  fontSize: '.72rem',      // was .78rem
+  whiteSpace: 'nowrap',
+}
+```
+
+Effect on phone:
+- All category chips render on a **single horizontal line**
+  with native horizontal swipe to reveal the rest. No more
+  vertical wrap eating screen space.
+- Chip font + padding reduced ~10–15% so more chips are
+  visible at once before the user needs to swipe.
+- The `flex: 0 0 auto` + `white-space: nowrap` keeps each chip
+  intact instead of letting flexbox squish them.
+- On desktop the same row also stays single-line and scrolls
+  if needed — visually consistent across breakpoints.
+
+Removed the `btn-sm` class from these chips since
+`chipBtnStyle` now controls the size inline (avoids the
+overspecific `.btn-sm` padding stomping our smaller values).
+
+Search input + "Review only" checkbox kept their previous
+in-card placement, just unaffected by the chip rule.
+
+**Changes — Prev/Next placement on `app/practice/page.js`:**
+
+- **Added a compact prev/next strip at the top of the question
+  card**, immediately after the meta-badge row, before the
+  "👮 Officer question" label:
+
+  ```jsx
+  <div style={{ display:'flex', alignItems:'center',
+                justifyContent:'space-between', gap:8, marginBottom:10 }}>
+    <button className="btn btn-sm" onClick={goPrev} ...>← Previous</button>
+    <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>
+      {safeIdx + 1} / {filtered.length}
+    </span>
+    <button className="btn btn-sm btn-primary" onClick={goNext} ...>Next →</button>
+  </div>
+  ```
+
+  This puts navigation always within thumb reach on phone,
+  without scrolling. Also shows live `n / total` so the user
+  knows their position.
+
+- **Removed Prev/Next from the bottom pager.** The bottom row
+  was reduced to just the two action buttons — `⚑ Review`
+  and `✓ Understood` — laid out with `justify-content:
+  space-between` so they sit on either edge:
+
+  ```jsx
+  <div className="flex-c" style={{ marginTop:16, justifyContent:'space-between', gap:8 }}>
+    <button className="btn btn-amber btn-sm" ...>{tx('needReview')}</button>
+    <button className="btn btn-success" ...>{tx('understood')}</button>
+  </div>
+  ```
+
+  The `✓ Understood` button still auto-advances via `goNext()`
+  (unchanged from before), so the "mark + advance in one tap"
+  flow still works. Users who just want to skip without
+  marking use the top Next button.
+
+**Changes — Prev/Next placement on `app/signs/page.js`:**
+
+- **Added prev/next + percentage strip right after the sign
+  name** (above the answer textarea):
+
+  ```jsx
+  <div style={{ display:'flex', alignItems:'center',
+                justifyContent:'space-between', gap:8, marginBottom:12 }}>
+    <button className="btn btn-sm" onClick={prev} disabled={idx === 0}>← Prev</button>
+    <span style={{ fontSize:'.74rem', color:'var(--muted)', fontWeight:600 }}>{pct}% complete</span>
+    <button className="btn btn-sm btn-primary" onClick={next}>Next Sign →</button>
+  </div>
+  ```
+
+- **Removed the old bottom pager** entirely from the sign
+  card. The bottom of the card now ends with the answer block
+  (when revealed), keeping the card shorter overall.
+
+**Design notes:**
+
+- **Why horizontal scroll instead of just shrinking until it
+  fits:** "Basic Identity / Documents" + "Vehicle Condition" +
+  "Accident / Emergency" + "HOS / ELD" + "Route / Cargo" +
+  "All" can't physically fit a 375px phone screen at any
+  legible font size. Horizontal scroll is the only honest
+  solution; shrinking buttons to fit would mean ~8pt text,
+  which fails accessibility.
+- **Why `WebkitOverflowScrolling: touch`:** smooth momentum
+  scroll on iOS Safari — the default `auto` scroll feels
+  janky there.
+- **Why number indicator (`n / total`) at top of practice
+  page:** The bottom row originally hinted at progress
+  implicitly (you saw Prev/Next reach the disabled state).
+  With Prev/Next now at the top, an explicit counter is the
+  natural way to convey "where am I in the deck."
+- **Why keep `✓ Understood` auto-advance:** breaking that
+  behavior would create extra taps for the user's main flow.
+  Just because Prev/Next moved doesn't mean Understood loses
+  its "and next" semantics.
+- **Why not make the top bar sticky:** sticky in a long
+  scrolling card competes with the global app header and
+  introduces stacking-context bugs across browsers. Putting
+  the bar near the top of the card is good enough: on phone,
+  the card itself starts near the top of the viewport, so the
+  bar is immediately reachable on first render. Users only
+  see it covered when they've intentionally scrolled past it
+  to read details — at which point the bottom action row is
+  itself in reach.
+
+**Not changed:**
+
+- Filter logic (Fisher-Yates shuffle, useMemo deps) from
+  Action 55 — unchanged.
+- The Terms page chips (kept their wrap-style design — Terms
+  has shorter labels and an `icon` prefix per chip, so wrap
+  is acceptable there).
+- TTS helpers on either page.
+- The home page and Mock/Drive pages.
+
+**Verification:**
+
+- `npx next build` → ✓ 17/17 routes.
+  - `/practice` 7.15 → 7.3 kB (+0.15 kB for the duplicated
+    prev/next bar and inline style objects).
+  - `/signs` 2.5 → 2.59 kB (+0.09 kB for the same).
+  - All other route sizes unchanged.
+- Manual sanity (JSX shape):
+  - Practice top of card: meta badges → top prev/next bar
+    (with `n/total`) → officer question label → question
+    text → mode-specific controls → answer → details →
+    speak panel → bottom (Review | Understood).
+  - Signs top of card: badges → progress bar → sign image →
+    sign name → top prev/next bar (with % complete) →
+    answer textarea → action buttons → revealed-answer
+    block.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/practice/page.js app/signs/page.js`
+  restores wrap-style chips and bottom-only Prev/Next.
