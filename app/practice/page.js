@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, useRef, Suspense } from 'react'
+import { useState, useCallback, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords } from '@/lib/data'
@@ -150,18 +150,32 @@ function PracticeInner() {
 
   const tx = (k) => t(lang, k)
 
-  // Filtered questions
-  const filtered = QUESTIONS.filter(q => {
-    if (filterCat !== 'all' && q.category !== filterCat) return false
-    if (filterDiff !== 'all' && q.difficulty !== filterDiff) return false
-    if (search) {
-      const s = search.toLowerCase()
-      if (!q.officer_question_en.toLowerCase().includes(s) &&
-          !q.simple_driver_answer_en.toLowerCase().includes(s)) return false
+  // Filtered + shuffled questions. Shuffle is memoized on filter keys only —
+  // not on `progress` — so marking a question doesn't re-randomize the order
+  // while the user is navigating. The reviewOnly trim happens after the shuffle
+  // so it preserves the random order.
+  const baseFiltered = useMemo(() => {
+    const list = QUESTIONS.filter(q => {
+      if (filterCat !== 'all' && q.category !== filterCat) return false
+      if (filterDiff !== 'all' && q.difficulty !== filterDiff) return false
+      if (search) {
+        const s = search.toLowerCase()
+        if (!q.officer_question_en.toLowerCase().includes(s) &&
+            !q.simple_driver_answer_en.toLowerCase().includes(s)) return false
+      }
+      return true
+    })
+    // Fisher-Yates shuffle — random order, not source order.
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[list[i], list[j]] = [list[j], list[i]]
     }
-    if (reviewOnly && progress[q.question_code]?.status !== 'needs_review') return false
-    return true
-  })
+    return list
+  }, [filterCat, filterDiff, search])
+
+  const filtered = reviewOnly
+    ? baseFiltered.filter(q => progress[q.question_code]?.status === 'needs_review')
+    : baseFiltered
 
   const safeIdx = Math.min(qIdx, Math.max(0, filtered.length - 1))
   const q = filtered[safeIdx]
@@ -307,22 +321,52 @@ function PracticeInner() {
 
   return (
     <AppShell lang={lang} setLang={setLang} stats={stats}>
-      {/* Filters */}
-      <div className="toolbar">
-        <select className="grow" value={filterCat} onChange={e => { setFilterCat(e.target.value); setQIdx(0) }}>
-          <option value="all">{tx('all')}</option>
-          {Q_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <select className="grow" value={filterDiff} onChange={e => { setFilterDiff(e.target.value); setQIdx(0) }}>
-          <option value="all">{tx('all')}</option>
-          {Q_DIFFICULTIES.map(d => <option key={d} value={d}>{d}</option>)}
-        </select>
-        <input type="search" className="grow" placeholder={tx('search')} value={search}
-          onChange={e => { setSearch(e.target.value); setQIdx(0) }} />
-        <label style={{ cursor:'pointer', display:'flex', alignItems:'center', gap:6,
-          background:'var(--bg2)', border:'1px solid var(--line)', borderRadius:'var(--rs)',
-          padding:'9px 12px', fontSize:'.83rem', fontWeight:500, color:'var(--ink2)',
-          flex:'0 0 auto', marginBottom:0, textTransform:'none', letterSpacing:0 }}>
+      {/* Category + difficulty chips (Terms-style) */}
+      <div className="card" style={{ marginBottom: 12 }}>
+        <div className="flex-c" style={{ flexWrap: 'wrap', gap: 6 }}>
+          <button
+            className={`btn btn-sm ${filterCat === 'all' ? 'btn-primary' : ''}`}
+            onClick={() => { setFilterCat('all'); setQIdx(0) }}
+          >
+            {tx('all')}
+          </button>
+          {Q_CATEGORIES.map(c => (
+            <button
+              key={c}
+              className={`btn btn-sm ${filterCat === c ? 'btn-primary' : ''}`}
+              onClick={() => { setFilterCat(c); setQIdx(0) }}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <div className="flex-c" style={{ flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+          <button
+            className={`btn btn-sm ${filterDiff === 'all' ? 'btn-primary' : ''}`}
+            onClick={() => { setFilterDiff('all'); setQIdx(0) }}
+          >
+            {tx('all')}
+          </button>
+          {Q_DIFFICULTIES.map(d => (
+            <button
+              key={d}
+              className={`btn btn-sm ${filterDiff === d ? 'btn-primary' : ''}`}
+              onClick={() => { setFilterDiff(d); setQIdx(0) }}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+        <input
+          type="search"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setQIdx(0) }}
+          placeholder={tx('search')}
+          style={{ marginTop: 10, width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink)', fontSize: '.9rem' }}
+        />
+        <label style={{ cursor:'pointer', display:'inline-flex', alignItems:'center', gap:6,
+          marginTop:10, fontSize:'.83rem', fontWeight:500, color:'var(--ink2)',
+          textTransform:'none', letterSpacing:0 }}>
           <input type="checkbox" checked={reviewOnly}
             onChange={e => setReviewOnly(e.target.checked)}
             style={{ width:'auto', accentColor:'var(--brand)' }} />

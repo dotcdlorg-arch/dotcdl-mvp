@@ -414,3 +414,147 @@ No JSX changes needed.
 
 - `git checkout HEAD~ -- app/terms/page.js` restores the
   sequential / shared-flag implementation.
+
+---
+
+## Action 55 — Practice + Signs: chip-button filters (Terms-style) + random question order
+
+**Files changed:**
+- `app/practice/page.js`
+- `app/signs/page.js`
+
+**Why:**
+User asked to bring the filter UI in the three categories
+**Listening**, **Speak + AI score**, and **Traffic Signs** into
+visual parity with the **Terms** category, which uses chip
+buttons rather than `<select>` dropdowns. Additionally, the
+three categories should present questions/signs in a **random
+order**, not in source-file order, so practice doesn't feel
+predictable.
+
+Listening and Speak + AI both live inside `app/practice/page.js`
+(distinguished by `?mode=listen` / `?mode=speak`), so one edit
+covers both modes.
+
+**Changes — `app/practice/page.js`:**
+
+1. **Replaced two `<select>` dropdowns** (`filterCat`,
+   `filterDiff`) with **chip-button rows** modeled exactly on
+   the Terms page pattern:
+   - `<div className="card">` wrapper.
+   - First row: All + each `Q_CATEGORIES` entry as
+     `btn btn-sm`, active one gets `btn-primary`.
+   - Second row: All + each `Q_DIFFICULTIES` entry, same chip
+     pattern, separated by `marginTop:8`.
+   - Search input moved inside the card (`marginTop:10`,
+     full-width, matching the Terms search styling).
+   - "Review only" checkbox moved inside the same card as an
+     inline-flex label (`marginTop:10`).
+   - Removed the old `toolbar` wrapper.
+
+2. **Randomized question order.** Added `useMemo` import. Split
+   the filter logic into two stages so the shuffle stays stable
+   while `progress` mutates:
+   - `baseFiltered = useMemo(..., [filterCat, filterDiff,
+     search])` — runs the category/difficulty/search filter,
+     then Fisher-Yates shuffles the result in place.
+   - `filtered = reviewOnly ? baseFiltered.filter(...) :
+     baseFiltered` — applies the progress-based "review only"
+     trim AFTER the shuffle, preserving the random order.
+   - Result: when the user marks a question understood or
+     needs-review, the navigation order does NOT jump around;
+     the order only re-randomizes when the user changes
+     category, difficulty, or search text.
+
+3. **`setQIdx(0)` calls preserved** on every chip click and on
+   search input change — same reset behavior as before, just
+   wired through the new buttons.
+
+**Changes — `app/signs/page.js`:**
+
+1. **Replaced category `<select>` dropdown** with chip buttons
+   in the same Terms-style card:
+   - All Categories + each `S_CATEGORIES` entry as
+     `btn btn-sm`, active one gets `btn-primary`.
+   - Search input moved into the same card with consistent
+     styling.
+   - Each chip click still calls `setIdx(0); setResult(null);
+     setAnswer('')` — same side-effects as the old dropdown.
+
+2. **Randomized sign order.** Added `useMemo` import. Wrapped
+   the filter in `useMemo(..., [filterCat, search])` plus
+   in-place Fisher-Yates shuffle. No progress-based filter on
+   this page, so a single memo handles it.
+
+**Design notes:**
+
+- **Why split shuffle from progress filter on practice page:**
+  The original `QUESTIONS.filter(...)` ran every render and
+  included `progress[...]?.status` checks. If I'd thrown the
+  whole thing under `useMemo` with `progress` in deps, the
+  shuffle would re-run every time a status was marked,
+  scrambling the user's navigation order mid-session. Putting
+  `reviewOnly` trim OUTSIDE the memo means: shuffle is
+  deterministic per filter combination, progress changes don't
+  jostle the deck.
+
+- **Why Fisher-Yates and not `sort(() => Math.random()-0.5)`:**
+  The sort-with-random-comparator trick has well-known
+  distribution bias (some browsers' sort implementations
+  amplify it). Fisher-Yates is O(n) and gives a uniform
+  permutation.
+
+- **Why keep `Q_CATEGORIES` / `S_CATEGORIES` strings as button
+  labels with no icons:** Unlike `TERM_CATEGORIES` (which has
+  `icon` / `name_en` / `name_zh` etc.), the questions and
+  signs JSON only carries a plain `category` string. Adding
+  icons would require a parallel icon map and lang variants
+  per category — outside the scope of "change the dropdown to
+  chip style." Visual parity with Terms is preserved (same
+  card, same `btn btn-sm` chips, same active `btn-primary`
+  highlight) even without per-chip icons.
+
+- **Why memoize shuffle deps on filter keys instead of using a
+  ref + effect:** Cleanest expression. The shuffle is a pure
+  function of the filter keys; useMemo is exactly the right
+  primitive. No ref bookkeeping, no effect timing surprises.
+
+**Not changed:**
+
+- `app/terms/page.js` — already had the chip pattern; left
+  untouched.
+- The category/difficulty enums themselves
+  (`Q_CATEGORIES`, `Q_DIFFICULTIES`, `S_CATEGORIES`) in
+  `lib/data.js` — same shape, same source.
+- TTS helpers, recording flow, scoring flow on practice page —
+  untouched.
+- The home page (`app/page.js`) — untouched.
+- The sign-detail rendering (image, answer textarea, score
+  ring, prev/next pager) — untouched.
+- The Mock and Drive pages — untouched (their filter UIs were
+  not in scope).
+
+**Verification:**
+
+- `npx next build` → ✓ 17/17 routes.
+  - `/practice` 6.5 → 7.15 kB (+0.65 kB for `useMemo` import,
+    extra chip JSX, shuffle helper).
+  - `/signs` 2.4 → 2.5 kB (+0.1 kB for same).
+  - All other route sizes unchanged.
+- Manual sanity (review of resulting JSX):
+  - Practice page: chip rows render under the page header,
+    category row first, difficulty row second, then search,
+    then "Review only" checkbox — all inside one card.
+  - Signs page: chip row + search inside one card, then the
+    sign detail card below as before.
+  - Clicking a chip changes the active highlight
+    (`btn-primary`), resets `qIdx`/`idx` to 0, and re-runs the
+    memo (new shuffle for the new filter combination).
+  - Marking a question understood/needs-review does NOT
+    reshuffle (memo deps don't include `progress`).
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/practice/page.js app/signs/page.js`
+  restores the `<select>` dropdowns and source-order
+  iteration.

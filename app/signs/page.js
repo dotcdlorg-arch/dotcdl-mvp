@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { SIGNS, S_CATEGORIES, getExplanation, scoreKeywords } from '@/lib/data'
@@ -40,11 +40,20 @@ export default function SignsPage() {
   const [result, setResult] = useState(null)
   const [progress, setProgress] = useState({})
 
-  const filtered = SIGNS.filter(s => {
-    if (filterCat !== 'all' && s.category !== filterCat) return false
-    if (search && !s.name.toLowerCase().includes(search.toLowerCase())) return false
-    return true
-  })
+  // Filtered + shuffled signs. Random order, re-shuffles only when filter
+  // changes — not on every render — so navigation stays stable.
+  const filtered = useMemo(() => {
+    const list = SIGNS.filter(s => {
+      if (filterCat !== 'all' && s.category !== filterCat) return false
+      if (search && !s.name.toLowerCase().includes(search.toLowerCase())) return false
+      return true
+    })
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[list[i], list[j]] = [list[j], list[i]]
+    }
+    return list
+  }, [filterCat, search])
   const sign = filtered[Math.min(idx, filtered.length - 1)]
   const pct = filtered.length > 0 ? Math.round((idx + 1) / filtered.length * 100) : 0
 
@@ -79,13 +88,32 @@ export default function SignsPage() {
 
   return (
     <AppShell lang={lang} setLang={setLang} stats={stats}>
-      <div className="toolbar">
-        <select className="grow" value={filterCat} onChange={e => { setFilterCat(e.target.value); setIdx(0); setResult(null); setAnswer('') }}>
-          <option value="all">All Categories</option>
-          {S_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <input type="search" className="grow" placeholder="Search sign name…" value={search}
-          onChange={e => { setSearch(e.target.value); setIdx(0); setResult(null); setAnswer('') }} />
+      {/* Category chips (Terms-style) */}
+      <div className="card" style={{ marginBottom: 12 }}>
+        <div className="flex-c" style={{ flexWrap: 'wrap', gap: 6 }}>
+          <button
+            className={`btn btn-sm ${filterCat === 'all' ? 'btn-primary' : ''}`}
+            onClick={() => { setFilterCat('all'); setIdx(0); setResult(null); setAnswer('') }}
+          >
+            All Categories
+          </button>
+          {S_CATEGORIES.map(c => (
+            <button
+              key={c}
+              className={`btn btn-sm ${filterCat === c ? 'btn-primary' : ''}`}
+              onClick={() => { setFilterCat(c); setIdx(0); setResult(null); setAnswer('') }}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <input
+          type="search"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setIdx(0); setResult(null); setAnswer('') }}
+          placeholder="Search sign name…"
+          style={{ marginTop: 10, width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink)', fontSize: '.9rem' }}
+        />
       </div>
 
       <div className="card">
