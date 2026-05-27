@@ -188,13 +188,29 @@ export default function TermsPage() {
                 <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--muted)', fontSize: '.85rem' }}>
                   💬 {tt(lang, 'conversation')}
                 </summary>
-                <div style={{ marginTop: 8, padding: 10, background: 'var(--bg3)', borderRadius: 6, borderLeft: '3px solid var(--brand)', fontSize: '.85rem', lineHeight: 1.55 }}>
-                  <div style={{ marginBottom: 4 }}>
-                    <strong>{tt(lang, 'inspector')}:</strong> {term.inspector}
+                <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {/* English conversation */}
+                  <div style={{ flex: '1 1 240px', padding: 10, background: 'var(--bg3)', borderRadius: 6, borderLeft: '3px solid var(--brand)', fontSize: '.85rem', lineHeight: 1.55 }}>
+                    <div style={{ fontSize: '.7rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>EN</div>
+                    <div style={{ marginBottom: 4 }}>
+                      <strong>{tt(lang, 'inspector')}:</strong> {term.inspector}
+                    </div>
+                    <div>
+                      <strong>{tt(lang, 'driver')}:</strong> {term.driver}
+                    </div>
                   </div>
-                  <div>
-                    <strong>{tt(lang, 'driver')}:</strong> {term.driver}
-                  </div>
+                  {/* Selected-language conversation (skip if lang is en) */}
+                  {lang !== 'en' && term.convTrans?.[lang] && (
+                    <div style={{ flex: '1 1 240px', padding: 10, background: 'var(--bg2)', borderRadius: 6, borderLeft: '3px solid var(--green)', fontSize: '.85rem', lineHeight: 1.55 }}>
+                      <div style={{ fontSize: '.7rem', fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>{lang.toUpperCase()}</div>
+                      <div style={{ marginBottom: 4 }}>
+                        <strong>{tt(lang, 'inspector')}:</strong> {term.convTrans[lang].inspector}
+                      </div>
+                      <div>
+                        <strong>{tt(lang, 'driver')}:</strong> {term.convTrans[lang].driver}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </details>
             )}

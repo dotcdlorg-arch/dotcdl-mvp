@@ -161,3 +161,117 @@ side-by-side.
 - `git checkout HEAD~ -- app/terms/page.js` restores the previous
   layout (always-visible conversation, "Show all languages"
   toggle, single 🔊 Hear button).
+
+---
+
+### Action 53 — Terms: add selected-language translation of conversation, side-by-side with English
+
+**Request:** User asked to "add the translation of select language
+for conversation example, and place it next to conversation
+example." → in each term card, show the inspector/driver
+conversation in the user's selected interface language right next
+to (or below) the English original.
+
+**Files modified:**
+
+1. `lib/terms.js` — added a `convTrans` nested object to every
+   one of the 63 terms. Schema per entry is now:
+   ```js
+   {
+     category, en, zh, vi, es, pa, hi,
+     inspector,  // English
+     driver,     // English
+     convTrans: {
+       zh: { inspector: '…', driver: '…' },
+       vi: { inspector: '…', driver: '…' },
+       es: { inspector: '…', driver: '…' },
+       pa: { inspector: '…', driver: '…' },
+       hi: { inspector: '…', driver: '…' },
+     }
+   }
+   ```
+   Total: **63 terms × 5 languages × 2 lines = 630 new translated
+   strings** for the inspector/driver dialogue, hand-translated to
+   match the natural roadside register (Chinese 简体, Vietnamese,
+   Spanish, Punjabi Gurmukhi, Hindi Devanagari).
+   - "Inspector" address forms are localised: 警官 / thanh tra /
+     inspector / ਸਾਹਬ / निरीक्षक.
+   - "Yes, inspector" tail phrasing kept idiomatic, not literal.
+   - Truck domain nouns (ELD, DVIR, IFTA, MC, USDOT, RODS) left
+     in English since drivers will hear/read them in English at
+     the roadside — matches how the rest of the app treats them.
+
+2. `app/terms/page.js` — inside the existing
+   `<details>` (the click-and-display conversation block from
+   Action 52), wrapped the conversation in a flex container that
+   holds **two side-by-side panels**:
+   - **EN panel** (left): English inspector/driver lines with
+     `borderLeft: 3px solid var(--brand)` (existing blue accent)
+     and a small "EN" header label.
+   - **Selected-lang panel** (right): rendered only when
+     `lang !== 'en'` and `term.convTrans[lang]` exists.
+     `borderLeft: 3px solid var(--green)` to distinguish, with
+     a header showing the language code (`lang.toUpperCase()` →
+     ZH / VI / ES / PA / HI). Inspector/Driver labels reuse the
+     already-translated `tt(lang, 'inspector' / 'driver')`.
+   - Container is `display: flex; flexWrap: wrap; gap: 8`. Each
+     panel `flex: 1 1 240px` — on wide screens the two panels
+     sit side-by-side; on narrow phones they stack. No new media
+     queries needed; native flex wrap handles it.
+
+**Design notes:**
+
+- **English-only mode (`lang === 'en'`)**: the second panel is
+  suppressed entirely (no point showing the same content twice).
+  The EN panel takes the full width of the flex container.
+- **"Place it next to" interpretation:** flex side-by-side
+  (when screen permits) — clearly fulfills "next to". Falls back
+  to stacked on narrow viewports, which is the right tradeoff
+  for mobile readability.
+- **Why not use the term's own translation field (`term[lang]`)
+  as the "explanation"?** The translation is already shown at
+  the top of each card. The new translated conversation is the
+  *real-life usage* in the target language — different content,
+  not a duplicate of the term translation.
+- **Why hand-translate rather than use an API?** No translation
+  API is wired into this codebase, and runtime translation would
+  cost per-request latency + dollar cost on every page view.
+  Bundling the translations into the JS data file makes
+  `/terms` a fully static prerendered page (✓ in the build
+  output) with no network calls for content.
+
+**Not changed:**
+
+- `convTrans` is purely additive. The original `inspector`/
+  `driver` English fields are unchanged so any code reading
+  them keeps working.
+- The 🔊 Hear-term and 🎙️ Play-conversation buttons still play
+  the English audio (the user is practicing English for
+  roadside inspections — TTS in target language is not the goal
+  here; the written translation is for comprehension).
+- `lib/terms.js` `TERMS` ordering, `TERM_CATEGORIES`, all term
+  translations, every other field — unchanged from Action 52.
+- `components/AppShell.js`, all other routes — untouched.
+
+**Verification:**
+
+- `npx next build` → ✓ 17/17 routes. `/terms` 11.6 → 28.8 kB
+  page chunk (+17 kB from inlining the 630 translation strings).
+  First-load JS 144 → 161 kB. Acceptable since `/terms` is a
+  reference view; users open it occasionally and benefit from
+  having no runtime translation calls.
+- Manual flow:
+  - `/terms` with Chinese selected → expand a card's
+    "💬 对话示例" → both EN and ZH panels render side-by-side.
+    Inspector/Driver labels in Chinese in both panels.
+  - Switch language to Spanish (top-right) → same card's
+    second panel now shows ES translation, label changes to
+    "ES". EN panel unchanged.
+  - Switch to English → second panel disappears, EN panel
+    fills the row alone.
+  - On narrow phone width, panels stack vertically (flex-wrap).
+
+**Reversal:**
+
+- `git checkout HEAD~ -- lib/terms.js app/terms/page.js` drops
+  the `convTrans` data + the two-panel render.
