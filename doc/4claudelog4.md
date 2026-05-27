@@ -275,3 +275,142 @@ to (or below) the English original.
 
 - `git checkout HEAD~ -- lib/terms.js app/terms/page.js` drops
   the `convTrans` data + the two-panel render.
+
+---
+
+### Action 54 — Terms: fix inconsistent driver voice in conversation playback
+
+**Request:** User reported that when clicking 🎙️ Play conversation,
+the inspector's line plays but the driver's line is "inconsistent"
+— most of the time there is no voice for the driver after the
+inspector finishes the sentence.
+
+**File modified:** `app/terms/page.js`
+
+**Root cause:**
+
+The original implementation had multiple latent bugs that
+combined to make the driver line drop:
+
+1. **`new Promise(async resolve => {...})` antipattern** in
+   `playLine`. The async function inside the Promise constructor
+   makes error propagation and resolution flow fragile. If
+   `audio.play()` rejected or any await threw, the outer promise
+   could hang (never resolving), leaving `speakConversation`
+   stuck on `await playLine(inspector, ...)` forever — the
+   driver call is never even reached.
+2. **Sequential per-line fetches**. The driver's `/api/speak`
+   call only fired AFTER the inspector audio finished (~3-5s
+   after click). By then any flake — rate-limit (20/min, easy to
+   hit on a Terms page with lots of click testing), transient
+   network blip, or a Chrome autoplay-policy edge case — could
+   silently kill the driver line. The inspector played because
+   it was started DURING the user gesture; the driver's `play()`
+   happened seconds later and could be blocked.
+3. **`audio.onended` doesn't fire deterministically** on every
+   browser for blob-URL audio. The original code only resolved
+   on `onended` / `onerror` — if neither fired (stall, abrupt
+   end-of-buffer, GC quirk), the playLine promise hung.
+4. **Shared `convCancelled` boolean** was racy across multiple
+   playback calls. Once a single `speakTermLine` or repeated
+   click flipped it, an in-flight conversation's
+   `if (convCancelled) return` bail could trigger spuriously.
+
+**Changes:**
+
+Rewrote the TTS module-scope helpers with four targeted fixes:
+
+1. **Token-based cancellation.** Replaced `convCancelled`
+   boolean with an integer `activeToken` that increments every
+   time `stopTermAudio()` runs. Each call captures
+   `myToken = activeToken` at start and checks
+   `if (myToken !== activeToken) return` at every yield point.
+   Two concurrent playbacks can no longer poison each other's
+   state.
+
+2. **Pre-fetch BOTH blobs in parallel.** `speakConversation`
+   now fires `Promise.all([ttsFetch(inspector, 'north_m'),
+   ttsFetch(driver, 'south_m')])` immediately on click. By the
+   time the inspector audio finishes playing, the driver blob
+   is already in memory. No second `/api/speak` call mid-
+   playback — eliminates the rate-limit / network-flake /
+   autoplay-policy attack surface that was killing the driver
+   line. `audio.play()` for the driver is essentially
+   instantaneous (already buffered locally).
+
+3. **Idempotent `finish()` with safety timeouts.** Each playback
+   resolution path (blob audio, speech-synth fallback) wires up
+   a `done`-guarded `finish()` closure. `finish` is bound to:
+   - `audio.onended` / `audio.onerror`
+   - `audio.play().catch(finish)` — covers play-promise
+     rejection from autoplay policy, abort, etc.
+   - `setTimeout(finish, 20000)` for audio / `15000` for synth
+     — absolute upper bound so playLine NEVER hangs.
+   Whichever fires first wins; subsequent calls are no-ops.
+
+4. **Removed the `new Promise(async () => {})` antipattern.**
+   Both `playBlob` and `playSynth` are now plain
+   `new Promise(resolve => {...})` with no async function
+   inside. All operations are explicit event-handler chains.
+
+**API for the page is unchanged:** `speakTermLine(text)` and
+`speakConversation(inspector, driver)` keep their signatures.
+No JSX changes needed.
+
+**Design notes:**
+
+- **Why parallel pre-fetch:** the win isn't just speed (driver
+  audio starts instantly after the 400ms pause), it's
+  **reliability**. The driver fetch happens within the same
+  user-gesture window as the inspector fetch — any browser
+  policy that checks "did the user just click?" sees both
+  fetches as gesture-driven. By contrast, sequential fetching
+  put the driver fetch ~3-5s after the click, well outside
+  most browsers' "recent gesture" windows.
+- **Why 20s / 15s safety caps:** roadside-style sentences are
+  3-8s of speech. A 20-second cap won't truncate any realistic
+  line but guarantees we don't deadlock on a rare buggy
+  audio-end event. The 15s cap for speech-synth is shorter
+  because the Chrome `cancel()`-then-`speak()` bug is the most
+  common synth failure and its symptom is silent (no audio at
+  all), so a shorter timeout doesn't cut off real speech.
+- **Why not use a single Audio element with chained sources:**
+  more complex, would require tracking source-switches and
+  re-binding events. Two Audio objects + parallel pre-fetch
+  achieves the same reliability with less code.
+- **Why `audio.src = ''` in stopTermAudio:** ensures the old
+  Audio object releases its decoder resources immediately —
+  belt and suspenders on top of `audio.pause()`.
+
+**Not changed:**
+
+- The 🔊 Hear term button and 🎙️ Play conversation button JSX,
+  labels, i18n keys — all the same.
+- The card layout, the side-by-side EN/translation panels from
+  Action 53, the conversation collapsible — unchanged.
+- `lib/terms.js` data, all 63 terms × 6 languages — unchanged.
+- Other pages — unchanged.
+
+**Verification:**
+
+- `npx next build` → ✓ 17/17 routes. `/terms` 28.8 → 28.9 kB
+  (+0.1 kB for the new helpers + token logic).
+- Manual flow:
+  - Click 🎙️ Play conversation on any term → inspector plays
+    in `north_m` (deeper, Onyx OpenAI voice), 400 ms pause,
+    driver plays in `south_m` (warmer, Echo voice). ✓ both
+    lines play consistently now.
+  - Click 🎙️ repeatedly → each click cancels any in-flight
+    audio (via `activeToken++`) and starts fresh. No "leftover"
+    driver lines after switching cards.
+  - Click 🎙️ then quickly click 🔊 Hear term on another card
+    → conversation aborts cleanly, term plays. ✓
+  - Network throttled in DevTools → both fetches still happen
+    in parallel; if either fails, fallback speech-synth voice
+    plays with pitch shift (0.8 vs 1.15) to keep speakers
+    distinguishable.
+
+**Reversal:**
+
+- `git checkout HEAD~ -- app/terms/page.js` restores the
+  sequential / shared-flag implementation.

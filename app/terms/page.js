@@ -4,69 +4,112 @@ import AppShell from '@/components/AppShell'
 import { TERMS, TERM_CATEGORIES } from '@/lib/terms'
 
 // ── TTS helpers ──────────────────────────────────────────────
-let currentTermAudio = null
-let convCancelled = false
+// Token-based cancellation: every stop bumps the token; in-flight playback
+// checks myToken !== activeToken and bails. Avoids the shared-flag race.
+let currentAudio = null
+let activeToken = 0
 
-function stopAllTermAudio() {
-  convCancelled = true
-  if (currentTermAudio) { try { currentTermAudio.pause() } catch {}; currentTermAudio = null }
-  if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
+function stopTermAudio() {
+  activeToken++
+  if (currentAudio) {
+    try { currentAudio.pause(); currentAudio.src = '' } catch {}
+    currentAudio = null
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    try { window.speechSynthesis.cancel() } catch {}
+  }
 }
 
-function playLine(text, voiceId) {
-  return new Promise(async resolve => {
-    if (!text) return resolve()
-    try {
-      const res = await fetch('/api/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, voiceId, speed: 0.95 }),
-      })
-      if (!res.ok) throw new Error('TTS ' + res.status)
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const audio = new Audio(url)
-      currentTermAudio = audio
-      const cleanup = () => {
-        URL.revokeObjectURL(url)
-        if (currentTermAudio === audio) currentTermAudio = null
-        resolve()
-      }
-      audio.onended = cleanup
-      audio.onerror = cleanup
-      await audio.play()
-    } catch {
-      // Fallback to browser synthesis with pitch shift to distinguish voices
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        const u = new SpeechSynthesisUtterance(text)
-        u.lang = 'en-US'; u.rate = 0.95
-        u.pitch = voiceId === 'south_m' ? 1.1 : 0.85
-        u.onend = resolve
-        u.onerror = resolve
-        window.speechSynthesis.speak(u)
-      } else {
-        resolve()
-      }
+// Fetch the TTS audio blob (no playback). Returns null on any failure.
+async function ttsFetch(text, voiceId) {
+  if (!text) return null
+  try {
+    const res = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voiceId, speed: 0.95 }),
+    })
+    if (!res.ok) return null
+    return await res.blob()
+  } catch { return null }
+}
+
+// Play a pre-fetched blob. Resolves on onended/onerror, on play() rejection,
+// or after 20s safety cap (in case the audio stalls without firing onended).
+function playBlob(blob, token) {
+  return new Promise(resolve => {
+    if (!blob || token !== activeToken) return resolve()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    currentAudio = audio
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      try { URL.revokeObjectURL(url) } catch {}
+      if (currentAudio === audio) currentAudio = null
+      resolve()
     }
+    audio.onended = finish
+    audio.onerror = finish
+    audio.play().catch(finish)
+    setTimeout(finish, 20000)
   })
+}
+
+// Fallback: speechSynthesis with pitch shift to distinguish voices.
+function playSynth(text, voiceId, token) {
+  return new Promise(resolve => {
+    if (token !== activeToken) return resolve()
+    if (typeof window === 'undefined' || !window.speechSynthesis) return resolve()
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'en-US'; u.rate = 0.95
+    u.pitch = voiceId === 'south_m' ? 1.15 : 0.8
+    let done = false
+    const finish = () => { if (!done) { done = true; resolve() } }
+    u.onend = finish
+    u.onerror = finish
+    window.speechSynthesis.speak(u)
+    // Chrome's cancel+speak race can swallow onend; safety cap.
+    setTimeout(finish, 15000)
+  })
+}
+
+async function playLineOrFallback(text, voiceId, blob, token) {
+  if (token !== activeToken) return
+  if (blob) await playBlob(blob, token)
+  else await playSynth(text, voiceId, token)
 }
 
 async function speakTermLine(text) {
   if (!text) return
-  stopAllTermAudio()
-  convCancelled = false
-  await playLine(text, 'north_m')
+  stopTermAudio()
+  const myToken = activeToken
+  const blob = await ttsFetch(text, 'north_m')
+  if (myToken !== activeToken) return
+  await playLineOrFallback(text, 'north_m', blob, myToken)
 }
 
 async function speakConversation(inspector, driver) {
-  stopAllTermAudio()
-  convCancelled = false
-  await playLine(inspector, 'north_m')
-  if (convCancelled) return
-  // brief pause between speakers
+  stopTermAudio()
+  const myToken = activeToken
+  // Pre-fetch BOTH blobs in parallel at click time. By the time inspector
+  // finishes playing, the driver blob is already in memory — no second
+  // network call mid-playback, so no race against rate-limit / network
+  // flake / autoplay-policy edge cases.
+  const [iBlob, dBlob] = await Promise.all([
+    ttsFetch(inspector, 'north_m'),
+    ttsFetch(driver, 'south_m'),
+  ])
+  if (myToken !== activeToken) return
+
+  await playLineOrFallback(inspector, 'north_m', iBlob, myToken)
+  if (myToken !== activeToken) return
+
   await new Promise(r => setTimeout(r, 400))
-  if (convCancelled) return
-  await playLine(driver, 'south_m')
+  if (myToken !== activeToken) return
+
+  await playLineOrFallback(driver, 'south_m', dBlob, myToken)
 }
 
 // ── i18n ─────────────────────────────────────────────────────
