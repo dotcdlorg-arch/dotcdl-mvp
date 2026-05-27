@@ -126,3 +126,78 @@ git add app/practice/page.js app/terms/page.js app/signs/page.js doc/4claudelog6
 git commit -m "Remove search-question/term/sign box from Practice (Listening + Speak + AI), Terms, and Signs pages"
 git push origin main
 ```
+
+---
+
+## Action 64 — Enlarge English conversation lines in 问答翻译 (Q&A translation) card to match the selected-language explanation size
+
+**Files changed:**
+- `app/practice/page.js`
+
+**Why:**
+User: "enlarge the font size to match the same size as selective
+language translation for speaking + AI Score/问答翻译 fields." After
+clarification (the Q&A translated text was already `.92rem` —
+already larger than the `.88rem` explanation body — so the visible
+mismatch was the English-original italic subtitles at `.78rem`),
+the user confirmed: "match the font size for English conversation
+with selective language explanation in 问答翻译 field." So the
+target is the English original subtitle lines, brought up to match
+the 💬 Explanation card's body size.
+
+### What changed
+
+Two `<div>` style objects inside the Q&A translation card in
+`app/practice/page.js`:
+
+- The 👮 Officer question English subtitle (the italic muted line
+  showing `q.officer_question_en` directly below the translated
+  Chinese/Hindi/etc. version): `fontSize:'.78rem'` → `'.88rem'`,
+  added `lineHeight:1.65`.
+- The ✅ Answer English subtitle (italic muted line showing
+  `q.simple_driver_answer_en` below the translated answer):
+  `fontSize:'.78rem'` → `'.88rem'`, added `lineHeight:1.65`.
+
+Both now match the body text of the 💬 selected-language
+Explanation block (which uses `fontSize:'.88rem', lineHeight:1.65`)
+that lives just above the Q&A translation card on the same screen.
+
+### Not changed
+
+- The translated text (`trans.q`, `trans.a`) — still `.92rem` /
+  `lineHeight:1.55`. The user asked specifically about matching the
+  English conversation lines, not flattening the whole hierarchy.
+- Italic + muted color on the English subtitles — preserved. They
+  still read as "the original" relative to the brighter `.ink`
+  colored translated text above each.
+- The 💬 Explanation block — untouched (it's the reference, not
+  the target).
+- Other size tokens in the card — `.7rem` UPPERCASE card label,
+  `.68rem` per-side sub-labels (👮 Officer / ✅ Answer), `.62rem`
+  language pill — all unchanged.
+- Listening mode and AI-score mode UI — share the same render path
+  (`{lang !== 'en' && ...}`), so the change benefits both modes
+  automatically. No mode-specific code touched.
+
+### Verification
+
+- `npx next build` → ✓ 18/18 routes. `/practice` 8.11 kB unchanged
+  (style-string churn fits in the same minified chunk).
+- The English subtitles now sit at the same line-height and font
+  size as the explanation paragraph above, so when a user reads
+  💬 explanation → 🌐 Q&A translation back-to-back the secondary
+  English lines no longer shrink visually.
+
+### Reversal
+
+`git checkout HEAD~ -- app/practice/page.js` restores the previous
+`.78rem` italic subtitles (only practice page changed this
+action).
+
+### Suggested commit
+
+```
+git add app/practice/page.js doc/4claudelog6.md
+git commit -m "Practice: enlarge English subtitle lines in Q&A translation card to .88rem to match selected-language explanation"
+git push origin main
+```

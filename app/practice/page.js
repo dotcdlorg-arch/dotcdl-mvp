@@ -680,7 +680,7 @@ function PracticeInner() {
                     <div style={{ fontSize:'.92rem', lineHeight:1.55, color:'var(--ink)' }}>
                       {trans.q}
                     </div>
-                    <div style={{ fontSize:'.78rem', color:'var(--muted)', marginTop:2, fontStyle:'italic' }}>
+                    <div style={{ fontSize:'.88rem', lineHeight:1.65, color:'var(--muted)', marginTop:2, fontStyle:'italic' }}>
                       {q.officer_question_en}
                     </div>
                   </div>
@@ -691,7 +691,7 @@ function PracticeInner() {
                     <div style={{ fontSize:'.92rem', lineHeight:1.55, color:'var(--ink)' }}>
                       {trans.a}
                     </div>
-                    <div style={{ fontSize:'.78rem', color:'var(--muted)', marginTop:2, fontStyle:'italic' }}>
+                    <div style={{ fontSize:'.88rem', lineHeight:1.65, color:'var(--muted)', marginTop:2, fontStyle:'italic' }}>
                       {q.simple_driver_answer_en}
                     </div>
                   </div>
