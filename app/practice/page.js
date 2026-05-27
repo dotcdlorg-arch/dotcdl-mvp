@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, useMemo, useRef, Suspense } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords } from '@/lib/data'
@@ -9,6 +9,7 @@ const T = {
   en:{ all:'All', search:'Search questions…', reviewOnly:'Review only', prev:'← Previous', next:'Next →',
     understood:'✓ Understood', needReview:'⚑ Review', officer:'Officer question', answer:'Standard answer',
     explanation:'Explanation', keywords:'Keywords', mistakes:'Common mistakes',
+    qaTrans:'Q&A translation', translating:'Translating…',
     listenTitle:'Listening practice mode', speakTitle:'Speak + AI pronunciation score',
     slow:'Slow 0.7×', normal:'Normal 1×', fast:'Fast 1.3×',
     playQ:'🔊 Play question', startRec:'🎤 Start recording', stopRec:'⏹ Stop', clearAns:'Clear',
@@ -21,6 +22,7 @@ const T = {
   zh:{ all:'全部', search:'搜索题目…', reviewOnly:'只看复习', prev:'← 上一题', next:'下一题 →',
     understood:'✓ 已理解', needReview:'⚑ 复习', officer:'警官问题', answer:'标准答案',
     explanation:'母语解释', keywords:'关键词', mistakes:'常见错误',
+    qaTrans:'问答翻译', translating:'翻译中…',
     listenTitle:'听力练习模式', speakTitle:'口语 + AI 发音评分',
     slow:'慢速 0.7×', normal:'正常 1×', fast:'快速 1.3×',
     playQ:'🔊 播放问题', startRec:'🎤 开始录音', stopRec:'⏹ 停止', clearAns:'清空',
@@ -33,6 +35,7 @@ const T = {
   es:{ all:'Todo', search:'Buscar…', reviewOnly:'Solo repaso', prev:'← Anterior', next:'Siguiente →',
     understood:'✓ Entendido', needReview:'⚑ Repasar', officer:'Pregunta del oficial', answer:'Respuesta',
     explanation:'Explicación', keywords:'Palabras clave', mistakes:'Errores comunes',
+    qaTrans:'Traducción de Q&A', translating:'Traduciendo…',
     listenTitle:'Modo de escucha', speakTitle:'Habla + Calificación AI',
     slow:'Lento 0.7×', normal:'Normal 1×', fast:'Rápido 1.3×',
     playQ:'🔊 Escuchar', startRec:'🎤 Grabar', stopRec:'⏹ Detener', clearAns:'Borrar',
@@ -45,6 +48,7 @@ const T = {
   hi:{ all:'सभी', search:'खोजें…', reviewOnly:'केवल समीक्षा', prev:'← पिछला', next:'अगला →',
     understood:'✓ समझ गया', needReview:'⚑ समीक्षा', officer:'अधिकारी प्रश्न', answer:'उत्तर',
     explanation:'व्याख्या', keywords:'कीवर्ड', mistakes:'गलतियाँ',
+    qaTrans:'प्रश्न-उत्तर अनुवाद', translating:'अनुवाद हो रहा है…',
     listenTitle:'सुनने का मोड', speakTitle:'बोलना + AI स्कोर',
     slow:'धीमा', normal:'सामान्य', fast:'तेज़',
     playQ:'🔊 सुनें', startRec:'🎤 रिकॉर्ड', stopRec:'⏹ रोकें', clearAns:'साफ़',
@@ -57,6 +61,7 @@ const T = {
   pa:{ all:'ਸਾਰੇ', search:'ਖੋਜੋ…', reviewOnly:'ਕੇਵਲ ਦੁਹਰਾਈ', prev:'← ਪਿਛਲਾ', next:'ਅਗਲਾ →',
     understood:'✓ ਸਮਝ ਗਿਆ', needReview:'⚑ ਦੁਹਰਾਈ', officer:'ਅਫਸਰ ਸਵਾਲ', answer:'ਜਵਾਬ',
     explanation:'ਵਿਆਖਿਆ', keywords:'ਕੀਵਰਡ', mistakes:'ਗਲਤੀਆਂ',
+    qaTrans:'ਸਵਾਲ-ਜਵਾਬ ਅਨੁਵਾਦ', translating:'ਅਨੁਵਾਦ ਹੋ ਰਿਹਾ ਹੈ…',
     listenTitle:'ਸੁਣਨ ਮੋਡ', speakTitle:'ਬੋਲਣਾ + AI ਸਕੋਰ',
     slow:'ਹੌਲੀ', normal:'ਸਧਾਰਨ', fast:'ਤੇਜ਼',
     playQ:'🔊 ਸੁਣੋ', startRec:'🎤 ਰਿਕਾਰਡ', stopRec:'⏹ ਰੋਕੋ', clearAns:'ਸਾਫ਼',
@@ -69,6 +74,7 @@ const T = {
   vi:{ all:'Tất cả', search:'Tìm kiếm…', reviewOnly:'Chỉ ôn lại', prev:'← Trước', next:'Tiếp →',
     understood:'✓ Đã hiểu', needReview:'⚑ Ôn lại', officer:'Câu hỏi viên chức', answer:'Câu trả lời',
     explanation:'Giải thích', keywords:'Từ khóa', mistakes:'Lỗi thường gặp',
+    qaTrans:'Bản dịch Hỏi-Đáp', translating:'Đang dịch…',
     listenTitle:'Chế độ nghe', speakTitle:'Nói + Chấm điểm AI',
     slow:'Chậm', normal:'Bình thường', fast:'Nhanh',
     playQ:'🔊 Nghe', startRec:'🎤 Ghi âm', stopRec:'⏹ Dừng', clearAns:'Xóa',
@@ -161,6 +167,7 @@ function PracticeInner() {
   const [scoring, setScoring] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [progress, setProgress] = useState({})
+  const [qaTrans, setQaTrans] = useState({})
   const mrRef = useRef(null)
   const autoPlayRef = useRef(false)
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
@@ -197,6 +204,44 @@ function PracticeInner() {
   const safeIdx = Math.min(qIdx, Math.max(0, filtered.length - 1))
   const q = filtered[safeIdx]
   const p = q ? progress[q.question_code] : null
+
+  // Fetch Q&A translation for the current question/lang. Uses localStorage as a
+  // persistent cache so each user pays the OpenAI cost at most once per
+  // (question_code, lang) pair, ever.
+  useEffect(() => {
+    if (!q || lang === 'en') return
+    const code = q.question_code
+    const key = `${code}-${lang}`
+    if (qaTrans[key]) return
+    try {
+      const cached = localStorage.getItem(`qatrans:${key}`)
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (parsed?.q && parsed?.a) {
+          setQaTrans(prev => ({ ...prev, [key]: parsed }))
+          return
+        }
+      }
+    } catch {}
+    let cancelled = false
+    fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        strings: [q.officer_question_en, q.simple_driver_answer_en],
+        targetLang: lang,
+      }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (cancelled || !data?.translations || data.translations.length < 2) return
+        const entry = { q: data.translations[0], a: data.translations[1] }
+        setQaTrans(prev => ({ ...prev, [key]: entry }))
+        try { localStorage.setItem(`qatrans:${key}`, JSON.stringify(entry)) } catch {}
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [q?.question_code, lang, qaTrans])
 
   const stats = {
     seen: Object.values(progress).filter(v => v.viewCount > 0).length,
@@ -473,12 +518,62 @@ function PracticeInner() {
           </div>
         )}
 
-        {q.required_keywords?.length > 0 && (
-          <details>
-            <summary>🔑 {tx('keywords')}</summary>
-            <div className="chips">{q.required_keywords.map(k => <span key={k} className="chip">{k}</span>)}</div>
-          </details>
-        )}
+        {/* Q&A translation — replaces the old Keywords field on Listening + Speak modes.
+            Auto-fetches via /api/translate; shows cached translation immediately on revisit. */}
+        {lang !== 'en' && (() => {
+          const trans = qaTrans[`${q.question_code}-${lang}`]
+          return (
+            <div style={{
+              marginTop: 10,
+              padding: '12px 14px',
+              background: 'var(--bg2)',
+              borderRadius: 6,
+              border: '1px solid var(--line)',
+            }}>
+              <div style={{
+                fontSize:'.7rem', fontWeight:700, textTransform:'uppercase',
+                letterSpacing:'.06em', color:'var(--muted)', marginBottom:8,
+                display:'flex', alignItems:'center', gap:8
+              }}>
+                <span>🌐 {tx('qaTrans')}</span>
+                <span style={{
+                  fontSize:'.62rem', padding:'1px 6px', borderRadius:4,
+                  background:'var(--green)', color:'#fff', letterSpacing:0, fontWeight:700
+                }}>{lang.toUpperCase()}</span>
+              </div>
+              {!trans ? (
+                <p style={{ fontSize:'.85rem', color:'var(--muted)', margin:0, fontStyle:'italic' }}>
+                  {tx('translating')}
+                </p>
+              ) : (
+                <>
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:'.68rem', fontWeight:700, color:'var(--muted)', marginBottom:3, textTransform:'uppercase', letterSpacing:'.05em' }}>
+                      👮 {tx('officer')}
+                    </div>
+                    <div style={{ fontSize:'.92rem', lineHeight:1.55, color:'var(--ink)' }}>
+                      {trans.q}
+                    </div>
+                    <div style={{ fontSize:'.78rem', color:'var(--muted)', marginTop:2, fontStyle:'italic' }}>
+                      {q.officer_question_en}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:'.68rem', fontWeight:700, color:'var(--muted)', marginBottom:3, textTransform:'uppercase', letterSpacing:'.05em' }}>
+                      ✅ {tx('answer')}
+                    </div>
+                    <div style={{ fontSize:'.92rem', lineHeight:1.55, color:'var(--ink)' }}>
+                      {trans.a}
+                    </div>
+                    <div style={{ fontSize:'.78rem', color:'var(--muted)', marginTop:2, fontStyle:'italic' }}>
+                      {q.simple_driver_answer_en}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )
+        })()}
 
         {q.common_mistakes?.length > 0 && (
           <details>
