@@ -7,3 +7,7 @@
 npm-debug.log*
 .DS_Store
 .vercel
+
+# Vendored Claude/agent skill packs — each subdir is its own git clone with
+# nested .git. Update locally via `git -C skills/<repo> pull`; don't track.
+/skills/

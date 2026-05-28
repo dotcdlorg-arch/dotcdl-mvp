@@ -746,3 +746,503 @@ git add data.md doc/4claudelog6.md
 git commit -m "doc: add data.md content inventory (questions / signs / terms / conversations / scenarios)"
 git push origin main
 ```
+
+---
+
+## Action 69 — Audit project state against improvement plans and produce `doc/2improve.md`
+
+**Files changed:**
+- `doc/2improve.md` (new)
+
+**Why:**
+User: "do a fully analysis and inspection and create doc/2improve.md
+by referring doc/1improve.md, and doc/2gptimprove.md. List what
+parts has been accomplished while parts still need to improve for
+current project. Referring to series of 4claudelog.md log files
+writer in clear and easy to read format." A single consolidated
+status doc the user can scan to see what's been done across 68
+logged actions vs what the two improvement docs originally laid out.
+
+### What was audited
+
+- Read `doc/1improve.md` (816 lines, Chinese architectural analysis,
+  v2.1.0 baseline) — 11-problem severity list, 16-section target
+  architecture, 3-stage refactor plan.
+- Read `doc/2gptimprove.md` (738 lines, Chinese phased execution
+  plan) — 6 phases, P0/P1/P2/P3 priority levels, 18 numbered
+  steps, 12 product-decision questions.
+- Grep'd all 6 `doc/4claudelog*.md` files for `^## Action` and
+  `^### Action` headers to enumerate the 68 completed actions
+  with their titles.
+- Inspected current source state:
+  - `app/loading.js`, `app/error.js`, `app/not-found.js` (Action 6
+    deliverables) — exist.
+  - `app/layout.js` — `next/font/google` Inter + JetBrains_Mono
+    confirmed (Action 7).
+  - `app/api/speak/route.js` — `Cache-Control: private,
+    max-age=3600` and `checkRateLimit` import confirmed
+    (Action 2).
+  - `lib/rate-limit.js` — exists (Action 1); imported by speak,
+    transcribe, score, and (later) translate routes.
+  - `hooks/`, `constants/`, `lib/i18n/`, `components/ui/` — all
+    confirmed **not present** (Phase 3 untouched).
+  - `.github/`, `.prettierrc*`, `*.test.*`, `*.spec.*` —
+    confirmed **none present** (Phase 5 untouched).
+  - Line counts on the three big page files + AppShell +
+    globals.css: practice 872, mock 781, drive 818, AppShell 300,
+    globals.css 514 — all grown 70–170 lines beyond the
+    1improve.md baseline figures.
+
+### Doc structure (11 sections)
+
+0. Headline scorecard — phase × items × done/partial/not-started.
+1. Phase 1 (P0 cost/safety) — 5/5 ✅, with action numbers + file
+   references.
+2. Phase 2 (P1 UX fixes) — 4/6 ✅, identifying language-prefs and
+   history-progress as the open items.
+3. Phase 3 (P2 structure) — 0/5 ❌, with the file-size growth
+   table showing the debt is actively worsening.
+4. Phase 4 (device limits) — open, awaiting product decision.
+5. Phase 5 (engineering) — 0/5 ❌.
+6. Phase 6 (Stripe) — 0/1 ❌.
+7. Beyond-plan work — 12 thematic groupings of the 68 actions
+   that fell outside the original two improvement docs (Vercel
+   stabilization, mobile UX overhaul, Terms feature, etc.).
+8. Cross-reference table mapping each of the 11 numbered problems
+   from 1improve.md §13 to current status (5 fixed / 5 open /
+   1 worse).
+9. Recommended next batch — 4-item priority list (history
+   progress, language persistence, i18n centralization,
+   useRecorder hook) + a unit-test entry-point + pending
+   product decisions.
+10. ASCII diff showing target architecture (1improve.md §16) vs
+    actual directory tree.
+11. One-paragraph honest close.
+
+### Style choices
+
+- Tables with ✅ / ⚠️ / ❌ legend so the scorecard is scannable.
+- Inline action numbers and clickable `[file](path)` references
+  so every claim is verifiable in one click.
+- File-size delta table (baseline → current) to make the
+  refactor-debt argument concrete instead of editorial.
+- Written in English even though the source improvement docs
+  are in Chinese — chosen for clarity of code-symbol references
+  (file paths, function names, API routes) which sit better
+  in English-language prose. Key Chinese terms preserved only
+  where they appear as direct labels.
+
+### Honest framing
+
+The doc deliberately does **not** sugar-coat. It calls out that
+file sizes have grown under feature pressure, that Phase 3 / 5 / 6
+are zero-progress, and that the i18n-scatter problem is now worse
+(5 page files instead of 4 — Terms page added a 5th `T` table in
+Action 51). The closing paragraph recommends swapping cadence
+toward refactor for the next 6–8 weeks.
+
+### Not changed
+
+- Zero source code touched. Documentation-only deliverable.
+- No `next.config.mjs`, no `package.json`, no API routes, no
+  pages, no styles modified.
+
+### Verification
+
+- `doc/2improve.md` saved at the requested path.
+- Action-number citations cross-checked against the
+  `grep "^## Action" doc/4claudelog*.md` output captured during
+  the audit.
+- File-existence claims (e.g., "no `hooks/` directory") verified
+  with `ls` / `find` — no claim is hand-waved.
+
+### Suggested commit
+
+```
+git add doc/2improve.md doc/4claudelog6.md
+git commit -m "doc: add 2improve.md — status vs 1improve.md / 2gptimprove.md after 68 logged actions"
+git push origin main
+```
+
+---
+
+## Action 70 — Create Chinese version of `doc/2improve.md` → `doc/2Cimprove.md`
+
+**Files changed:**
+- `doc/2Cimprove.md` (new)
+
+**Why:**
+User: "generate a chinese version with same content to
+doc/2Cimprove.md". The two source improvement docs (`1improve.md`
+and `2gptimprove.md`) are in Chinese, so it makes sense to have
+the status report in Chinese too — easier to cross-read.
+
+### What changed
+
+Translated `doc/2improve.md` (Action 69) to Simplified Chinese,
+saved at `doc/2Cimprove.md`. All 11 sections + headline scorecard
+preserved with identical structure, numbers, and references.
+
+### Translation choices
+
+- **Kept in English (code/identifiers must stay clickable and
+  greppable):**
+  - All file paths (`app/practice/page.js`, `lib/i18n/`, etc.)
+  - All function / variable names (`useState`, `useLang`,
+    `scoreKeywords`, `MediaRecorder`, `T` / `MT`)
+  - All HTTP method + route refs (`GET /api/progress`,
+    `/api/speak`)
+  - Cache header values, code snippets, action numbers
+    (`Action 65`, etc.)
+  - Library / tool names (Next.js, Clerk, Supabase, OpenAI,
+    Vitest, Sentry, Stripe, Playwright, Pino, Winston)
+  - Mode names where they appear as URL params (`?mode=listen`)
+- **Translated to Chinese:**
+  - All narrative prose (status descriptions, recommendations,
+    closing paragraph)
+  - Table headers and legend (✅ 已完成 / ⚠️ 部分完成 / ❌ 未启动)
+  - Phase names and section titles
+  - Severity labels (高严重度, etc.) where they appear in
+    descriptions
+
+- **Style:** matches the bilingual register used by the two
+  source improvement docs — Simplified Chinese with English
+  technical terms inline.
+
+### Structure preserved
+
+All 12 numbered sections from `2improve.md` are present in the
+same order:
+
+- 0. 总览评分卡 (Headline scorecard)
+- 1–6. Phases 1 through 6 status
+- 7. 计划之外的工作 (Beyond-plan work, 12 sub-themes)
+- 8. 交叉对照 (Cross-reference to 11 numbered problems)
+- 9. 推荐下一批工作 (Recommended next batch)
+- 10. 架构 vs 目标 (ASCII directory diff)
+- 11. 收尾一段话 (Honest close)
+
+Same scorecard numbers (5/5, 4/6, 0/5, etc.), same action
+references, same file-size delta table, same recommended
+6-item priority list.
+
+### Not changed
+
+- `doc/2improve.md` — left intact as the English authoritative
+  version. The Chinese file is a sibling translation, not a
+  replacement.
+- No code, no other docs modified.
+
+### Verification
+
+- File saved at `doc/2Cimprove.md` (project doc directory,
+  alongside the other improvement docs).
+- All clickable links (e.g., `[file](path)`) preserved with
+  identical relative paths so cross-navigation works in the
+  IDE / GitHub preview.
+- Action number citations match the English source verbatim.
+
+### Suggested commit
+
+```
+git add doc/2Cimprove.md doc/4claudelog6.md
+git commit -m "doc: add Chinese translation of 2improve.md as 2Cimprove.md"
+git push origin main
+```
+
+---
+
+## Action 71 — Research available Claude skills + GitHub ecosystem; produce `doc/skillsavi.md` (Chinese) mapping open problems to skills
+
+**Files changed:**
+- `doc/skillsavi.md` (new)
+
+**Why:**
+User: "to fix the existing problem, doing a throughly research to
+see if any skills or other methods is available for using from
+claude database or github repo. give a detail chinese info to
+.doc/skillsavi.md with corresponding error to available skills
+description." Want a Chinese-language reference that maps each
+open problem from `doc/2improve.md` / `doc/2Cimprove.md` to a
+concrete skill / agent / plugin that can be used to address it.
+
+### What was researched
+
+1. **Anthropic official skills repo** — fetched
+   [github.com/anthropics/skills](https://github.com/anthropics/skills)
+   and the `/skills` subtree. Enumerated all 17 official skill
+   directories: algorithmic-art, brand-guidelines, canvas-design,
+   claude-api, doc-coauthoring, docx, frontend-design, internal-
+   comms, mcp-builder, pdf, pptx, skill-creator, slack-gif-creator,
+   theme-factory, web-artifacts-builder, webapp-testing, xlsx.
+   Pulled raw SKILL.md content for the four most relevant ones
+   (webapp-testing, frontend-design, skill-creator, mcp-builder)
+   to characterize their actual capabilities.
+
+2. **Claude Code built-in skills** — taken from the current session's
+   `available-skills` system reminder list: simplify, verify,
+   review, security-review, run, init, update-config,
+   fewer-permission-prompts, keybindings-help, loop, schedule,
+   claude-api.
+
+3. **Built-in agent types** — Plan, Explore, general-purpose,
+   claude-code-guide, statusline-setup (from the Agent tool
+   description).
+
+4. **Anthropic official plugins** — fetched
+   [claude.com/plugins/sentry](https://claude.com/plugins/sentry)
+   for the Sentry plugin's actual feature surface (error access,
+   pattern detection, root-cause suggestions, `/seer` natural-
+   language query, issue-summarizer agent, PR auto-fix skill).
+
+5. **Community ecosystem** — searched GitHub + community
+   marketplaces and pulled details for: stripe-mcp-skill
+   (wrsmith108), mastering-typescript-skill (SpillwaveSolutions),
+   react-modernization, next-intl-localization (mcpmarket),
+   vercel-labs/{next,react,composition}-best-practices,
+   openai/playwright, trailofbits/testing-handbook-skills,
+   callstackincubator/github, alirezarezvani/claude-skills (329
+   skills), VoltAgent/awesome-agent-skills (1000+).
+
+### Document structure (9 sections)
+
+0. **Resource panorama** — 4 lookup tables: 17 official skills,
+   built-in skills, built-in agents, community/marketplace
+   resources. Each row marks relevance to this specific project
+   (✅✅✅ direct / ✅ partial / ⚪ unlikely / ❌ irrelevant).
+
+1. **Phase 2 (P1) open items** — 4 items mapped:
+   - 1.1 Language preference persistence
+   - 1.2 History progress loading
+   - 1.3 Unified user feedback (toast/alert)
+   - 1.4 Lint script verification
+
+2. **Phase 3 (P2 structure refactor)** — 7 items:
+   - 2.1 `useRecorder` hook
+   - 2.2 `useScoring` hook
+   - 2.3 `useProgress` hook
+   - 2.4 Component library split
+   - 2.5 i18n centralization (Plan A: lightweight / Plan B: next-intl)
+   - 2.6 `constants/` directory
+   - 2.7 Large file shrinking
+
+3. **Phase 4 device limits** — flagged as product-decision
+   blocked; skills per option (A: delete / B: log-only /
+   C: full management).
+
+4. **Phase 5 (P3 engineering)** — 7 items:
+   - 4.1 Prettier
+   - 4.2 Unit tests (Vitest)
+   - 4.3 E2E tests (Playwright via webapp-testing)
+   - 4.4 CI pipeline (GitHub Actions)
+   - 4.5 Error monitoring (Sentry plugin is the headline pick)
+   - 4.6 Structured logging
+   - 4.7 TypeScript migration
+
+5. **Phase 6 Stripe commercialization** — wrsmith108/stripe-mcp-skill
+   as primary; Plan agent for webhook idempotency design;
+   security-review for permission gates.
+
+6. **Recommended batch combos** — 6 mini-batches mapped to
+   2improve.md §9 priority order, each batch listing the exact
+   skill chain (Explore → Plan → direct edit → simplify →
+   verify) and time estimate.
+
+7. **Risk & caveats** — 4 risk types: community skill quality,
+   tech-stack mismatch (this project uses pure CSS not
+   Tailwind — important callout for frontend-design), MCP
+   server maintenance cost, PII handling for Sentry.
+
+8. **Lookup matrix** — single flat table: 18 open problems ×
+   primary skill + alternative skill, scannable in one view.
+
+9. **One-paragraph close** — names the 4 highest-ROI levers:
+   `Plan` agent for upfront design, Sentry plugin for monitoring,
+   `webapp-testing` skill for first E2E test, `stripe-mcp-skill`
+   for commercialization. Notes that all small-refactor work can
+   be done with built-in skills only — no third-party install
+   needed.
+
+### Translation / formatting choices
+
+- Written in Simplified Chinese, matching `2Cimprove.md` style
+  (Chinese prose + English technical identifiers preserved).
+- Action numbers, file paths, function names, library names
+  (Anthropic, Sentry, Stripe, Vitest, Playwright, next-intl,
+  TypeScript, Pino, Winston) all kept in English so they stay
+  searchable.
+- Skill names kept in English in their original form (e.g.,
+  `frontend-design`, `webapp-testing`, `simplify`, `Plan`,
+  `Explore`).
+- Severity emojis (🔴 / 🟡 / 🟢 / ⚪) and effort estimates
+  carried over from `2improve.md` for consistency.
+
+### Project-specific guardrails embedded
+
+Throughout the doc, several "watch out" callouts specific to
+this project's reality:
+
+- ⚠️ Project uses pure CSS + CSS variables, NOT Tailwind.
+  `frontend-design` skill's default suggestions need explicit
+  override.
+- ⚠️ `useRecorder` extraction MUST encapsulate the `unlockAudio()`
+  iOS gesture-handling pattern (history: Actions 60–61, 65–67
+  all stem from getting this wrong).
+- ⚠️ i18n centralization should NOT immediately introduce
+  next-intl. Per 2gptimprove.md §5 step 13: "先不急着引入
+  next-intl" — start with lightweight `t(lang, key)` function
+  first.
+- ⚠️ Sentry plugin: don't transmit recording transcripts /
+  full user text. Confirm PII scrub config.
+- ⚠️ Stripe webhook must be idempotent (same event repeatable);
+  Stripe CLI for local webhook forwarding cuts debug cycles.
+
+### Not changed
+
+- No code touched. Documentation-only deliverable.
+- `doc/2improve.md` and `doc/2Cimprove.md` remain authoritative
+  problem inventories; `skillsavi.md` is the "tooling answer
+  sheet" for them.
+
+### Verification
+
+- File saved at `doc/skillsavi.md` (project doc directory,
+  alongside other improvement docs).
+- 17 Anthropic official skills listed match the GitHub repo
+  listing (verified by `WebFetch` on `/tree/main/skills`).
+- All clickable links use real, fetched URLs (no fabricated
+  paths).
+- Action references cross-checked against existing
+  `4claudelog*.md` files.
+
+### Suggested commit
+
+```
+git add doc/skillsavi.md doc/4claudelog6.md
+git commit -m "doc: add skillsavi.md — Chinese guide mapping 2improve.md open problems to available Claude skills / GitHub ecosystem"
+git push origin main
+```
+
+---
+
+## Action 72 — Append reliability ratings (1–5 stars) to `doc/skillsavi.md` for every skill / plugin / MCP / resource cited
+
+**Files changed:**
+- `doc/skillsavi.md` (new §10 appended)
+
+**Why:**
+User: "are those skills reliable? append reliable info rating from
+1-5(most reliable) into doc/skillsavi.md". The original
+`skillsavi.md` listed skills/plugins/MCPs but didn't grade their
+trustworthiness — the user noticed and asked for evidence-based
+ratings.
+
+### What changed
+
+Appended a new §10 "可靠性评级" (Reliability Ratings) to
+`doc/skillsavi.md`. Ten sub-sections:
+
+- §10.1 — Rating definitions (1 to 5 stars) + usage guidance
+- §10.2 — All 17 Anthropic official skills (all 5 stars)
+- §10.3 — Claude Code built-in skills (all 5 stars)
+- §10.4 — Built-in agent types (Plan / Explore / general-purpose
+  / etc., all 5 stars)
+- §10.5 — Anthropic official plugins (Sentry, 5 stars)
+- §10.6 — Community skills, broken into:
+  - Stripe integration (incl. correction below)
+  - TypeScript / React modernization
+  - Next.js / React patterns (vercel-labs/*)
+  - i18n (next-intl-localization, etc.)
+  - Testing (openai/playwright, trailofbits/testing-handbook)
+  - CI/CD (callstackincubator/github)
+  - Sentry community wrappers
+  - Single-author mega-collections
+- §10.7 — Directory/aggregator sites (N/A — not graded; only
+  discovery entry points)
+- §10.8 — Installation priority for this project + skills to
+  avoid + general principles
+- §10.9 — Final flat lookup table
+
+### Headline correction surfaced during research
+
+**`wrsmith108/stripe-mcp-skill`** — the Stripe MCP I cited as
+"core recommendation" in §5.1 of the original doc — was verified
+to have **only 1 GitHub star and 1 commit, no real maintenance
+activity**. Downgraded to **1 star** and explicitly flagged as
+"不推荐 / 上文 §5.1 错误推荐".
+
+Replaced with **Stripe's own official MCP options** (all 5 stars):
+
+- **mcp.stripe.com** — Stripe's hosted remote MCP server with OAuth
+- **`@stripe/mcp`** — official npm package (`npx -y @stripe/mcp
+  --api-key=YOUR_KEY`)
+- **`@stripe/agent-toolkit`** — official Python + TypeScript SDK,
+  integrates with OpenAI Agent SDK, LangChain, CrewAI, Vercel AI
+  SDK
+- **stripe/ai** GitHub repo — Stripe's own AI tools hub
+
+A 📌 callout was inserted directing readers to ignore the original
+§5.1 recommendation in favor of these.
+
+### Rating distribution
+
+| Tier | Count |
+|---|---:|
+| 5 ⭐⭐⭐⭐⭐ | ~30 (all Anthropic official + built-ins + Stripe + Sentry official) |
+| 4 ⭐⭐⭐⭐ | 6 (vercel-labs/* x3, openai/playwright, trailofbits/testing-handbook-skills, callstackincubator/github, microsoft Azure) |
+| 3 ⭐⭐⭐ | 5 (thin-wrapper skills over reliable underlying tech: next-intl-localization, sentry-cli-integration, mastering-typescript-skill, secondsky, blencorp) |
+| 2 ⭐⭐ | 4 (mcpmarket generic skills, single-author mega-collections: react-modernization, internationalization-localization-2, alirezarezvani, canatufkansu) |
+| 1 ⭐ | 1 (wrsmith108/stripe-mcp-skill) |
+| N/A | 5 directories (VoltAgent, claudemarketplaces, mcpmarket, agentskill.club, lobehub) |
+
+### Rating methodology embedded in the doc
+
+§10.1 defines the 5 tiers with explicit criteria:
+1. **Maintainer identity** — official Anthropic > known company
+   teams > individuals
+2. **GitHub signals** — stars, commit recency, contributor count
+3. **Documentation completeness**
+4. **Tech-stack fit with this project**
+5. **Real-world production evidence**
+
+Each tier maps to a usage recommendation (e.g., "5 = use freely;
+1 = do not use; N/A = use only as discovery entry point").
+
+### Key general principles surfaced in §10.8
+
+1. Official ≥ known-company team > individual skill
+2. Thin-wrapper skills over solid underlying tech (next-intl,
+   Stripe API, Sentry) are less valuable than the official docs
+   themselves — skill value is in "providing project context for
+   the AI," not replacing documentation
+3. Every external MCP adds dependency cost — only Stripe / Sentry
+   level production-critical tooling justifies MCP install
+4. Always small-case verify before broad adoption; reject any
+   suggestion that breaks project conventions (CSS variables, no
+   Tailwind, plain JavaScript)
+
+### Not changed
+
+- §0 through §9 of `skillsavi.md` — kept intact. The corrections
+  (esp. the Stripe MCP downgrade) are surfaced in §10 with
+  explicit pointers back to the affected earlier sections.
+- No code touched. Doc-only deliverable.
+- `2improve.md` / `2Cimprove.md` / other docs unchanged.
+
+### Verification
+
+- Stripe official MCP claim verified via WebSearch + WebFetch of
+  Stripe documentation (docs.stripe.com/mcp) and stripe/ai repo.
+- wrsmith108/stripe-mcp-skill 1-star/1-commit status verified via
+  direct WebFetch of the repo page.
+- All ratings tied to actual research signals (org reputation,
+  star count where checkable, official-vs-community status,
+  fit with this project's tech stack).
+
+### Suggested commit
+
+```
+git add doc/skillsavi.md doc/4claudelog6.md
+git commit -m "doc: append reliability ratings (1-5) to skillsavi.md; correct Stripe MCP recommendation (use official @stripe/mcp instead of unmaintained wrsmith108 fork)"
+git push origin main
+```
