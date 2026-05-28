@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, SCENARIOS } from '@/lib/data'
 import { useLang } from '@/lib/lang-context'
+import { useToast } from '@/lib/toast-context'
 
 // ── Officer voice profiles ────────────────────────────────────
 const OFFICER_VOICES = [
@@ -205,6 +206,7 @@ const PREVIEW_TEXT = 'Good afternoon, driver. May I see your CDL and logbook ple
 
 export default function DrivePage() {
   const { lang, setLang } = useLang()
+  const { showToast } = useToast()
   const [selectedVoice, setSelectedVoice] = useState(OFFICER_VOICES[0])
   const [phase, setPhase] = useState('select')
   const [selectedScenario, setSelectedScenario] = useState(null)
@@ -486,7 +488,9 @@ export default function DrivePage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ questionCode: q.question_code, status: 'viewed', lastScore: scoreResult.score, lastTranscript: text })
-    }).catch(() => {})
+    })
+      .then(r => { if (!r.ok && r.status !== 401) showToast('Could not save progress', 'warn') })
+      .catch(() => showToast('Could not save progress', 'warn'))
   }
 
   const avgScore = sessionScores.length

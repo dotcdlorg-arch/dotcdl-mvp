@@ -5,6 +5,8 @@ import AppShell from '@/components/AppShell'
 import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords } from '@/lib/data'
 import { useProgress } from '@/hooks/useProgress'
 import { useLang } from '@/lib/lang-context'
+import { useToast } from '@/lib/toast-context'
+import InlineAlert from '@/components/InlineAlert'
 
 // ── i18n ──────────────────────────────────────────
 const T = {
@@ -291,6 +293,8 @@ function PracticeInner() {
   const [scoreData, setScoreData] = useState(null)
   const [scoring, setScoring] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
+  const [micError, setMicError] = useState(null)
+  const { showToast } = useToast()
   const { progress, stats: hookStats, markQuestion } = useProgress({ type: 'question' })
   const [qaTrans, setQaTrans] = useState({})
   const mrRef = useRef(null)
@@ -408,9 +412,12 @@ function PracticeInner() {
   async function startRecording() {
     if (typeof window === 'undefined') return
     if (!navigator.mediaDevices?.getUserMedia) {
-      alert('Microphone requires HTTPS. Please use https://dotcdl.org')
+      const msg = 'Microphone requires HTTPS. Please use https://dotcdl.org'
+      showToast(msg, 'error')
+      setMicError(msg)
       return
     }
+    setMicError(null)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mr = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg' })
@@ -433,7 +440,9 @@ function PracticeInner() {
       mrRef.current = mr
       setIsRecording(true)
     } catch (e) {
-      alert('Microphone error: ' + e.message)
+      const msg = 'Microphone error: ' + e.message
+      showToast(msg, 'error')
+      setMicError(msg)
     }
   }
 
@@ -753,6 +762,8 @@ function PracticeInner() {
                 </>
               )}
             </div>
+
+            {micError && <InlineAlert type="error">{micError}</InlineAlert>}
 
             <label style={{ marginTop:12 }}>Your answer (edit if needed)</label>
             <textarea

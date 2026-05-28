@@ -1,6 +1,8 @@
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { LanguageProvider } from '@/lib/lang-context'
+import { ToastProvider } from '@/lib/toast-context'
+import Toast from '@/components/Toast'
 import './globals.css'
 
 const inter = Inter({
@@ -28,7 +30,12 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body className={`${inter.variable} ${mono.variable}`}>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <ToastProvider>
+              {children}
+              <Toast />
+            </ToastProvider>
+          </LanguageProvider>
         </body>
       </html>
     </ClerkProvider>

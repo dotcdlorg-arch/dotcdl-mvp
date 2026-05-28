@@ -1,12 +1,15 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useToast } from '@/lib/toast-context'
 
 // 401 (signed-out) is treated as a silent no-op on BOTH read and write paths,
 // so anonymous user flows on /practice and /signs keep working without console
-// noise. Other failures are logged but never bubble.
+// noise. Non-401 write failures surface as a 'warn' toast (the optimistic local
+// update already succeeded, so this is non-fatal — just informational).
 export function useProgress({ type }) {
   const [progress, setProgress] = useState({})
+  const { showToast } = useToast()
 
   useEffect(() => {
     let cancelled = false
@@ -61,9 +64,9 @@ export function useProgress({ type }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ questionCode: code, status, lastScore: score, lastTranscript: transcript }),
     })
-      .then(r => { if (!r.ok && r.status !== 401) console.warn('progress POST failed', r.status) })
-      .catch(e => console.warn('progress POST failed', e))
-  }, [])
+      .then(r => { if (!r.ok && r.status !== 401) showToast('Could not save progress', 'warn') })
+      .catch(() => showToast('Could not save progress', 'warn'))
+  }, [showToast])
 
   const markSign = useCallback((code, score, answer) => {
     setProgress(prev => ({ ...prev, [code]: { score } }))
@@ -72,9 +75,9 @@ export function useProgress({ type }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ signCode: code, score, answer, type: 'sign' }),
     })
-      .then(r => { if (!r.ok && r.status !== 401) console.warn('progress POST failed', r.status) })
-      .catch(e => console.warn('progress POST failed', e))
-  }, [])
+      .then(r => { if (!r.ok && r.status !== 401) showToast('Could not save progress', 'warn') })
+      .catch(() => showToast('Could not save progress', 'warn'))
+  }, [showToast])
 
   const stats = useMemo(() => {
     const vals = Object.values(progress)

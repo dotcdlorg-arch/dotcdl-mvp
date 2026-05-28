@@ -4,6 +4,7 @@ import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, SIGNS, scoreKeywords, getExplanation } from '@/lib/data'
 import { useLang } from '@/lib/lang-context'
+import { useToast } from '@/lib/toast-context'
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - .5) }
 
@@ -261,6 +262,7 @@ async function speakText(text, onEnd, voiceId = 'north_m', speed = 0.92) {
 
 export default function MockPage() {
   const { lang, setLang } = useLang()
+  const { showToast } = useToast()
   const [mode, setMode] = useState(null) // null | 'write' | 'speak'
   const [phase, setPhase] = useState('intro') // intro | active | result
   const [answers, setAnswers] = useState({})
@@ -374,7 +376,9 @@ export default function MockPage() {
       const avg = Math.round(allScores.reduce((a, b) => a + b, 0) / items.length)
       setResult({ avg, details })
       setPhase('result')
-      fetch('/api/mock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ score: avg, totalItems: items.length, details }) }).catch(() => {})
+      fetch('/api/mock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ score: avg, totalItems: items.length, details }) })
+        .then(r => { if (!r.ok && r.status !== 401) showToast('Could not save mock result', 'warn') })
+        .catch(() => showToast('Could not save mock result', 'warn'))
     } else {
       setSpeakIdx(next)
       setRecState('idle')
