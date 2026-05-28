@@ -1,8 +1,9 @@
 'use client'
-import { useState, useCallback, useEffect, useMemo, useRef, Suspense } from 'react'
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords } from '@/lib/data'
+import { useProgress } from '@/hooks/useProgress'
 
 // ── i18n ──────────────────────────────────────────
 const T = {
@@ -274,14 +275,6 @@ async function speakViaApi(text, rate, onEnd) {
 function speak(text, rate) { speakViaApi(text, rate, null) }
 function speakWithCb(text, rate, onEnd) { speakViaApi(text, rate, onEnd) }
 
-function saveProgress(questionCode, status, lastScore, lastTranscript) {
-  fetch('/api/progress', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ questionCode, status, lastScore, lastTranscript })
-  }).catch(() => {})
-}
-
 // ── Main component ────────────────────────────────
 function PracticeInner() {
   const searchParams = useSearchParams()
@@ -297,7 +290,7 @@ function PracticeInner() {
   const [scoreData, setScoreData] = useState(null)
   const [scoring, setScoring] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
-  const [progress, setProgress] = useState({})
+  const { progress, stats: hookStats, markQuestion } = useProgress({ type: 'question' })
   const [qaTrans, setQaTrans] = useState({})
   const mrRef = useRef(null)
   const autoPlayRef = useRef(false)
@@ -369,30 +362,9 @@ function PracticeInner() {
     return () => { cancelled = true }
   }, [q?.question_code, lang, qaTrans])
 
-  const stats = {
-    seen: Object.values(progress).filter(v => v.viewCount > 0).length,
-    total: QUESTIONS.length,
-    understood: Object.values(progress).filter(v => v.status === 'understood').length,
-    review: Object.values(progress).filter(v => v.status === 'needs_review').length,
-    avgScore: (() => {
-      const scores = Object.values(progress).map(v => v.score).filter(Boolean)
-      return scores.length ? Math.round(scores.reduce((a,b) => a+b,0)/scores.length) + '/100' : null
-    })()
-  }
+  const stats = { ...hookStats, total: QUESTIONS.length }
 
-  const markStatus = useCallback((code, status, score, transcript) => {
-    setProgress(prev => ({
-      ...prev,
-      [code]: {
-        ...prev[code],
-        status,
-        score: score ?? prev[code]?.score,
-        transcript: transcript ?? prev[code]?.transcript,
-        viewCount: (prev[code]?.viewCount || 0) + 1
-      }
-    }))
-    saveProgress(code, status, score, transcript)
-  }, [])
+  const markStatus = markQuestion
 
   function startAutoPlay() {
     // Synchronously unlock the persistent audio element on this click so

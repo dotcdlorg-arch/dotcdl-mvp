@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { SIGNS, S_CATEGORIES, getExplanation, scoreKeywords } from '@/lib/data'
+import { useProgress } from '@/hooks/useProgress'
 
 // Chip-row styling: single-line horizontal scroll with smaller chips so all
 // categories fit on a phone screen (swipe to see the rest).
@@ -54,7 +55,7 @@ export default function SignsPage() {
   const [idx, setIdx] = useState(0)
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState(null)
-  const [progress, setProgress] = useState({})
+  const { progress, stats: hookStats, markSign } = useProgress({ type: 'sign' })
 
   // Filtered + shuffled signs. Random order, re-shuffles only when filter
   // changes — not on every render — so navigation stays stable.
@@ -76,22 +77,13 @@ export default function SignsPage() {
     if (!sign || !answer.trim()) return
     const score = scoreKeywords(answer, sign.keywords || [])
     setResult({ score, revealed: false })
-    setProgress(prev => ({ ...prev, [sign.sign_code]: score }))
-    fetch('/api/progress', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ signCode: sign.sign_code, score, answer, type: 'sign' })
-    }).catch(() => {})
+    markSign(sign.sign_code, score, answer)
   }
 
   function next() { setIdx(i => (i + 1) % filtered.length); setAnswer(''); setResult(null) }
   function prev() { setIdx(i => Math.max(0, i - 1)); setAnswer(''); setResult(null) }
 
-  const stats = {
-    seen: Object.keys(progress).length, total: SIGNS.length,
-    understood: Object.values(progress).filter(x => x >= 80).length,
-    review: Object.values(progress).filter(x => x > 0 && x < 55).length,
-  }
+  const stats = { ...hookStats, total: SIGNS.length }
 
   if (!sign) return (
     <AppShell lang={lang} setLang={setLang} stats={stats}>
@@ -163,9 +155,9 @@ export default function SignsPage() {
       <div className="card">
         <div className="between mb-8">
           <span className="badge badge-gray">{sign.category}</span>
-          {progress[sign.sign_code] != null && (
-            <span className={`badge ${progress[sign.sign_code]>=80?'badge-green':progress[sign.sign_code]>=55?'badge-amber':'badge-red'}`}>
-              {progress[sign.sign_code]}/100
+          {progress[sign.sign_code]?.score != null && (
+            <span className={`badge ${progress[sign.sign_code].score>=80?'badge-green':progress[sign.sign_code].score>=55?'badge-amber':'badge-red'}`}>
+              {progress[sign.sign_code].score}/100
             </span>
           )}
         </div>
