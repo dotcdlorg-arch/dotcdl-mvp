@@ -2,6 +2,7 @@
 import { useState, useMemo } from 'react'
 import AppShell from '@/components/AppShell'
 import { TERMS, TERM_CATEGORIES } from '@/lib/terms'
+import { useLang } from '@/lib/lang-context'
 
 // ── TTS helpers ──────────────────────────────────────────────
 // Token-based cancellation: every stop bumps the token; in-flight playback
@@ -140,7 +141,7 @@ function categoryName(cat, lang) {
 }
 
 export default function TermsPage() {
-  const [lang, setLang] = useState('zh')
+  const { lang, setLang } = useLang()
   const [filterCat, setFilterCat] = useState('all')
 
   const filtered = useMemo(() => TERMS.filter(t => {

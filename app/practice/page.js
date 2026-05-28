@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, Q_CATEGORIES, Q_DIFFICULTIES, getExplanation, scoreKeywords } from '@/lib/data'
 import { useProgress } from '@/hooks/useProgress'
+import { useLang } from '@/lib/lang-context'
 
 // ── i18n ──────────────────────────────────────────
 const T = {
@@ -280,7 +281,7 @@ function PracticeInner() {
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') || 'text'
 
-  const [lang, setLang] = useState('zh')
+  const { lang, setLang } = useLang()
   const [filterCat, setFilterCat] = useState('all')
   const [filterDiff, setFilterDiff] = useState('all')
   const [reviewOnly, setReviewOnly] = useState(false)

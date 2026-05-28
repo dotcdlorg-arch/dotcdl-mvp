@@ -4,6 +4,7 @@ import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { SIGNS, S_CATEGORIES, getExplanation, scoreKeywords } from '@/lib/data'
 import { useProgress } from '@/hooks/useProgress'
+import { useLang } from '@/lib/lang-context'
 
 // Chip-row styling: single-line horizontal scroll with smaller chips so all
 // categories fit on a phone screen (swipe to see the rest).
@@ -50,7 +51,7 @@ async function speakSignAnswer(text) {
 }
 
 export default function SignsPage() {
-  const [lang, setLang] = useState('zh')
+  const { lang, setLang } = useLang()
   const [filterCat, setFilterCat] = useState('all')
   const [idx, setIdx] = useState(0)
   const [answer, setAnswer] = useState('')

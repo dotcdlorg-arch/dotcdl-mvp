@@ -3,6 +3,7 @@ import { useState, useMemo, useRef } from 'react'
 import Image from 'next/image'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, SIGNS, scoreKeywords, getExplanation } from '@/lib/data'
+import { useLang } from '@/lib/lang-context'
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - .5) }
 
@@ -259,7 +260,7 @@ async function speakText(text, onEnd, voiceId = 'north_m', speed = 0.92) {
 }
 
 export default function MockPage() {
-  const [lang, setLang] = useState('zh')
+  const { lang, setLang } = useLang()
   const [mode, setMode] = useState(null) // null | 'write' | 'speak'
   const [phase, setPhase] = useState('intro') // intro | active | result
   const [answers, setAnswers] = useState({})

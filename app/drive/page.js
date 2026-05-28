@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import AppShell from '@/components/AppShell'
 import { QUESTIONS, SCENARIOS } from '@/lib/data'
+import { useLang } from '@/lib/lang-context'
 
 // ── Officer voice profiles ────────────────────────────────────
 const OFFICER_VOICES = [
@@ -203,7 +204,7 @@ const DIFFICULTY_COLORS = { Easy: 'badge-green', Medium: 'badge-amber', Hard: 'b
 const PREVIEW_TEXT = 'Good afternoon, driver. May I see your CDL and logbook please?'
 
 export default function DrivePage() {
-  const [lang, setLang] = useState('zh')
+  const { lang, setLang } = useLang()
   const [selectedVoice, setSelectedVoice] = useState(OFFICER_VOICES[0])
   const [phase, setPhase] = useState('select')
   const [selectedScenario, setSelectedScenario] = useState(null)

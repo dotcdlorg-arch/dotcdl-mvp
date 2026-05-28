@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
+import { LanguageProvider } from '@/lib/lang-context'
 import './globals.css'
 
 const inter = Inter({
@@ -26,7 +27,9 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.variable} ${mono.variable}`}>{children}</body>
+        <body className={`${inter.variable} ${mono.variable}`}>
+          <LanguageProvider>{children}</LanguageProvider>
+        </body>
       </html>
     </ClerkProvider>
   )
