@@ -7,90 +7,7 @@ import { useProgress } from '@/hooks/useProgress'
 import { useLang } from '@/lib/lang-context'
 import { useToast } from '@/lib/toast-context'
 import InlineAlert from '@/components/InlineAlert'
-
-// ── i18n ──────────────────────────────────────────
-const T = {
-  en:{ all:'All', reviewOnly:'Review only', prev:'← Previous', next:'Next →',
-    understood:'✓ Understood', needReview:'⚑ Review', officer:'Officer question', answer:'Standard answer',
-    explanation:'Explanation', keywords:'Keywords', mistakes:'Common mistakes',
-    qaTrans:'Q&A translation', translating:'Translating…',
-    listenTitle:'Listening practice mode', speakTitle:'Speak + AI pronunciation score',
-    slow:'Slow 0.7×', normal:'Normal 1×', fast:'Fast 1.3×',
-    playQ:'🔊 Play question', startRec:'🎤 Start recording', stopRec:'⏹ Stop', clearAns:'Clear',
-    typeHere:'Type or record your English answer here…',
-    scoreBtn:'🏆 AI score', scoreTitle:'AI score result', keyHits:'Keyword matches',
-    good:'Clear answer with complete keywords!', partial:'Partially correct, keep practicing.', bad:'Needs more practice.',
-    betterAns:'Model answer', pronTitle:'Pronunciation analysis',
-    pronGood:'Pronunciation correct', pronOk:'Can be improved', pronMiss:'Needs practice',
-    noQ:'No questions match. Adjust your filters.', autoPlay:'▶ Play all', stopPlay:'⏸ Pause' },
-  zh:{ all:'全部', reviewOnly:'只看复习', prev:'← 上一题', next:'下一题 →',
-    understood:'✓ 已理解', needReview:'⚑ 复习', officer:'警官问题', answer:'标准答案',
-    explanation:'母语解释', keywords:'关键词', mistakes:'常见错误',
-    qaTrans:'问答翻译', translating:'翻译中…',
-    listenTitle:'听力练习模式', speakTitle:'口语 + AI 发音评分',
-    slow:'慢速 0.7×', normal:'正常 1×', fast:'快速 1.3×',
-    playQ:'🔊 播放问题', startRec:'🎤 开始录音', stopRec:'⏹ 停止', clearAns:'清空',
-    typeHere:'在此输入或录音转录您的英文回答…',
-    scoreBtn:'🏆 AI 评分', scoreTitle:'AI 评分结果', keyHits:'关键词匹配',
-    good:'回答清晰，关键词完整！', partial:'部分正确，继续练习。', bad:'需要更多练习。',
-    betterAns:'参考答案', pronTitle:'发音分析',
-    pronGood:'发音准确', pronOk:'可以改善', pronMiss:'需要练习',
-    noQ:'没有符合条件的题目。请调整筛选条件。', autoPlay:'▶ 连续播放', stopPlay:'⏸ 暂停' },
-  es:{ all:'Todo', reviewOnly:'Solo repaso', prev:'← Anterior', next:'Siguiente →',
-    understood:'✓ Entendido', needReview:'⚑ Repasar', officer:'Pregunta del oficial', answer:'Respuesta',
-    explanation:'Explicación', keywords:'Palabras clave', mistakes:'Errores comunes',
-    qaTrans:'Traducción de Q&A', translating:'Traduciendo…',
-    listenTitle:'Modo de escucha', speakTitle:'Habla + Calificación AI',
-    slow:'Lento 0.7×', normal:'Normal 1×', fast:'Rápido 1.3×',
-    playQ:'🔊 Escuchar', startRec:'🎤 Grabar', stopRec:'⏹ Detener', clearAns:'Borrar',
-    typeHere:'Escriba o transcriba su respuesta en inglés…',
-    scoreBtn:'🏆 Calificar con AI', scoreTitle:'Resultado AI', keyHits:'Palabras clave',
-    good:'¡Respuesta clara!', partial:'Parcialmente correcta.', bad:'Necesita práctica.',
-    betterAns:'Respuesta modelo', pronTitle:'Análisis de pronunciación',
-    pronGood:'Pronunciación correcta', pronOk:'Puede mejorar', pronMiss:'Necesita práctica',
-    noQ:'No hay preguntas. Cambie los filtros.', autoPlay:'▶ Reproducir todo', stopPlay:'⏸ Pausar' },
-  hi:{ all:'सभी', reviewOnly:'केवल समीक्षा', prev:'← पिछला', next:'अगला →',
-    understood:'✓ समझ गया', needReview:'⚑ समीक्षा', officer:'अधिकारी प्रश्न', answer:'उत्तर',
-    explanation:'व्याख्या', keywords:'कीवर्ड', mistakes:'गलतियाँ',
-    qaTrans:'प्रश्न-उत्तर अनुवाद', translating:'अनुवाद हो रहा है…',
-    listenTitle:'सुनने का मोड', speakTitle:'बोलना + AI स्कोर',
-    slow:'धीमा', normal:'सामान्य', fast:'तेज़',
-    playQ:'🔊 सुनें', startRec:'🎤 रिकॉर्ड', stopRec:'⏹ रोकें', clearAns:'साफ़',
-    typeHere:'अंग्रेज़ी उत्तर यहाँ टाइप करें…',
-    scoreBtn:'🏆 AI स्कोर', scoreTitle:'AI परिणाम', keyHits:'कीवर्ड',
-    good:'बहुत अच्छा!', partial:'आंशिक सही।', bad:'और अभ्यास करें।',
-    betterAns:'बेहतर उत्तर', pronTitle:'उच्चारण विश्लेषण',
-    pronGood:'सही उच्चारण', pronOk:'सुधार हो सकता है', pronMiss:'अभ्यास जरूरी',
-    noQ:'कोई प्रश्न नहीं। फ़िल्टर बदलें।', autoPlay:'▶ सभी चलाएं', stopPlay:'⏸ रोकें' },
-  pa:{ all:'ਸਾਰੇ', reviewOnly:'ਕੇਵਲ ਦੁਹਰਾਈ', prev:'← ਪਿਛਲਾ', next:'ਅਗਲਾ →',
-    understood:'✓ ਸਮਝ ਗਿਆ', needReview:'⚑ ਦੁਹਰਾਈ', officer:'ਅਫਸਰ ਸਵਾਲ', answer:'ਜਵਾਬ',
-    explanation:'ਵਿਆਖਿਆ', keywords:'ਕੀਵਰਡ', mistakes:'ਗਲਤੀਆਂ',
-    qaTrans:'ਸਵਾਲ-ਜਵਾਬ ਅਨੁਵਾਦ', translating:'ਅਨੁਵਾਦ ਹੋ ਰਿਹਾ ਹੈ…',
-    listenTitle:'ਸੁਣਨ ਮੋਡ', speakTitle:'ਬੋਲਣਾ + AI ਸਕੋਰ',
-    slow:'ਹੌਲੀ', normal:'ਸਧਾਰਨ', fast:'ਤੇਜ਼',
-    playQ:'🔊 ਸੁਣੋ', startRec:'🎤 ਰਿਕਾਰਡ', stopRec:'⏹ ਰੋਕੋ', clearAns:'ਸਾਫ਼',
-    typeHere:'ਅੰਗਰੇਜ਼ੀ ਜਵਾਬ ਇੱਥੇ ਲਿਖੋ…',
-    scoreBtn:'🏆 AI ਸਕੋਰ', scoreTitle:'AI ਨਤੀਜਾ', keyHits:'ਕੀਵਰਡ',
-    good:'ਬਹੁਤ ਵਧੀਆ!', partial:'ਅੰਸ਼ਿਕ ਸਹੀ।', bad:'ਅਭਿਆਸ ਜਾਰੀ ਰੱਖੋ।',
-    betterAns:'ਬਿਹਤਰ ਜਵਾਬ', pronTitle:'ਉਚਾਰਣ ਵਿਸ਼ਲੇਸ਼ਣ',
-    pronGood:'ਸਹੀ ਉਚਾਰਣ', pronOk:'ਸੁਧਾਰ ਹੋ ਸਕਦਾ', pronMiss:'ਅਭਿਆਸ ਲੋੜੀਂਦਾ',
-    noQ:'ਕੋਈ ਸਵਾਲ ਨਹੀਂ।', autoPlay:'▶ ਸਾਰੇ ਚਲਾਓ', stopPlay:'⏸ ਰੋਕੋ' },
-  vi:{ all:'Tất cả', reviewOnly:'Chỉ ôn lại', prev:'← Trước', next:'Tiếp →',
-    understood:'✓ Đã hiểu', needReview:'⚑ Ôn lại', officer:'Câu hỏi viên chức', answer:'Câu trả lời',
-    explanation:'Giải thích', keywords:'Từ khóa', mistakes:'Lỗi thường gặp',
-    qaTrans:'Bản dịch Hỏi-Đáp', translating:'Đang dịch…',
-    listenTitle:'Chế độ nghe', speakTitle:'Nói + Chấm điểm AI',
-    slow:'Chậm', normal:'Bình thường', fast:'Nhanh',
-    playQ:'🔊 Nghe', startRec:'🎤 Ghi âm', stopRec:'⏹ Dừng', clearAns:'Xóa',
-    typeHere:'Nhập hoặc ghi âm câu trả lời tiếng Anh…',
-    scoreBtn:'🏆 Chấm điểm AI', scoreTitle:'Kết quả AI', keyHits:'Từ khóa',
-    good:'Câu trả lời tốt!', partial:'Đúng một phần.', bad:'Cần luyện thêm.',
-    betterAns:'Câu trả lời mẫu', pronTitle:'Phân tích phát âm',
-    pronGood:'Phát âm đúng', pronOk:'Có thể cải thiện', pronMiss:'Cần luyện phát âm',
-    noQ:'Không có câu hỏi. Thay đổi bộ lọc.', autoPlay:'▶ Phát tất cả', stopPlay:'⏸ Dừng' },
-}
-
-function t(lang, key) { return (T[lang] || T.en)[key] || T.en[key] || key }
+import { t } from '@/lib/i18n'
 
 // Chip-row styling: single-line horizontal scroll with smaller chips so all
 // categories fit on a phone screen (swipe to see the rest).
@@ -301,7 +218,7 @@ function PracticeInner() {
   const autoPlayRef = useRef(false)
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
 
-  const tx = (k) => t(lang, k)
+  const tx = (k) => t(lang, 'practice.' + k)
 
   // Filtered + shuffled questions. Shuffle is memoized on filter keys only —
   // not on `progress` — so marking a question doesn't re-randomize the order
