@@ -312,3 +312,84 @@ git commit -m "doc: log first-stage PR1/PR2/PR3 execution + simplify/verify audi
 
 ⚠️ Per CLAUDE.md / AGENTS.md: do not `git push` without explicit user confirmation.
 
+---
+
+## 2026-05-29 — PR4a: i18n centralization, canary on `practice` (P2 #16, sub-PR 1 of 5)
+
+### Trigger
+
+User: "yes" (start next PR per 2implan.md §9.1 after first three PRs landed).
+
+Plan source: [`doc/2implan.md`](2implan.md) §4 (P2 #16). Sub-PR 4a migrates `practice` as canary; 4b–4e follow (mock, drive, terms, AppShell).
+
+### What changed
+
+**New: `lib/i18n/index.js`** (29 lines after simplify-fix)
+- `t(lang, key)` resolver: `dict[lang]?.[key] ?? dict.en[key] ?? key`. Uses `??` (not `||`) so an intentional empty-string translation renders as `''` instead of falling back.
+- Dev-only missing-key warning, with per-key `warned` Set so each unknown key only logs the first time.
+- Dev-only cross-lang drift check at module-load: scans every non-English file for keys missing relative to English; logs once if any drift. Both dev blocks are `process.env.NODE_ENV !== 'production'`-gated → Next.js dead-code-eliminates them in prod.
+
+**New: `lib/i18n/messages.{en,zh,es,hi,pa,vi}.js`** (37 keys each, 6 files)
+- Flat namespaced keys: `'practice.officer': 'Officer question'`, etc.
+- Flat chosen over nested (`practice: { officer: '...' }`) for: (a) sub-PRs 4b–4e append additional namespaces with zero merge-conflict risk; (b) `t()` lookup stays O(1).
+- All 222 entries (37 × 6) copied verbatim from the old inline `T` table in `practice/page.js`.
+
+**Modified: `app/practice/page.js`**
+- Removed the 79-line `T = { en: {...}, zh: {...}, es, hi, pa, vi }` literal.
+- Removed the local `function t(lang, key)` resolver.
+- Added `import { t } from '@/lib/i18n'`.
+- Changed local closure `const tx = (k) => t(lang, k)` → `(k) => t(lang, 'practice.' + k)`. All 43 `tx('foo')` call sites unchanged.
+
+### Simplify audit (one combined agent)
+
+| # | Finding | Action |
+|---|---|---|
+| 1 | `LANGS` not re-exported from `lib/i18n/` (plan §4 said it should) | **SKIP** — `components/AppShell.js` already exports `LANGS`; lib/lang-context.js imports it. Adding a duplicate from i18n violates "surgical changes." |
+| 2 | `??` vs `||` for empty-string keys | **SKIP — already correct** with `??`. |
+| 3 | Top-level dev side-effect (drift check) | **SKIP** — standard React-style dev assertion pattern; NODE_ENV-gated. |
+| 4 | Unbounded `warned` Set | **SKIP** — bounded by unique-key count (~37 today, ~250 after 4e). Trivial. |
+| 5 | Flat vs nested keys | **SKIP** — flat is the deliberate choice for merge-conflict-free sub-PR composition. |
+| 6 | `tx` string-concat per render | **SKIP** — sub-microsecond, ~43 calls/render. |
+| 7 | Eager import of 6 lang files | **DEFER** — plan §4 says "don't over-engineer dynamic imports until measured." `/practice` grew +0.12 kB; reassess after PR4e. |
+| 8 | WHAT-comments in `lib/i18n/index.js` (warned-once Set + drift-check headers) | **FIX** — trimmed; variable names + NODE_ENV guard are self-explanatory. |
+
+Only #8 produced an edit — folded into the same commit.
+
+### Verify (browser-driven, headless Chromium)
+
+PR4a's user-facing surface is `/practice`, which is auth-gated. The i18n bundle is only loaded by `/practice`, so anonymous browser testing can't exercise the resolver itself. What I verified instead:
+
+```
+✅ PR4a: /practice still redirects to /sign-in (auth gate intact through new import chain)
+✅ PR2/PR3 regression: /terms still renders with provider stack
+✅ PR2 regression: language switch + localStorage persistence still works (cdl-lang="es")
+✅ PR4a: /signs still redirects (no i18n side-effect on other pages)
+✅ PR4a: no relevant console errors on public surface
+✅ PR4a: no [i18n] missing-key or drift warnings on public surface (lib not loaded here)
+```
+
+### Findings
+
+- ⚠️ **PR4a's full §4 acceptance ("All 6 languages still work on every page") needs an authenticated browser session.** ~2-minute manual pass: log in → `/practice` → flip the dropdown through `en/zh/es/hi/pa/vi` → confirm every visible string changes (officer, answer, all 6 chip labels, score badges, etc.).
+- 🔍 Bundle delta: `/practice` 8.88 → 9.0 kB (+0.12 kB). Plan budget allowed +24 kB after all sub-PRs land. Way under.
+- 🔍 The dev drift check fires only on `lib/i18n` module load. Currently only `app/practice/page.js` imports it, so the check runs once when /practice mounts in dev. As sub-PRs 4b–4e land, it will catch any key gaps across the 6 lang files at dev time before runtime.
+- ⚠️ `mock`, `drive`, `terms`, `AppShell` still hold their inline `MT` / `DT` / `T` / `NAV_LABELS` tables. **§4 verification criterion "grep `const T = {` in app/ returns no results" will only be satisfied at end of PR4e** — by design.
+- ⚠️ Plan §4 "bundle size diff < +20 KB" cannot be evaluated until PR4e. Current cumulative budget: PR4a alone is +0.12 kB.
+
+### Files changed
+
+- `lib/i18n/index.js` — created (29 lines after simplify-fix)
+- `lib/i18n/messages.en.js` — created (39 lines)
+- `lib/i18n/messages.zh.js` — created (39 lines)
+- `lib/i18n/messages.es.js` — created (39 lines)
+- `lib/i18n/messages.hi.js` — created (39 lines)
+- `lib/i18n/messages.pa.js` — created (39 lines)
+- `lib/i18n/messages.vi.js` — created (39 lines)
+- `app/practice/page.js` — −79 (T table) −1 (local `t()`) +1 (import) +0 (tx redirect) = net −79
+
+### Commit
+
+```
+493d0f2  feat(i18n): centralize practice page strings via lib/i18n + t(lang, key) (P2 #16 sub-PR 4a)
+```
+
