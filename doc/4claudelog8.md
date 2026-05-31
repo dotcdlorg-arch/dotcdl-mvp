@@ -538,4 +538,41 @@ git commit -m "feat(i18n): centralize mock page strings via lib/i18n (P2 #16 sub
 git push origin main
 ```
 
+---
+
+## 2026-05-31 — PR4c: i18n migration on `drive` (P2 #16, sub-PR 3 of 5)
+
+### What changed
+
+- Appended `drive.*` keys to all 6 lang files. Started with 38 (from original DT table), removed 5 truly dead keys (`easy`, `hard`, `medium`, `loadingVoice`, `officerSays` — present in original DT but never called via `dt(lang, 'X')` anywhere in `app/drive/page.js`). Net 33 per file × 6 = 198 entries.
+- `app/drive/page.js`: deleted the 176-line `DT = {...}` literal + 4-line `function dt(lang, key)` resolver; added 1-line wrapper `function dt(lang, key) { return t(lang, 'drive.' + key) }` + `import { t } from '@/lib/i18n'`. All 38 `dt(lang, 'X')` call sites unchanged.
+
+### Key-use audit (same method as PR4b)
+
+```
+drive.* used in app/drive/page.js: 33
+drive.* defined in lib/i18n/messages.en.js: 33
+missing: 0, dead: 0
+```
+
+### Build
+
+```
+✓ Compiled in 1170ms
+/drive: 8.95 → 5.07 kB (−3.88 kB)
+```
+
+### Files changed
+
+- `lib/i18n/messages.{en,zh,es,hi,pa,vi}.js` — +33 keys each (after dead-key pruning)
+- `app/drive/page.js` — net −178 lines (DT block + resolver out, wrapper in)
+
+### Commit
+
+```
+git add lib/i18n/ app/drive/page.js doc/4claudelog8.md
+git commit -m "feat(i18n): centralize drive page strings via lib/i18n (P2 #16 sub-PR 4c)"
+git push origin main
+```
+
 
