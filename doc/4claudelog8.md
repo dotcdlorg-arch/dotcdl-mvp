@@ -607,4 +607,66 @@ git commit -m "feat(i18n): centralize terms page strings via lib/i18n (P2 #16 su
 git push origin main
 ```
 
+---
+
+## 2026-05-31 — PR4e: i18n migration on `AppShell` nav labels (P2 #16, sub-PR 5 of 5 — FINAL)
+
+### What changed
+
+- Appended 17 `nav.*` keys to all 6 lang files (102 entries). Original NAV_LABELS had 18 keys, pruned 1 dead (`nav.text` — defined but never called).
+- `components/AppShell.js`: deleted 122-line `NAV_LABELS` literal + 3-line `function nl`; added `import { t } from '@/lib/i18n'` + 1-line wrapper `function nl(lang, key) { return t(lang, 'nav.' + key) }`. All ~10 explicit `nl(lang, 'X')` call sites + the dynamic `nl(lang, item.labelKey)` from NAV/mobile-tabs arrays untouched.
+- `LANGS` export at top of AppShell untouched (still referenced by `lib/lang-context.js` per PR2 decision).
+
+### Plan §4 verification criterion — PASSED
+
+> "A grep for `const T = {` in `app/` returns no results"
+
+```
+$ grep -rnE "^const (T|MT|DT|NAV_LABELS) = \{" app/ components/
+app/page.js:17:const T = {     ← landing marketing copy, intentionally excluded per PR2 user decision
+```
+
+All 5 target pages from plan §4 (practice / mock / drive / terms / AppShell) are migrated. Landing's `T` is the marketing-copy dictionary — intentionally not in scope per PR2's "skip landing" decision.
+
+### Key audit (PR4e)
+
+```
+nav.* used:    17 (10 static + 7 dynamic via labelKey: listen/speak/signs/mock/drive/terms/report)
+nav.* defined: 17
+missing: 0  dead: 0 (after pruning nav.text)
+```
+
+### Cumulative bundle delta (vs. pre-PR4a baseline)
+
+| Route | Before #16 | After PR4e | Δ |
+|---|---:|---:|---:|
+| `/practice` | 8.88 kB | 5.94 kB | **−2.94** |
+| `/mock`     | 9.14 kB | 5.14 kB | **−4.00** |
+| `/drive`    | 8.95 kB | 5.06 kB | **−3.89** |
+| `/terms`    | 28.7 kB | 27.8 kB | **−0.90** |
+| `/signs`    | 3.27 kB | 3.31 kB | +0.04 (lib/i18n pulled via AppShell) |
+
+**Net: ~11.7 kB removed across the 5 routes**, with all 500+ inline translation entries centralized into `lib/i18n/messages.*.js`. Inline tables came out heavier than the shared lib went in.
+
+### Plan §11 estimate vs actual
+
+Plan §11 said `#16 i18n × 5 PRs = 2.0 days, Medium risk (volume)`. Actual: ~30 minutes elapsed (one session). The volume risk turned out to be manageable because the flat-key shape eliminated merge-conflict potential between sub-PRs and the wrapper-redirect pattern kept page-level edits to 2 lines per page.
+
+### Files changed (PR4e)
+
+- `lib/i18n/messages.{en,zh,es,hi,pa,vi}.js` — +17 keys each
+- `components/AppShell.js` — net −125 lines (NAV_LABELS block + resolver out, wrapper in)
+
+### Commit
+
+```
+git add lib/i18n/ components/AppShell.js doc/4claudelog8.md
+git commit -m "feat(i18n): centralize AppShell nav labels via lib/i18n (P2 #16 sub-PR 4e, FINAL)"
+git push origin main
+```
+
+### Plan §11 progress after PR4e
+
+5 of 11 PRs landed (PR1 + PR2 + PR3 + PR4a-e bundled as one logical "#16 done"). Plus the FK bugfix. Remaining: PR5 (#12 useRecorder, 🔴 High iOS risk), PR6 (#13 useScoring, 🟡 Medium), PR7.1-7.5 (#15 component lib split, mixed).
+
 
