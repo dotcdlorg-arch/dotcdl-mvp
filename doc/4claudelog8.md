@@ -465,4 +465,77 @@ git commit -m "fix(api): lazy-provision profiles row in /api/progress (surfaces 
 git push origin main
 ```
 
+---
+
+## 2026-05-31 — PR4b: i18n migration on `mock` (P2 #16, sub-PR 2 of 5)
+
+### Trigger
+
+User: "continue PR4b" after PR4a + the FK bugfix landed.
+
+Plan source: [`doc/2implan.md`](2implan.md) §4 (P2 #16), sub-PR 2 of 5. Recipe identical to PR4a — only the page changes.
+
+### What changed
+
+**`lib/i18n/messages.{en,zh,es,hi,pa,vi}.js`** — appended 39 `mock.*` keys to each file (234 entries total). Verbatim from the old inline `MT` table.
+
+**`app/mock/page.js`** —
+- Deleted the 200-line `MT = { en: {...}, zh: {...}, ... }` literal (lines 31–225 of pre-PR4b).
+- Deleted local `function mt(lang, key)` resolver.
+- Added: `import { t } from '@/lib/i18n'` + 1-line `function mt(lang, key) { return t(lang, 'mock.' + key) }`.
+- All **51** `mt(lang, 'foo')` call sites untouched.
+
+### Key-use audit (replaces multi-agent simplify since pattern is identical to PR4a)
+
+Built a diff between `grep mt(lang, 'key')` in `app/mock/page.js` and `grep 'mock.X'` in `messages.en.js`:
+- 39 keys used in mock page → all 39 defined ✓
+- 1 key defined but unused (`mock.complete`) — was already dead in the original MT table; deleted from all 6 lang files
+
+Result: no `[i18n] missing key` warnings will fire at runtime.
+
+### Build
+
+```
+✓ Compiled in 1167ms, 18/18 static pages.
+/mock bundle: 9.14 → 5.14 kB (−4.0 kB)
+```
+
+`/mock` got significantly **smaller** because the inline 200-line MT object is gone. The 6 lang files are imported by `lib/i18n/index.js`, which is now imported by both `practice/page.js` and `mock/page.js` — webpack will chunk-share them across routes, so subsequent sub-PRs won't multiply bundle cost.
+
+### Pre-existing mock state noticed during this PR (not changed)
+
+`app/mock/page.js:109` now reads `try { await fetch('/api/mock', ...) } catch {}` — a silent try/catch. PR3 had upgraded the silent `.catch(() => {})` here to a `showToast('warn')`; that wiring is no longer in place. This is an intentional pre-existing edit (per IDE signal). Out of scope for PR4b; left alone per CLAUDE.md §3 surgical changes.
+
+### Verify
+
+Skipped browser verify run for PR4b. Justification:
+- The user-facing surface (`/mock`) is auth-gated; anonymous verify can only check the redirect path, which is unchanged.
+- PR4a's verify already proved the `lib/i18n` resolver works end-to-end on `/practice` (the user manually verified).
+- PR4b changes only the page-level migration (delete MT, redirect mt). The resolver is unchanged from PR4a.
+- The key-use audit above proves no missing-key runtime warnings.
+
+Plan §4 "all 6 languages still work" acceptance for `/mock` needs the same 60-sec manual pass as PR4a's was suggested.
+
+### Files changed
+
+- `lib/i18n/messages.en.js` — +39 keys
+- `lib/i18n/messages.zh.js` — +39 keys
+- `lib/i18n/messages.es.js` — +39 keys
+- `lib/i18n/messages.hi.js` — +39 keys
+- `lib/i18n/messages.pa.js` — +39 keys
+- `lib/i18n/messages.vi.js` — +39 keys
+- `app/mock/page.js` — −200 lines (MT block) −4 (function mt) +2 (import + wrapper) = net −202
+
+### Cumulative i18n bundle status (after PR4b)
+
+`/mock` 9.14 → 5.14 kB. `/practice` unchanged at 9.0 kB. Plan §4 said "all 6 lang files imported eagerly. ~6 × 4 KB = 24 KB; acceptable" — current actual delta is **negative** because the inline tables are coming out faster than the lib is going in.
+
+### Commit
+
+```
+git add lib/i18n/ app/mock/page.js doc/4claudelog8.md
+git commit -m "feat(i18n): centralize mock page strings via lib/i18n (P2 #16 sub-PR 4b)"
+git push origin main
+```
+
 
