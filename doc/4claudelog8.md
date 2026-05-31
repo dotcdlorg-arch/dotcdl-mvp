@@ -575,4 +575,36 @@ git commit -m "feat(i18n): centralize drive page strings via lib/i18n (P2 #16 su
 git push origin main
 ```
 
+---
+
+## 2026-05-31 — PR4d: i18n migration on `terms` (P2 #16, sub-PR 4 of 5)
+
+### What changed
+
+- Appended 9 `terms.*` keys to all 6 lang files (54 entries). Original T had 10 keys but `translation` was unused (kept the pruning practice from PR4b/4c).
+- `app/terms/page.js`: deleted 20-line `T = {...}` literal + 1-line `function tt`; added 1-line wrapper `function tt(lang, key) { return t(lang, 'terms.' + key) }` + `import { t } from '@/lib/i18n'`. All 12 `tt(lang, 'X')` call sites unchanged.
+
+### Key audit
+
+```
+terms.* used:    9
+terms.* defined: 9
+missing: 0  dead: 0
+```
+
+### Build
+
+```
+✓ Compiled in 1290ms
+/terms: 28.7 → 27.9 kB (−0.8 — terms is data-driven; the T literal was small)
+```
+
+### Commit
+
+```
+git add lib/i18n/ app/terms/page.js doc/4claudelog8.md
+git commit -m "feat(i18n): centralize terms page strings via lib/i18n (P2 #16 sub-PR 4d)"
+git push origin main
+```
+
 
