@@ -393,3 +393,76 @@ PR4a's user-facing surface is `/practice`, which is auth-gated. The i18n bundle 
 493d0f2  feat(i18n): centralize practice page strings via lib/i18n + t(lang, key) (P2 #16 sub-PR 4a)
 ```
 
+---
+
+## 2026-05-31 — Bugfix: profile FK violation surfaced by PR3 warn-toast
+
+### Trigger
+
+User did the 5-minute authenticated browser pass on `/practice`. Marking a question "understood" surfaced a "Could not save progress" warn toast.
+
+### Diagnosis
+
+Added 3 temporary `console.error('[diag] ...')` lines to `app/api/progress/route.js` (userId presence, request body, full Supabase error object). User clicked "understood" once; terminal showed:
+
+```
+[diag] POST /api/progress userId: <set len=32>
+[diag] POST /api/progress body: {"questionCode":"VEH_002","status":"understood"}
+[diag] question_progress upsert error: {
+  code: '23503',
+  details: 'Key (user_id)=(user_3E31GIkuftRWlzuyIgpJvpPDdn8) is not present in table "profiles".',
+}
+```
+
+PostgreSQL **error 23503** — foreign-key violation. `question_progress.user_id` has an FK to `profiles.id`. The user authenticated via Clerk, but their `profiles` row didn't exist.
+
+### Root cause
+
+Profile rows are created by the Clerk webhook at `app/api/webhooks/clerk/route.js` on `user.created`. The webhook needs a public URL to receive events from Clerk's servers — `localhost:3000` is unreachable, so in **local dev no profile row ever gets created** for any user. Same applies to any prod account that signed up while the webhook was misconfigured or down.
+
+This bug **predates PR1** — it was always there. The original `saveProgress(...).catch(() => {})` in practice/page.js silently swallowed every 500. PR1's hook propagated the same silent catch. **PR3 (toast on POST failure) is what surfaced it.** This is exactly the "verify-pass catches latent bugs" outcome.
+
+### Fix
+
+`app/api/progress/route.js`: added a small `ensureProfile(db, userId)` helper at module scope:
+
+```js
+async function ensureProfile(db, userId) {
+  await db.from('profiles').upsert(
+    { id: userId, email: '', language: 'zh', plan: 'free', created_at: new Date().toISOString() },
+    { onConflict: 'id', ignoreDuplicates: true }
+  )
+}
+```
+
+Called once in each branch of POST handler (sign + question), right after `createServerClient()`, before the user-scoped upsert. `ignoreDuplicates: true` makes it a no-op if the row already exists, so the webhook-created data is never clobbered.
+
+Why upsert with `ignoreDuplicates` instead of select-then-insert:
+- One round-trip instead of two
+- Idempotent — safe to call on every POST
+- The webhook still owns the canonical insert path with real email/timestamp; this is only a fallback
+
+### Verify
+
+- `[diag]` logs reverted in the same edit.
+- `npm run build`: ✓ Compiled in 1213ms.
+- User confirmed: clicked "Understood" → no toast; hard refresh → sidebar shows `seen=1, understood=1`. **PR1's user-facing acceptance now actually passes for the first time.**
+
+### Files changed
+
+- `app/api/progress/route.js` — +14 lines net (`ensureProfile` helper + 2 call sites)
+
+### Future work (not done in this fix — out of scope per CLAUDE.md §3)
+
+- `app/api/mock/route.js` may have the same FK violation pattern (writes `mock_results`). Will hit it if a new dev user runs a mock exam.
+- Could be lifted to a shared helper in `lib/supabase/server.js` if a third caller appears. Two callers in one file = below abstraction threshold.
+
+### Commit
+
+```
+git add app/api/progress/route.js doc/4claudelog8.md
+git commit -m "fix(api): lazy-provision profiles row in /api/progress (surfaces FK violation 23503 for dev users / pre-webhook accounts)"
+git push origin main
+```
+
+

@@ -6,6 +6,18 @@ const VALID_Q_CODES = new Set(QUESTIONS.map(q => q.question_code))
 const VALID_S_CODES = new Set(SIGNS.map(s => s.sign_code))
 const VALID_STATUS = new Set(['viewed', 'understood', 'needs_review'])
 
+// Lazy profile provisioning. The Clerk webhook (app/api/webhooks/clerk) creates
+// profile rows in prod, but it can't reach localhost in dev — and any account
+// that signed up before the webhook existed is also missing a row. Without
+// this, question_progress / sign_progress upserts hit a 23503 FK violation.
+// ignoreDuplicates means we never overwrite a row the webhook already wrote.
+async function ensureProfile(db, userId) {
+  await db.from('profiles').upsert(
+    { id: userId, email: '', language: 'zh', plan: 'free', created_at: new Date().toISOString() },
+    { onConflict: 'id', ignoreDuplicates: true }
+  )
+}
+
 export async function POST(req) {
   const { userId } = await auth()
   if (!userId) return Response.json({ error: 'Unauthenticated' }, { status: 401 })
@@ -25,6 +37,7 @@ export async function POST(req) {
     }
 
     const db = createServerClient()
+    await ensureProfile(db, userId)
     const { error } = await db.from('sign_progress').upsert({
       user_id: userId, sign_code: signCode,
       score: lastScore, answer,
@@ -49,6 +62,7 @@ export async function POST(req) {
     }
 
     const db = createServerClient()
+    await ensureProfile(db, userId)
     const { error } = await db.from('question_progress').upsert({
       user_id: userId,
       question_code: questionCode,
